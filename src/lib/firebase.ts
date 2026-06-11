@@ -6,7 +6,7 @@ import firebaseConfig from "../../firebase-applet-config.json";
 // Securely override apiKey with environment variable if present, keeping it out of commit history
 const resolvedConfig = {
   ...firebaseConfig,
-  apiKey: (import.meta as any).env?.VITE_FIREBASE_API_KEY || firebaseConfig.apiKey,
+  apiKey: (window as any).__FIREBASE_API_KEY__ || firebaseConfig.apiKey,
 };
 
 const app = getApps().length > 0 ? getApp() : initializeApp(resolvedConfig);

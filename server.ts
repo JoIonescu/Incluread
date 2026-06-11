@@ -175,6 +175,89 @@ ${contentSample}`;
     }
   });
 
+  // AI Route: Generate Accessible Book on-demand
+  app.post("/api/ai/generate-book", async (req, res) => {
+    const { title, author, category } = req.body;
+    if (!title || !author) {
+      return res.status(400).json({ error: "Missing title or author parameters" });
+    }
+
+    try {
+      const client = getGeminiClient();
+      const prompt = `You are a professional educational reading curator and accessibility specialist.
+We are converting classic or popular books into dyslexia-optimized layouts.
+Format your response as a strictly valid, single JSON object containing content for "${title}" by "${author}" (Category: "${category || 'Literature'}"). 
+Do not wrap in markdown quotes or block formats, return exclusively raw JSON matching this schema:
+{
+  "chapters": [
+    {
+      "id": "chap-1",
+      "title": "Chapter I: The Beginning of the Journey",
+      "content": [
+        "First paragraph of the actual starting story passage, custom-adapted for visual stress relief. Must be immersive, high quality, and 3-4 sentences long.",
+        "Second paragraph of actual story passage continues with easy vocabulary...",
+        "Third paragraph of actual story passage...",
+        "Fourth paragraph of actual story passage..."
+      ]
+    }
+  ],
+  "characters": [
+    { "name": "Protagonist Name", "role": "Main Hero", "relationships": "Describe who they connect with", "events": "What they do in Chapter 1" }
+  ],
+  "concepts": [
+    { "term": "Vocabulary word or complex theme", "definition": "Direct, easy-to-read explanation", "keyTerms": ["helper key", "easy definition"], "examples": ["A plain illustrative sentence using the word"] }
+  ]
+}
+
+Make sure the narrated narrative is high quality and faithful to the spirit, plot, and tone of "${title}". Keep paragraphs spaced and short. No placeholder text or truncated lists.`;
+
+      const response = await client.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+        }
+      });
+
+      if (response.text) {
+        res.json(JSON.parse(response.text.trim()));
+      } else {
+        throw new Error("Empty response text from Gemini");
+      }
+    } catch (err: any) {
+      console.warn("Gemini Error, utilizing fallback generator:", err.message);
+      res.json({
+        chapters: [
+          {
+            id: "chap-1",
+            title: "Chapter I: The Discovery",
+            content: [
+              `This is an accessible overview and starting passage of code-generated narration for "${title}" by ${author}.`,
+              "Every great story begins with a curious mind exploring new boundaries and learning to see things differently.",
+              "As we turn the first page of this classic, we invite you to adjust your font size, contrast theme, and line-spacing multiplier in the Preferences panel."
+            ]
+          }
+        ],
+        characters: [
+          {
+            name: "The Protagonist",
+            role: "Determined Leader",
+            relationships: "The central voice of this classic tale.",
+            events: "Emerged at the start of the narrative to face new questions."
+          }
+        ],
+        concepts: [
+          {
+            term: "Discovery",
+            definition: "The act of finding, learning, or experiencing something brand new for the first time.",
+            keyTerms: ["Finding", "Opening", "Learning"],
+            examples: ["Finding a secret passageway in a library."]
+          }
+        ]
+      });
+    }
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
