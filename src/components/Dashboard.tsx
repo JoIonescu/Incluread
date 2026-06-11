@@ -87,6 +87,22 @@ export default function Dashboard({
     }
   }, [books]);
 
+  // Automated background query for global database search when looking for a specific book
+  useEffect(() => {
+    const term = searchQuery.trim();
+    if (!term || term.length < 3) {
+      setOnlineBooks([]);
+      setOnlineError(null);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(() => {
+      handleSearchOnline(term);
+    }, 850); // 850ms debounce delay to protect API rate limit smoothly
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
+
   const handleSearchOnline = async (term: string) => {
     if (!term || term.trim() === "") {
       setOnlineError("Please type a book title, author, or keyword first.");
@@ -625,130 +641,8 @@ export default function Dashboard({
                   </div>
                 </div>
 
-                {/* Database Source Selection for Dyslexia Reader */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-[#DCD9D0]/50 pb-2 gap-4 font-sans">
-                  <div className="flex gap-4 text-xs">
-                    <button
-                      onClick={() => setOnlineSearchActive(false)}
-                      className={`pb-2 font-black px-2 relative transition-all cursor-pointer ${
-                        !onlineSearchActive ? "text-[#5B8FB9] border-b-2 border-[#5B8FB9]" : "text-[#777777] hover:text-[#5B8FB9]"
-                      }`}
-                    >
-                      📚 My Bookshelf ({books.length})
-                    </button>
-                    <button
-                      onClick={() => {
-                        setOnlineSearchActive(true);
-                        if (searchQuery && onlineBooks.length === 0) {
-                          handleSearchOnline(searchQuery);
-                        }
-                      }}
-                      className={`pb-2 font-black px-2 relative transition-all flex items-center gap-1.5 cursor-pointer ${
-                        onlineSearchActive ? "text-emerald-700 border-b-2 border-emerald-600" : "text-[#777777] hover:text-emerald-700 font-bold"
-                      }`}
-                    >
-                      <Globe className="w-4 h-4 text-emerald-600 animate-pulse" />
-                      <span>Free Global Library Search (Millions of titles)</span>
-                    </button>
-                  </div>
-
-                  <span className="text-xs text-[#666666] font-bold">
-                    {onlineSearchActive ? `${onlineBooks.length} global search results` : `${filteredBooks.length} titles on shelf`}
-                  </span>
-                </div>
-
-                {onlineSearchActive ? (
-                  <div className="space-y-6">
-                    {/* Online Database Search Quick Assistant */}
-                    <div className="bg-[#EEF5FA] border border-[#5B8FB9]/20 p-5 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 font-sans">
-                      <div className="space-y-1">
-                        <span className="text-[10px] uppercase font-black tracking-widest text-[#5B8FB9] bg-white border px-2 py-0.5 rounded">
-                          Continuous Free Database Access
-                        </span>
-                        <h4 className="text-sm font-black text-slate-800">
-                          Search results are connected directly to the Open Library public catalogue
-                        </h4>
-                        <p className="text-xs text-slate-600 max-w-xl">
-                          Type any book or author in the filter search box above, and click <strong>"Fetch live database"</strong> to pool millions of free titles. Any title can be converted into Nara's active visual reader immediately!
-                        </p>
-                      </div>
-                      
-                      <button
-                        onClick={() => handleSearchOnline(searchQuery || "all")}
-                        disabled={searchingOnline}
-                        className="px-6 py-3 bg-[#5B8FB9] hover:bg-[#4C7C9E] text-white text-xs font-black uppercase rounded-xl transition-all cursor-pointer shadow-sm flex items-center gap-2"
-                      >
-                        {searchingOnline ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin text-white" />
-                            <span>Connecting...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Search className="w-4 h-4 text-white" />
-                            <span>Fetch live database</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-
-                    {onlineError && (
-                      <p className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-100 p-4 rounded-xl">
-                        {onlineError}
-                      </p>
-                    )}
-
-                    {searchingOnline ? (
-                      <div className="text-center py-20 bg-white/50 border border-dashed border-[#DCD9D0] rounded-2xl">
-                        <Loader2 className="w-8 h-8 animate-spin text-[#5B8FB9] mx-auto" />
-                        <p className="text-sm font-black text-slate-700 mt-4 uppercase">Peering into Open Library database...</p>
-                        <p className="text-xs text-slate-500 mt-1">Retrieving matching records, page counts, and categories safely.</p>
-                      </div>
-                    ) : onlineBooks.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {onlineBooks.map((book) => {
-                          const limitDesc = book.description.substring(0, 80) + "...";
-                          return (
-                            <div
-                              key={book.id}
-                              onClick={() => setDetailedBookId(book.id)}
-                              className="bg-white border border-[#DCD9D0] rounded-2xl p-5 flex flex-col justify-between hover:border-[#5B8FB9] hover:shadow-md cursor-pointer transition-all"
-                            >
-                              <div className="space-y-4">
-                                <div className={`h-40 rounded-xl bg-gradient-to-br ${book.coverColor} p-4 text-white flex flex-col justify-between border border-black/5`}>
-                                  <span className="text-[10px] font-black uppercase opacity-75">{book.author}</span>
-                                  <p className="text-base font-extrabold">{book.title}</p>
-                                  <div className="flex justify-between items-center text-[9px] font-black bg-white/20 p-1.5 rounded">
-                                    <span>{book.difficulty} • Free Global Title</span>
-                                    <span>{book.reading_time}m length</span>
-                                  </div>
-                                </div>
-                                <div>
-                                  <p className="text-xs text-emerald-700 font-bold uppercase">{book.category}</p>
-                                  <p className="text-xs text-gray-600 mt-1 leading-relaxed">{limitDesc}</p>
-                                </div>
-                              </div>
-                              
-                              <button
-                                className="mt-4 w-full py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold transition-all"
-                              >
-                                Explore Global Book
-                              </button>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    ) : (
-                      <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-[#DCD9D0] font-sans">
-                        <Globe className="w-8 h-8 text-[#5B8FB9] mx-auto opacity-75 animate-bounce" />
-                        <p className="text-sm font-black text-[#444444] mt-2">Millions of Books are waiting!</p>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          Type a book title (e.g. "Treasure Island" or "Dracula") in the search bar and hit the blue button to load it.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ) : (
+                {/* Clean, Non-Flicker Layout matching user search action */}
+                {!searchQuery.trim() ? (
                   <div className="space-y-6">
                     {/* Continue reading strip hero if exists */}
                     <div
@@ -775,11 +669,11 @@ export default function Dashboard({
                       </div>
                     </div>
 
-                    {/* Main Books Shelf Grid */}
+                    {/* Main Books Shelf Grid - EXACTLY 10 Pre-loaded books are visible */}
                     <div>
                       <h3 className="text-xs font-extrabold uppercase text-[#777777] tracking-widest mb-4">Recommended Shelf</h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredBooks.map((book) => {
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 font-sans">
+                        {books.slice(0, 10).map((book) => {
                           const limitDesc = book.description.substring(0, 100) + "...";
                           return (
                             <div
@@ -810,22 +704,6 @@ export default function Dashboard({
                             </div>
                           );
                         })}
-
-                        {filteredBooks.length === 0 && (
-                          <div className="col-span-3 text-center py-12 bg-white rounded-2xl border border-dashed border-[#DCD9D0]">
-                            <p className="text-sm font-bold text-[#666666]">No books match your cognitive filter guidelines.</p>
-                            <button
-                              onClick={() => {
-                                setSearchQuery("");
-                                setSelectedDifficulty("All");
-                                setSelectedCategory("All");
-                              }}
-                              className="text-xs font-bold text-[#5B8FB9] underline mt-1"
-                            >
-                              Reset Filters
-                            </button>
-                          </div>
-                        )}
                       </div>
                     </div>
 
@@ -835,6 +713,124 @@ export default function Dashboard({
                       <p className="text-sm leading-relaxed max-w-xl">
                         You aren't trying to finish a massive library index today. Pick one single story, focus on a comfortable speed, and let your eyes guide your limits.
                       </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-8 animate-fadeIn">
+                    {/* Search results subdivision */}
+                    <div>
+                      <h3 className="text-xs font-extrabold uppercase text-[#777777] tracking-widest mb-4">Matches in My Bookshelf</h3>
+                      {filteredBooks.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 font-sans">
+                          {filteredBooks.map((book) => {
+                            const limitDesc = book.description.substring(0, 100) + "...";
+                            return (
+                              <div
+                                key={book.id}
+                                onClick={() => setDetailedBookId(book.id)}
+                                className="bg-white border border-[#DCD9D0] rounded-2xl p-5 flex flex-col justify-between hover:border-[#5B8FB9] hover:shadow-md cursor-pointer transition-all"
+                              >
+                                <div className="space-y-4">
+                                  <div className={`h-40 rounded-xl bg-gradient-to-br ${book.coverColor} p-4 text-white flex flex-col justify-between border border-black/5`}>
+                                    <span className="text-[10px] font-black uppercase opacity-75">{book.author}</span>
+                                    <p className="text-base font-extrabold">{book.title}</p>
+                                    <div className="flex justify-between items-center text-[9px] font-black bg-white/20 p-1.5 rounded">
+                                      <span>{book.difficulty} • {book.ageGroup ? `${book.ageGroup} Group` : "All Ages"}</span>
+                                      <span>{book.reading_time}m length</span>
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-[#888888] font-bold uppercase">{book.category}</p>
+                                    <p className="text-xs text-gray-600 mt-1 leading-relaxed">{limitDesc}</p>
+                                  </div>
+                                </div>
+                                
+                                <button
+                                  className="mt-4 w-full py-2 border border-[#5B8FB9] text-[#5B8FB9] rounded-xl text-xs font-bold hover:bg-[#5B8FB9] hover:text-white transition-colors"
+                                >
+                                  Explore Book
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <p className="text-xs text-gray-500 italic p-4 bg-white rounded-xl border border-[#DCD9D0]">
+                          No local titles match your criteria. Searching the global library below...
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Global Database Automated Search subdivision */}
+                    <div className="border-t border-[#DCD9D0]/60 pt-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <Globe className="w-4 h-4 text-emerald-600 animate-pulse" />
+                          <h3 className="text-xs font-extrabold uppercase text-emerald-800 tracking-widest">
+                            Discoveries from Free Global Library (Open Library & Gutenberg Integration)
+                          </h3>
+                        </div>
+                        {searchingOnline && (
+                          <span className="flex items-center gap-1 text-[10px] uppercase font-black text-[#5B8FB9] animate-pulse">
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            Searching...
+                          </span>
+                        )}
+                      </div>
+
+                      {onlineError && (
+                        <p className="text-xs font-bold text-rose-700 bg-rose-50 border border-rose-100 p-4 rounded-xl mb-4">
+                          {onlineError}
+                        </p>
+                      )}
+
+                      {searchingOnline && onlineBooks.length === 0 ? (
+                        <div className="text-center py-12 bg-white/50 border border-dashed border-[#DCD9D0] rounded-2xl">
+                          <Loader2 className="w-6 h-6 animate-spin text-[#5B8FB9] mx-auto" />
+                          <p className="text-xs font-bold text-slate-700 mt-3 uppercase tracking-wider">Connecting to Open Library & Gutenberg database...</p>
+                          <p className="text-[10px] text-slate-500 mt-0.5">Searching for covers, authors, metadata, and books matching "{searchQuery}" automatically.</p>
+                        </div>
+                      ) : onlineBooks.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {onlineBooks.map((book) => {
+                            const limitDesc = book.description.substring(0, 80) + "...";
+                            return (
+                              <div
+                                key={book.id}
+                                onClick={() => setDetailedBookId(book.id)}
+                                className="bg-white border border-[#DCD9D0] rounded-2xl p-5 flex flex-col justify-between hover:border-[#5B8FB9] hover:shadow-md cursor-pointer transition-all"
+                              >
+                                <div className="space-y-4">
+                                  <div className={`h-40 rounded-xl bg-gradient-to-br ${book.coverColor} p-4 text-white flex flex-col justify-between border border-black/5`}>
+                                    <span className="text-[10px] font-black uppercase opacity-75">{book.author}</span>
+                                    <p className="text-base font-extrabold">{book.title}</p>
+                                    <div className="flex justify-between items-center text-[9px] font-black bg-white/20 p-1.5 rounded">
+                                      <span>{book.difficulty} • Free Global Title</span>
+                                      <span>{book.reading_time}m length</span>
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-emerald-700 font-bold uppercase">{book.category}</p>
+                                    <p className="text-xs text-gray-600 mt-1 leading-relaxed">{limitDesc}</p>
+                                  </div>
+                                </div>
+                                
+                                <button
+                                  className="mt-4 w-full py-2 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold transition-all animate-fadeIn"
+                                >
+                                  Explore Global Book
+                                </button>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="text-center py-8 bg-[#F7F4EE]/40 rounded-2xl border border-dashed border-[#DCD9D0]">
+                          <p className="text-xs text-[#666666] font-bold">
+                            {searchingOnline ? "Updating live database entries..." : `No additional global public domain matches were found for "${searchQuery}".`}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

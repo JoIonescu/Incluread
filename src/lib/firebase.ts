@@ -4,9 +4,20 @@ import { getFirestore, doc, getDocFromServer } from "firebase/firestore";
 import firebaseConfig from "../../firebase-applet-config.json";
 
 // Securely override apiKey with environment variable if present, keeping it out of commit history
+// @ts-ignore
+let apiKeyEnv = import.meta.env.VITE_FIREBASE_API_KEY || "";
+if (typeof apiKeyEnv === "string") {
+  if (apiKeyEnv.startsWith('"') && apiKeyEnv.endsWith('"')) {
+    apiKeyEnv = apiKeyEnv.substring(1, apiKeyEnv.length - 1);
+  }
+  if (apiKeyEnv.startsWith("'") && apiKeyEnv.endsWith("'")) {
+    apiKeyEnv = apiKeyEnv.substring(1, apiKeyEnv.length - 1);
+  }
+}
+
 const resolvedConfig = {
   ...firebaseConfig,
-  apiKey: (window as any).__FIREBASE_API_KEY__ || firebaseConfig.apiKey,
+  apiKey: (apiKeyEnv && apiKeyEnv !== "PLACEHOLDER_SEE_ENV") ? apiKeyEnv : firebaseConfig.apiKey,
 };
 
 const app = getApps().length > 0 ? getApp() : initializeApp(resolvedConfig);
