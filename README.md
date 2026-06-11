@@ -1,10 +1,5 @@
 Accessible Reader platform, a reading workspace designed for dyslexic, ADHD, and visual-stress readers.
 
-# Run and deploy your AI Studio app
-
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/5ea6f874-2a24-4864-a069-5d5b3c3ee723
 
 ## Run Locally
 
