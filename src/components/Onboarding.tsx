@@ -25,12 +25,51 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   const themeClasses: Record<ThemeOption, string> = {
-    cream: "bg-[#F7F4EE] text-[#222222] border-[#DCD9D0]",
-    yellow: "bg-[#FFFDE5] text-[#1D1B11] border-[#E8E3CD]",
-    blue: "bg-[#EEF5FA] text-[#1B2A4A] border-[#D0DFEB]",
-    sepia: "bg-[#F4EAD4] text-[#3E2723] border-[#DFCEB3]",
-    dark: "bg-[#1E1F22] text-[#E3E3E3] border-[#383A40]",
+    cream: "bg-[#F7F4EE] text-[#111111] border-[#C5C2B8]",
+    yellow: "bg-[#FFFDE5] text-[#000000] border-[#D2CCA9]",
+    blue: "bg-[#EEF5FA] text-[#0A192F] border-[#AFC3D4]",
+    sepia: "bg-[#F4EAD4] text-[#2D1910] border-[#CCD2B8]",
+    dark: "bg-[#121214] text-[#FFFFFF] border-[#383A40]",
   };
+
+  const isDark = theme === "dark";
+  const isYellow = theme === "yellow";
+  const isBlue = theme === "blue";
+  const isSepia = theme === "sepia";
+
+  const pageBgClass = isDark 
+    ? "bg-[#121214] text-[#E1E4EA]" 
+    : isYellow 
+    ? "bg-[#FFFDE5] text-[#1D1B11]" 
+    : isBlue 
+    ? "bg-[#EEF5FA] text-[#1B2A4A]" 
+    : isSepia 
+    ? "bg-[#F4EAD4] text-[#3E2723]" 
+    : "bg-[#F7F4EE] text-[#111111]";
+
+  const borderClass = isDark 
+    ? "border-[#2D3139]" 
+    : isYellow 
+    ? "border-[#D2CCA9]" 
+    : isBlue 
+    ? "border-[#AFC3D4]" 
+    : isSepia 
+    ? "border-[#CCD2B8]" 
+    : "border-[#DCD9D0]";
+
+  const cardBgClass = isDark 
+    ? "bg-[#1C1E22]/95 border-[#2D3139] text-[#E1E4EA]" 
+    : isYellow 
+    ? "bg-white border-[#E8E3CD]" 
+    : isBlue 
+    ? "bg-white border-[#D0DFEB]" 
+    : isSepia 
+    ? "bg-[#FDFBF4] border-[#DFCEB3]" 
+    : "bg-white border-[#DCD9D0]";
+
+  const textPrimary = isDark ? "text-white" : isYellow ? "text-black" : isBlue ? "text-[#0A192F]" : isSepia ? "text-[#2D1910]" : "text-[#111111]";
+  const textSecondary = isDark ? "text-[#BAC1CC]" : isYellow ? "text-[#2F2A15]" : isBlue ? "text-[#1E2D4A]" : isSepia ? "text-[#4A3525]" : "text-[#444444]";
+  const textTertiary = isDark ? "text-[#7B818F]" : isYellow ? "text-[#5D5030]" : isBlue ? "text-[#4A5B7E]" : isSepia ? "text-[#6D5A4E]" : "text-[#666666]";
 
   const sampleText =
     "The way we read shouldn't be fixed. Some of us need wider spacing, others need larger letters or specialized fonts. With dynamic focus modes and audio assistance, you can build your own comfortable visual path.";
@@ -47,15 +86,15 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   return (
-    <div id="onboarding-root" className="min-h-screen bg-[#F0EDE5] text-[#222222] font-sans flex flex-col justify-between py-12 px-6">
+    <div id="onboarding-root" className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between py-12 px-6 transition-all duration-300`}>
       <div className="max-w-4xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-start my-auto">
         
         {/* Left Interactive Configuration Screen */}
-        <div id="config-col" className="md:col-span-7 bg-white/90 backdrop-blur-sm p-8 rounded-2xl border border-[#DCD9D0] shadow-md flex flex-col min-h-[480px] justify-between">
+        <div id="config-col" className={`md:col-span-7 backdrop-blur-sm p-8 rounded-2xl shadow-md flex flex-col min-h-[480px] justify-between transition-all duration-300 border ${cardBgClass}`}>
           <div>
-            <div className="flex items-center justify-between mb-6 border-b border-[#DCD9D0]/50 pb-4">
+            <div className={`flex items-center justify-between mb-6 border-b pb-4 ${borderClass}`}>
               <NaraLogo showText={true} size="sm" />
-              <div className="text-xs font-bold text-gray-400">Step {step} of 7</div>
+              <div className={`text-xs font-bold ${textTertiary}`}>Step {step} of 7</div>
             </div>
 
             {/* Step 1: Welcome Screen (with Built-in Interactive Tutorial Tour) */}
@@ -327,8 +366,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         </div>
 
         {/* Right Sticky Live Preview panel */}
-        <div id="sticky-preview" className="md:col-span-5 sticky top-8 bg-white p-6 rounded-2xl border border-[#DCD9D0] shadow-sm">
-          <h3 className="text-xs font-extrabold uppercase text-[#777777] tracking-widest mb-4">
+        <div id="sticky-preview" className={`md:col-span-5 sticky top-8 p-6 rounded-2xl shadow-sm transition-all duration-300 border ${cardBgClass}`}>
+          <h3 className={`text-xs font-extrabold uppercase tracking-widest mb-4 ${isDark ? 'text-[#BAC1CC]' : 'text-[#777777]'}`}>
             Live Preview Screen
           </h3>
 
@@ -352,7 +391,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             </p>
           </div>
 
-          <div className="mt-4 p-3 bg-[#F7F4EE] rounded-xl border border-[#DCD9D0] text-center text-[10px] text-[#555555] font-semibold">
+          <div className={`mt-4 p-3 rounded-xl border text-center text-[10px] font-semibold transition-all duration-300 ${isDark ? 'bg-[#2A2B35] border-[#383A40] text-stone-300' : 'bg-[#F7F4EE] border-[#DCD9D0] text-[#555555]'}`}>
             Watch the font weight, sizes, list distance, and ambient backdrops interact instantly as you choose.
           </div>
         </div>

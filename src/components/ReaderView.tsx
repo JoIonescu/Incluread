@@ -117,11 +117,11 @@ export default function ReaderView({
   };
 
   const themeClasses: Record<string, string> = {
-    cream: "bg-[#F7F4EE] text-[#222222]",
-    yellow: "bg-[#FFFDE5] text-[#1D1B11]",
-    blue: "bg-[#EEF5FA] text-[#1B2A4A]",
-    sepia: "bg-[#F4EAD4] text-[#3E2723]",
-    dark: "bg-[#1E1F22] text-[#E3E3E3]",
+    cream: "bg-[#F7F4EE] text-[#111111] border-[#C5C2B8]",
+    yellow: "bg-[#FFFDE5] text-[#000000] border-[#D2CCA9]",
+    blue: "bg-[#EEF5FA] text-[#0A192F] border-[#AFC3D4]",
+    sepia: "bg-[#F4EAD4] text-[#2D1910] border-[#CCD2B8]",
+    dark: "bg-[#1E1F22] text-[#FFFFFF] border-[#383A40]",
   };
 
   const themeConfigNames = {
@@ -129,8 +129,56 @@ export default function ReaderView({
     yellow: "Soft Yellow",
     blue: "Soft Ice Blue",
     sepia: "Classic Sepia",
-    dark: "Midnight Grey",
+    dark: "Midnight Grey / Dark",
   };
+
+  const isDark = preferences.theme === "dark";
+  const isYellow = preferences.theme === "yellow";
+  const isBlue = preferences.theme === "blue";
+  const isSepia = preferences.theme === "sepia";
+
+  // Dynamic system style lookups for entire workspace Shell
+  const shellBgClass = isDark 
+    ? "bg-[#121214] text-[#E1E4EA]" 
+    : isYellow 
+    ? "bg-[#FFFDE5] text-[#1D1B11]" 
+    : isBlue 
+    ? "bg-[#EEF5FA] text-[#1B2A4A]" 
+    : isSepia 
+    ? "bg-[#F4EAD4] text-[#3E2723]" 
+    : "bg-[#F7F4EE] text-[#111111]"; // Organic Cream
+
+  const headerBgClass = isDark 
+    ? "bg-[#1C1E22]/90 border-[#2D3139] text-[#FFFFFF]" 
+    : isYellow 
+    ? "bg-[#FFFDE5]/90 border-[#D2CCA9] text-[#000000]" 
+    : isBlue 
+    ? "bg-[#EEF5FA]/90 border-[#AFC3D4] text-[#0A192F]" 
+    : isSepia 
+    ? "bg-[#F4EAD4]/90 border-[#CCD2B8] text-[#2D1910]" 
+    : "bg-white/90 border-[#DCD9D0] text-[#111111]";
+
+  const cardBgClass = isDark 
+    ? "bg-[#1A1D21] border-[#2D3139] text-[#E1E4EA]" 
+    : isYellow 
+    ? "bg-white border-[#E8E3CD]" 
+    : isBlue 
+    ? "bg-white border-[#D0DFEB]" 
+    : isSepia 
+    ? "bg-[#FDFBF4] border-[#DFCEB3]" 
+    : "bg-white border-[#DCD9D0]";
+
+  const buttonClass = isDark
+    ? "bg-[#252830] text-[#E1E4EA] hover:bg-[#323642] border-[#2D3139]"
+    : isSepia
+    ? "bg-[#FDFBF4] text-[#3E2723] hover:bg-[#ECE0C6] border-[#DFCEB3]"
+    : "bg-white text-stone-700 hover:bg-stone-50 border-[#DCD9D0]";
+
+  const labelClass = isDark ? "text-[#BAC1CC]" : "text-[#555555]";
+  const mutedTextClass = isDark ? "text-[#A5AAB5]" : "text-[#666666]";
+  const textPrimary = isDark ? "text-white" : isYellow ? "text-black" : isBlue ? "text-[#0A192F]" : isSepia ? "text-[#2D1910]" : "text-[#111111]";
+  const textSecondary = isDark ? "text-[#BAC1CC]" : isYellow ? "text-[#2F2A15]" : isBlue ? "text-[#1E2D4A]" : isSepia ? "text-[#4A3525]" : "text-[#444444]";
+  const textTertiary = isDark ? "text-[#7B818F]" : isYellow ? "text-[#5D5030]" : isBlue ? "text-[#4A5B7E]" : isSepia ? "text-[#6D5A4E]" : "text-[#666666]";
 
   // Chapter Navigation Handler
   const goToNextChapter = () => {
@@ -211,9 +259,33 @@ export default function ReaderView({
 
         // Auto select preferred user-selected voice, or a beautiful English custom voice
         const voices = window.speechSynthesis.getVoices();
+        
+        // Smart voice rating to pick the absolute highest fidelity natural voice
+        const scored = [...voices]
+          .filter(v => v.lang.toLowerCase().startsWith("en"))
+          .sort((a, b) => {
+            const nameA = a.name.toLowerCase();
+            const nameB = b.name.toLowerCase();
+            
+            let scoreA = 0;
+            let scoreB = 0;
+
+            if (nameA.includes("natural") || nameA.includes("online")) scoreA += 20;
+            if (nameA.includes("google")) scoreA += 12;
+            if (nameA.includes("premium") || nameA.includes("alex")) scoreA += 10;
+            if (nameA.includes("samantha") || nameA.includes("daniel") || nameA.includes("jenny")) scoreA += 5;
+
+            if (nameB.includes("natural") || nameB.includes("online")) scoreB += 20;
+            if (nameB.includes("google")) scoreB += 12;
+            if (nameB.includes("premium") || nameB.includes("alex")) scoreB += 10;
+            if (nameB.includes("samantha") || nameB.includes("daniel") || nameB.includes("jenny")) scoreB += 5;
+
+            return scoreB - scoreA;
+          });
+
         const preferredVoice = 
           (preferences.narratorVoice ? voices.find(v => v.name === preferences.narratorVoice) : null) ||
-          voices.find(v => v.lang.startsWith("en") && (v.name.includes("Google") || v.name.includes("Natural"))) ||
+          scored[0] ||
           voices.find(v => v.lang.startsWith("en")) ||
           voices[0];
 
@@ -414,14 +486,14 @@ export default function ReaderView({
   };
 
   return (
-    <div id="reader-shell" className="min-h-screen bg-[#F0EDE5] text-[#222222] font-sans flex flex-col relative">
+    <div id="reader-shell" className={`min-h-screen ${shellBgClass} font-sans flex flex-col relative transition-all duration-300`}>
       
       {/* 1. Header with minimalist Nara Logo style */}
-      <header className="h-16 border-b border-[#DCD9D0] px-6 flex items-center justify-between bg-white/50 backdrop-blur-sm sticky top-0 z-40">
+      <header className={`h-16 border-b px-6 flex items-center justify-between backdrop-blur-sm sticky top-0 z-40 ${headerBgClass} transition-all duration-300`}>
         <div className="flex items-center gap-4">
           <button
             onClick={onBackToDashboard}
-            className="flex items-center gap-1 text-xs font-black uppercase text-[#666666] hover:text-[#222222] transition-colors border border-[#DCD9D0] px-3 py-2 bg-white rounded-xl touch-target"
+            className={`flex items-center gap-1 text-xs font-black uppercase transition-all border px-3 py-2 rounded-xl touch-target ${buttonClass}`}
             aria-label="Return to library shelf"
           >
             <ArrowLeft className="w-4 h-4 text-[#5B8FB9]" />
@@ -469,25 +541,25 @@ export default function ReaderView({
         <main className="col-span-1 lg:col-span-8 flex flex-col items-center">
           
           {/* Chapter Quick Selector card */}
-          <div className="w-full max-w-[700px] bg-white border border-[#DCD9D0] rounded-2xl p-4 mb-6 flex justify-between items-center shadow-sm">
+          <div className={`w-full max-w-[700px] border rounded-2xl p-4 mb-6 flex justify-between items-center shadow-sm ${cardBgClass} transition-all duration-300`}>
             <button
               onClick={goToPrevChapter}
               disabled={safeChapterIndex === 0}
-              className="p-2 border border-[#DCD9D0] rounded-xl hover:bg-gray-100 disabled:opacity-40"
+              className={`p-2 border rounded-xl disabled:opacity-40 transition-all ${buttonClass}`}
               aria-label="Go to previous chapter"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             
             <div className="text-center">
-              <p className="text-[10px] font-black uppercase text-[#666666] tracking-widest">Active Chapter</p>
+              <p className={`text-[10px] font-black uppercase tracking-widest ${textTertiary}`}>Active Chapter</p>
               <p className="text-sm font-bold mt-0.5">{activeChapter.title}</p>
             </div>
             
             <button
               onClick={goToNextChapter}
               disabled={safeChapterIndex === book.chapters.length - 1}
-              className="p-2 border border-[#DCD9D0] rounded-xl hover:bg-gray-100 disabled:opacity-40"
+              className={`p-2 border rounded-xl disabled:opacity-40 transition-all ${buttonClass}`}
               aria-label="Go to next chapter"
             >
               <ChevronRight className="w-5 h-5" />
@@ -498,7 +570,7 @@ export default function ReaderView({
           <div className="w-full max-w-[700px] flex justify-end gap-2 mb-3">
             <button
               onClick={triggerAddBookmark}
-              className="text-xs bg-white text-[#222222] border border-[#DCD9D0] hover:bg-gray-50 flex items-center gap-1 px-3 py-1.5 rounded-lg font-semibold"
+              className={`text-xs border flex items-center gap-1 px-3 py-1.5 rounded-lg font-semibold transition-all ${buttonClass}`}
             >
               <BookmarkIcon className="w-4 h-4 text-[#5B8FB9]" />
               <span>Bookmark spot</span>
@@ -646,16 +718,16 @@ export default function ReaderView({
         <aside id="cognitive-dock animate-fadeIn" className="col-span-1 lg:col-span-4 space-y-6">
           
           {/* Audio read-along assist trigger panel */}
-          <div className="bg-white border border-[#DCD9D0] rounded-3xl p-6 shadow-sm">
+          <div className={`border rounded-3xl p-6 shadow-sm ${cardBgClass} transition-all duration-300`}>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-xs uppercase font-extrabold text-[#777777] tracking-widest flex items-center gap-1">
+              <span className={`text-xs uppercase font-extrabold tracking-widest flex items-center gap-1 ${isDark ? 'text-[#BAC1CC]' : 'text-[#777777]'}`}>
                 <Volume2 className="w-4 h-4 text-[#5B8FB9]" /> Narrator Companion
               </span>
-              <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded">Active Sync</span>
+              <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${isDark ? 'bg-amber-950/40 text-amber-400 border border-amber-900/50' : 'bg-amber-50 text-amber-700'}`}>Active Sync</span>
             </div>
 
             <div className="space-y-4">
-              <p className="text-xs text-[#555555]">
+              <p className={`text-xs ${textSecondary}`}>
                 Highlights update dynamically as you read. Auto-scroll anchors your eyes safely.
               </p>
 
@@ -690,33 +762,54 @@ export default function ReaderView({
               </div>
 
               {/* Dynamic Voice Select */}
-              <div className="mt-3 pt-3 border-t border-[#DCD9D0]/50">
-                <span className="text-[9px] font-bold uppercase text-[#888888] flex items-center gap-1 mb-1">
+              <div className={`mt-3 pt-3 border-t ${isDark ? 'border-[#383A40]' : 'border-[#DCD9D0]/50'}`}>
+                <span className={`text-[9px] font-bold uppercase flex items-center gap-1 mb-1 ${isDark ? 'text-[#A5AAB5]' : 'text-[#888888]'}`}>
                   <User className="w-3.5 h-3.5 text-[#5B8FB9]" /> Choose Narrator Voice
                 </span>
                 <select
                   value={preferences.narratorVoice || ""}
                   onChange={(e) => onUpdatePreferences({ ...preferences, narratorVoice: e.target.value })}
-                  className="w-full text-xs bg-[#F7F4EE] border border-[#DCD9D0] p-1.5 rounded-lg font-bold text-stone-700 truncate"
+                  className={`w-full text-xs p-1.5 rounded-lg font-bold truncate ${isDark ? 'bg-[#252830] border-[#383A40] text-stone-200' : 'bg-[#F7F4EE] border-[#DCD9D0] text-stone-700'}`}
                 >
                   <option value="">Default Human Reader</option>
-                  {availableVoices.map((voice, idx) => (
-                    <option key={idx} value={voice.name}>
-                      {voice.name} ({voice.lang})
-                    </option>
-                  ))}
+                  {(() => {
+                    const sorted = [...availableVoices]
+                      .filter(v => v.lang.toLowerCase().startsWith("en"))
+                      .sort((a, b) => {
+                        const nameA = a.name.toLowerCase();
+                        const nameB = b.name.toLowerCase();
+                        let sA = 0;
+                        let sB = 0;
+                        if (nameA.includes("natural") || nameA.includes("online")) sA += 20;
+                        if (nameA.includes("google")) sA += 12;
+                        if (nameA.includes("premium") || nameA.includes("alex")) sA += 10;
+                        if (nameA.includes("samantha") || nameA.includes("daniel") || nameA.includes("jenny")) sA += 5;
+
+                        if (nameB.includes("natural") || nameB.includes("online")) sB += 20;
+                        if (nameB.includes("google")) sB += 12;
+                        if (nameB.includes("premium") || nameB.includes("alex")) sB += 10;
+                        if (nameB.includes("samantha") || nameB.includes("daniel") || nameB.includes("jenny")) sB += 5;
+
+                        return sB - sA;
+                      });
+                    return sorted.map((voice, idx) => (
+                      <option key={idx} value={voice.name} className={`${isDark ? 'bg-[#1E1F22] text-white' : 'bg-white text-stone-800'}`}>
+                        {voice.name} ({voice.lang})
+                      </option>
+                    ));
+                  })()}
                 </select>
               </div>
             </div>
           </div>
 
           {/* Quick interactive Focus Modes block */}
-          <div className="bg-[#FFFDEB] border border-[#EBE6C2] rounded-3xl p-6 shadow-xs">
-            <h3 className="text-xs font-extrabold uppercase text-[#777777] tracking-widest mb-4 flex items-center gap-1">
-              <Highlighter className="w-4 h-4 text-amber-700" /> Sensory Focus Modes
+          <div className={`rounded-3xl p-6 shadow-xs border transition-all duration-300 ${isDark ? 'bg-[#211E10] border-[#5C531E] text-amber-200' : 'bg-[#FFFDEB] border-[#EBE6C2] text-[#2D1910]'}`}>
+            <h3 className={`text-xs font-extrabold uppercase tracking-widest mb-4 flex items-center gap-1 ${isDark ? 'text-amber-400' : 'text-[#777777]'}`}>
+              <Highlighter className="w-4 h-4 text-amber-500" /> Sensory Focus Modes
             </h3>
 
-            <p className="text-[11px] text-[#5A5636] leading-relaxed mb-4">
+            <p className={`text-[11px] leading-relaxed mb-4 ${isDark ? 'text-amber-300/80' : 'text-[#5A5636]'}`}>
               Switch physical visual overlays, isolates rows, and centers cognitive focus parameters.
             </p>
 
@@ -730,50 +823,58 @@ export default function ReaderView({
                 <button
                   key={f.id}
                   onClick={() => setFocusMode(f.id as FocusModeType)}
-                  className={`text-left p-3 rounded-xl border text-xs transition-colors ${
+                  className={`text-left p-3 rounded-xl border text-xs transition-all ${
                     focusMode === f.id
-                      ? "bg-amber-200/50 border-amber-500 font-extrabold"
-                      : "bg-white border-[#DCD9D0] hover:bg-gray-50"
+                      ? isDark
+                        ? "bg-amber-500/20 border-amber-400 font-extrabold text-amber-300 shadow-sm"
+                        : "bg-amber-200/50 border-amber-500 font-extrabold text-amber-950"
+                      : isDark
+                        ? "bg-[#2A2715] border-[#5C531E] text-amber-200 hover:bg-[#34301A]"
+                        : "bg-white border-[#DCD9D0] hover:bg-gray-50 text-stone-700 font-medium"
                   }`}
                 >
                   <p>{f.label}</p>
-                  <p className="text-[9px] text-[#888888] font-normal mt-0.5">{f.desc}</p>
+                  <p className={`text-[9px] font-normal mt-0.5 ${isDark ? 'text-amber-300/50' : 'text-[#888888]'}`}>{f.desc}</p>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Dynamic Side Drawer Switch Triggers: Memory Cards, AI, Dictionary */}
-          <div className="bg-white border border-[#DCD9D0] rounded-3xl p-6 space-y-4 shadow-sm">
-            <h3 className="text-xs font-extrabold uppercase text-[#666666] tracking-widest">
+          <div className={`border rounded-3xl p-6 space-y-4 shadow-sm transition-all duration-300 ${cardBgClass}`}>
+            <h3 className={`text-xs font-extrabold uppercase tracking-widest ${isDark ? 'text-[#BAC1CC]' : 'text-[#666666]'}`}>
               Reader Support Drawers
             </h3>
 
             <div className="space-y-2">
               <button
                 onClick={() => setActiveSideDrawer(activeSideDrawer === "memory" ? "none" : "memory")}
-                className={`w-full p-3 rounded-xl border text-left flex items-center justify-between text-xs font-bold ${
-                  activeSideDrawer === "memory" ? "border-[#5B8FB9] bg-slate-50" : "border-[#DCD9D0]"
+                className={`w-full p-3 rounded-xl border text-left flex items-center justify-between text-xs font-bold transition-all ${
+                  activeSideDrawer === "memory" 
+                    ? "border-[#5B8FB9] bg-[#5B8FB9]/10 text-[#5B8FB9] ring-2 ring-[#5B8FB9]/30" 
+                    : buttonClass
                 }`}
               >
                 <span className="flex items-center gap-2">
                   <Smile className="w-4 h-4 text-[#5B8FB9]" /> Memory Support Cards
                 </span>
-                <span className="text-[10px] bg-indigo-50 px-2 py-0.5 rounded font-black text-[#5B8FB9]">
+                <span className={`text-[10px] px-2 py-0.5 rounded font-black ${isDark ? 'bg-indigo-950 text-indigo-300' : 'bg-indigo-50 text-[#5B8FB9]'}`}>
                   {book.characters.length + book.concepts.length} active
                 </span>
               </button>
 
               <button
                 onClick={() => setActiveSideDrawer(activeSideDrawer === "aichat" ? "none" : "aichat")}
-                className={`w-full p-3 rounded-xl border text-left flex items-center justify-between text-xs font-bold ${
-                  activeSideDrawer === "aichat" ? "border-green-600 bg-green-50/20" : "border-[#DCD9D0]"
+                className={`w-full p-3 rounded-xl border text-left flex items-center justify-between text-xs font-bold transition-all ${
+                  activeSideDrawer === "aichat" 
+                    ? "border-green-600 bg-green-50/20 text-green-700" 
+                    : buttonClass
                 }`}
               >
                 <span className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-green-700" /> Ask AI Language Assistant
+                  <Sparkles className="w-4 h-4 text-green-700 font-semibold" /> Ask AI Language Assistant
                 </span>
-                <span className="text-[10px] bg-green-50 px-2 py-0.5 rounded font-black text-green-700">Open</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded font-black ${isDark ? 'bg-green-950/50 text-green-400' : 'bg-green-50 text-green-700'}`}>Open</span>
               </button>
             </div>
 
@@ -781,21 +882,21 @@ export default function ReaderView({
             {activeSideDrawer === "memory" && (
               <div className="pt-2 border-t mt-2 space-y-4 transition-all">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm font-black">Story Anchor Cards</span>
-                  <button onClick={() => setActiveSideDrawer("none")} className="text-gray-400 hover:text-black">
+                  <span className={`text-sm font-black ${textPrimary}`}>Story Anchor Cards</span>
+                  <button onClick={() => setActiveSideDrawer("none")} className={`${isDark ? 'text-gray-400 hover:text-white' : 'text-gray-400 hover:text-black'}`}>
                     <X className="w-4 h-4" />
                   </button>
                 </div>
                 
                 {book.characters.length > 0 && (
                   <div className="space-y-3">
-                    <p className="text-[10px] font-black uppercase text-[#888888] tracking-widest">Character Profiles</p>
+                    <p className={`text-[10px] font-black uppercase tracking-widest ${textTertiary}`}>Character Profiles</p>
                     {book.characters.map((char, index) => (
-                      <div key={index} className="p-3 bg-[#EEF5FA] rounded-xl border border-[#D0DFEB] text-xs">
-                        <p className="font-bold text-[#1B2A4A]">{char.name}</p>
-                        <p className="text-[10px] font-semibold text-[#5B8FB9] mt-0.5 uppercase tracking-wider">{char.role}</p>
-                        <p className="text-[11px] text-[#444444] mt-1.5"><span className="font-bold">Relationships:</span> {char.relationships}</p>
-                        <p className="text-[11px] text-[#444444] mt-1"><span className="font-bold">Recent Storyline:</span> {char.events}</p>
+                      <div key={index} className={`p-3 rounded-xl border text-xs ${isDark ? 'bg-sky-950/20 border-sky-900/50 text-[#BAC1CC]' : 'bg-[#EEF5FA] border-[#D0DFEB] text-[#1B2A4A]'}`}>
+                        <p className="font-bold">{char.name}</p>
+                        <p className={`text-[10px] font-semibold mt-0.5 uppercase tracking-wider ${isDark ? 'text-[#5B8FB9]' : 'text-sky-700'}`}>{char.role}</p>
+                        <p className={`text-[11px] mt-1.5 ${isDark ? 'text-gray-300' : 'text-[#444444]'}`}><span className="font-bold">Relationships:</span> {char.relationships}</p>
+                        <p className={`text-[11px] mt-1 ${isDark ? 'text-gray-300' : 'text-[#444444]'}`}><span className="font-bold">Recent Storyline:</span> {char.events}</p>
                       </div>
                     ))}
                   </div>
@@ -803,14 +904,14 @@ export default function ReaderView({
 
                 {book.concepts.length > 0 && (
                   <div className="space-y-3">
-                    <p className="text-[10px] font-black uppercase text-[#888888] tracking-widest">Concept Anchors</p>
+                    <p className={`text-[10px] font-black uppercase tracking-widest ${textTertiary}`}>Concept Anchors</p>
                     {book.concepts.map((conc, index) => (
-                      <div key={index} className="p-3 bg-[#FDFBF2] rounded-xl border border-[#DFCEB3] text-xs">
-                        <p className="font-bold text-amber-900">{conc.term}</p>
-                        <p className="text-[11px] text-[#555555] mt-1 italic">&ldquo;{conc.definition}&rdquo;</p>
+                      <div key={index} className={`p-3 rounded-xl border text-xs ${isDark ? 'bg-amber-950/20 border-amber-900/50 text-amber-200' : 'bg-[#FDFBF2] border-[#DFCEB3] text-amber-900'}`}>
+                        <p className="font-bold">{conc.term}</p>
+                        <p className={`text-[11px] mt-1 italic ${isDark ? 'text-amber-100/70' : 'text-[#555555]'}`}>&ldquo;{conc.definition}&rdquo;</p>
                         <div className="flex flex-wrap gap-1 mt-2">
                           {conc.keyTerms.map((kw, i) => (
-                            <span key={i} className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold">{kw}</span>
+                            <span key={i} className={`text-[9px] px-1.5 py-0.5 rounded font-bold ${isDark ? 'bg-amber-900/40 text-amber-300' : 'bg-amber-100 text-amber-800'}`}>{kw}</span>
                           ))}
                         </div>
                       </div>
@@ -911,14 +1012,14 @@ export default function ReaderView({
       </div>
 
       {/* Reader Layout Sticky Accessibility controls (Thumb reachable bottom toolbar) */}
-      <footer className="bg-white border-t border-[#DCD9D0] p-4 sticky bottom-0 z-40 shadow-lg mt-auto">
+      <footer className={`border-t p-4 sticky bottom-0 z-40 shadow-lg mt-auto ${headerBgClass} transition-all duration-300`}>
         <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-4">
           
           <div className="flex gap-2">
             <button
               onClick={() => setShowToolbarSettings(!showToolbarSettings)}
               className={`p-3 rounded-xl border flex items-center justify-center font-bold text-xs gap-1.5 transition-colors ${
-                showToolbarSettings ? "bg-[#5B8FB9] text-white border-[#5B8FB9]" : "bg-white text-[#222222] border-[#DCD9D0]"
+                showToolbarSettings ? "bg-[#5B8FB9] text-white border-[#5B8FB9]" : buttonClass
               }`}
               title="Scale sizes and fonts"
             >
@@ -939,7 +1040,7 @@ export default function ReaderView({
           <div className="flex items-center gap-2">
             <button
               onClick={() => setIsPlayingAudio(!isPlayingAudio)}
-              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 active:scale-95 text-white rounded-xl font-bold text-xs flex items-center gap-1 hover:brightness-105"
+              className="px-4 py-2 bg-gradient-to-r from-amber-500 to-amber-600 active:scale-95 text-white rounded-xl font-bold text-xs flex items-center gap-1 hover:brightness-105 animate-none"
             >
               {isPlayingAudio ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
               <span>{isPlayingAudio ? "Pause" : "Listen along"}</span>
@@ -949,16 +1050,16 @@ export default function ReaderView({
 
         {/* Floating Settings Panel underneath Toolbar when clicked */}
         {showToolbarSettings && (
-          <div className="max-w-4xl mx-auto mt-4 p-4 bg-gray-50 border border-[#DCD9D0] rounded-2xl grid grid-cols-1 md:grid-cols-4 gap-4 transition-all">
+          <div className={`max-w-4xl mx-auto mt-4 p-4 border rounded-2xl grid grid-cols-1 md:grid-cols-4 gap-4 transition-all ${cardBgClass} transition-all duration-300`}>
             <div>
-              <p className="text-[10px] font-black uppercase text-[#666666]">Read Typography</p>
+              <p className={`text-[10px] font-black uppercase ${textTertiary}`}>Read Typography</p>
               <div className="grid grid-cols-2 gap-1 mt-1.5">
                 {["Lexend", "OpenDyslexic", "Atkinson", "Inter"].map((f) => (
                   <button
                     key={f}
                     onClick={() => onUpdatePreferences({ ...preferences, font: f as any })}
-                    className={`p-1.5 border rounded-lg text-xs font-bold text-left truncate ${
-                      preferences.font === f ? "border-[#5B8FB9] bg-white text-[#5B8FB9]" : "border-gray-200 bg-white"
+                    className={`p-1.5 border rounded-lg text-xs font-bold text-left truncate transition-all ${
+                      preferences.font === f ? "border-[#5B8FB9] bg-[#5B8FB9]/10 text-[#5B8FB9]" : buttonClass
                     }`}
                   >
                     {f}

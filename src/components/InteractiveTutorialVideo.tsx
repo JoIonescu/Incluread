@@ -81,53 +81,108 @@ export default function InteractiveTutorialVideo() {
     }
   ];
 
+  // Unified playback and synchronization loop
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    if (isPlaying) {
-      interval = setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 100) {
-            // Advance to next step
-            setActiveStep((prevStep) => {
-              const nextStep = (prevStep + 1) % videoSteps.length;
-              return nextStep;
-            });
-            return 0;
-          }
-          return prev + 1;
-        });
-      }, 70); // duration of each step ~7 seconds
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [isPlaying]);
-
-  // Speaking simulated speech narration
-  useEffect(() => {
-    if (isPlaying && !isMuted) {
-      try {
-        if ("speechSynthesis" in window) {
-          window.speechSynthesis.cancel();
-          const utteranceText = videoSteps[activeStep].caption.replace(/\[Narrator\]:\s*/, "");
-          const utterance = new SpeechSynthesisUtterance(utteranceText);
-          utterance.rate = 1.05;
-          
-          const voices = window.speechSynthesis.getVoices();
-          const targetVoice = voices.find(v => v.lang.startsWith("en") && v.name.includes("Natural")) || voices.find(v => v.lang.startsWith("en"));
-          if (targetVoice) utterance.voice = targetVoice;
-
-          window.speechSynthesis.speak(utterance);
-        }
-      } catch (err) {
-        console.warn("Tour Voice Narration failed:", err);
-      }
-    } else {
+    if (!isPlaying) {
       if ("speechSynthesis" in window) {
         window.speechSynthesis.cancel();
       }
+      return;
     }
+
+    let interval: NodeJS.Timeout | null = null;
+    let voiceEnded = false;
+    let transitionTimeout: NodeJS.Timeout | null = null;
+
+    // 1. Core narration setup
+    const cleanText = videoSteps[activeStep].caption.replace(/\[Narrator\]:\s*/, "");
+    const wordCount = cleanText.split(/\s+/).length;
+    // Speak at a slightly relaxed rate (0.95 gives high clarity and rich natural intonation)
+    const rateOfSpeech = 0.95; 
+    
+    // Calculate speaking duration based on 130 words per minute (natural reading speed)
+    const speakingDurationMs = (wordCount / 130) * 60 * 1000;
+    const estDuration = isMuted 
+      ? 8500 
+      : Math.max(7500, speakingDurationMs + 1000);
+
+    const startTime = Date.now();
+
+    if (!isMuted && "speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.rate = rateOfSpeech;
+      utterance.pitch = 0.98; // Relax the pitch slightly to make the voice rich and comfortable
+
+      // Smart Voice Selection: Rating browser voices to get the least robotic voice
+      const voices = window.speechSynthesis.getVoices();
+      const scoredVoices = [...voices]
+        .filter(v => v.lang.toLowerCase().startsWith("en"))
+        .sort((a, b) => {
+          const nameA = a.name.toLowerCase();
+          const nameB = b.name.toLowerCase();
+          
+          let scoreA = 0;
+          let scoreB = 0;
+
+          if (nameA.includes("natural") || nameA.includes("online")) scoreA += 20;
+          if (nameA.includes("google")) scoreA += 12;
+          if (nameA.includes("premium") || nameA.includes("alex")) scoreA += 10;
+          if (nameA.includes("samantha") || nameA.includes("daniel") || nameA.includes("jenny")) scoreA += 5;
+
+          if (nameB.includes("natural") || nameB.includes("online")) scoreB += 20;
+          if (nameB.includes("google")) scoreB += 12;
+          if (nameB.includes("premium") || nameB.includes("alex")) scoreB += 10;
+          if (nameB.includes("samantha") || nameB.includes("daniel") || nameB.includes("jenny")) scoreB += 5;
+
+          return scoreB - scoreA;
+        });
+
+      const selectedVoice = scoredVoices[0] || voices.find(v => v.lang.startsWith("en")) || voices[0];
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
+
+      utterance.onend = () => {
+        voiceEnded = true;
+      };
+
+      utterance.onerror = () => {
+        voiceEnded = true; // Recover from TTS blockages safely
+      };
+
+      window.speechSynthesis.speak(utterance);
+    } else {
+      voiceEnded = true; // If muted, treat voice as ended instantly
+    }
+
+    // 2. Playback progress ticks
+    interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      let pct = (elapsed / estDuration) * 100;
+
+      if (pct >= 99) {
+        if (!isMuted && !voiceEnded) {
+          // Clamp at 99% until voice narration is fully completed
+          pct = 99;
+        } else {
+          // Speak finished! Complete progress and prepare next transition
+          pct = 100;
+          clearInterval(interval!);
+          
+          transitionTimeout = setTimeout(() => {
+            setProgress(0);
+            setActiveStep((prev) => (prev + 1) % videoSteps.length);
+          }, 1200); // Wait 1.2 seconds for visual absorption before advancing
+        }
+      }
+
+      setProgress(Math.min(100, pct));
+    }, 100);
+
     return () => {
+      if (interval) clearInterval(interval);
+      if (transitionTimeout) clearTimeout(transitionTimeout);
       if ("speechSynthesis" in window) {
         window.speechSynthesis.cancel();
       }

@@ -348,12 +348,75 @@ export default function Dashboard({
 
   // Core visual theme names mapped
   const themeClasses: Record<string, string> = {
-    cream: "bg-[#F7F4EE] text-[#222222] border-[#DCD9D0]",
-    yellow: "bg-[#FFFDE5] text-[#1D1B11] border-[#E8E3CD]",
-    blue: "bg-[#EEF5FA] text-[#1B2A4A] border-[#D0DFEB]",
-    sepia: "bg-[#F4EAD4] text-[#3E2723] border-[#DFCEB3]",
-    dark: "bg-[#1E1F22] text-[#E3E3E3] border-[#383A40]",
+    cream: "bg-[#F7F4EE] text-[#111111] border-[#C5C2B8]",
+    yellow: "bg-[#FFFDE5] text-[#000000] border-[#D2CCA9]",
+    blue: "bg-[#EEF5FA] text-[#0A192F] border-[#AFC3D4]",
+    sepia: "bg-[#F4EAD4] text-[#2D1910] border-[#CCD2B8]",
+    dark: "bg-[#121214] text-[#FFFFFF] border-[#383A40]",
   };
+
+  const activeTheme = preferences.theme || "cream";
+  const isDark = activeTheme === "dark";
+
+  // Dynamic system styles for the outer Dashboard shell
+  const pageBgClass = 
+    activeTheme === "dark" ? "bg-[#121214] text-[#E1E4EA]" :
+    activeTheme === "yellow" ? "bg-[#FFFDE5] text-[#000000]" :
+    activeTheme === "blue" ? "bg-[#EEF5FA] text-[#0A192F]" :
+    activeTheme === "sepia" ? "bg-[#F4EAD4] text-[#2D1910]" :
+    "bg-[#F7F4EE] text-[#111111]"; // Organic Cream
+
+  const borderClass = 
+    activeTheme === "dark" ? "border-[#2D3139]" :
+    activeTheme === "yellow" ? "border-[#D2CCA9]" :
+    activeTheme === "blue" ? "border-[#AFC3D4]" :
+    activeTheme === "sepia" ? "border-[#CCD2B8]" :
+    "border-[#DCD9D0]";
+
+  const cardBgClass = 
+    activeTheme === "dark" ? "bg-[#1A1D21] border-[#2D3139] text-[#E1E4EA]" :
+    activeTheme === "sepia" ? "bg-[#FDFBF4] border-[#DFCEB3]" :
+    "bg-white border-[#DCD9D0]";
+
+  const textPrimary = 
+    activeTheme === "dark" ? "text-white" :
+    activeTheme === "yellow" ? "text-black" :
+    activeTheme === "blue" ? "text-[#0A192F]" :
+    activeTheme === "sepia" ? "text-[#2D1910]" :
+    "text-[#111111]";
+
+  const textSecondary = 
+    activeTheme === "dark" ? "text-[#BAC1CC]" :
+    activeTheme === "yellow" ? "text-[#2B2505]" :
+    activeTheme === "blue" ? "text-[#1E2D4A]" :
+    activeTheme === "sepia" ? "text-[#4A3525]" :
+    "text-[#444444]";
+
+  const textTertiary = 
+    activeTheme === "dark" ? "text-[#7B818F]" :
+    activeTheme === "yellow" ? "text-[#5D5030]" :
+    activeTheme === "blue" ? "text-[#4A5B7E]" :
+    activeTheme === "sepia" ? "text-[#6D5A4E]" :
+    "text-[#666666]";
+
+  const headerBgClass = 
+    activeTheme === "dark" ? "bg-[#1C1E22]/90 border-[#2D3139] text-[#FFFFFF]" :
+    activeTheme === "yellow" ? "bg-[#FFFDE5]/90 border-[#D2CCA9] text-[#000000]" :
+    activeTheme === "blue" ? "bg-[#EEF5FA]/90 border-[#AFC3D4] text-[#0A192F]" :
+    activeTheme === "sepia" ? "bg-[#F4EAD4]/90 border-[#CCD2B8] text-[#2D1910]" :
+    "bg-white/50 border-[#DCD9D0] text-[#111111]";
+
+  const inputBgClass = 
+    activeTheme === "dark" ? "bg-[#2A2D35] text-[#FFFFFF] border-[#383A40]" :
+    activeTheme === "yellow" ? "bg-[#FFFDE5] text-black border-[#D2CCA9]" :
+    activeTheme === "blue" ? "bg-[#EEF5FA] text-[#0A192F] border-[#AFC3D4]" :
+    activeTheme === "sepia" ? "bg-[#FDFBF4] text-[#2D1910] border-[#CCD2B8]" :
+    "bg-[#F7F4EE]/50 text-stone-900 border-[#DCD9D0]";
+
+  const buttonClass =
+    activeTheme === "dark" ? "bg-[#252830] text-[#E1E4EA] hover:bg-[#323642] border-[#2D3139]" :
+    activeTheme === "sepia" ? "bg-[#FDFBF4] text-[#2D1910] hover:bg-[#ECE0C6] border-[#DFCEB3]" :
+    "bg-white text-stone-700 hover:bg-stone-50 border-[#DCD9D0]";
 
   const fontClasses: Record<string, string> = {
     Lexend: "font-lexend",
@@ -403,10 +466,10 @@ export default function Dashboard({
   };
 
   return (
-    <div id="dashboard-root" className="min-h-screen bg-[#F7F4EE] text-[#222222] font-sans flex flex-col justify-between">
+    <div id="dashboard-root" className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between transition-all duration-300`}>
       
       {/* HEADER: Geometric navigation toolbar */}
-      <nav className="h-16 border-b border-[#DCD9D0] px-8 flex items-center justify-between bg-white/50 backdrop-blur-sm shadow-xs sticky top-0 z-40">
+      <nav className={`h-16 border-b px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 ${headerBgClass} ${borderClass} transition-all duration-300`}>
         <NaraLogo showText={true} />
         
         {/* Navigation tabs */}
@@ -428,7 +491,7 @@ export default function Dashboard({
                   setDetailedBookId(null);
                 }}
                 className={`text-xs font-black uppercase flex items-center gap-1.5 pb-1 border-b-2 transition-colors touch-target ${
-                  isActive ? "border-[#5B8FB9] text-[#222222]" : "border-transparent text-[#666666] hover:text-[#222222]"
+                  isActive ? "border-[#5B8FB9] text-[#5B8FB9]" : `border-transparent ${textSecondary} hover:text-[#5B8FB9]`
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -1292,31 +1355,31 @@ export default function Dashboard({
             {activeTab === "settings" && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="text-2xl font-black">Accessibility Control Tower</h2>
-                  <p className="text-xs text-[#666666]">Refine visual properties, toggles, and synthesize audio preferences.</p>
+                  <h2 className={`text-2xl font-black ${textPrimary}`}>Accessibility Control Tower</h2>
+                  <p className={`text-xs ${textSecondary}`}>Refine visual properties, toggles, and synthesize audio preferences.</p>
                 </div>
 
-                <div className="bg-white p-8 rounded-3xl border border-[#DCD9D0] space-y-6">
+                <div className={`p-8 rounded-3xl border space-y-6 ${cardBgClass} ${borderClass}`}>
                   
                   {/* Contrast, spacing slider controls */}
-                  <div className="space-y-4">
-                    <h3 className="text-sm font-black text-stone-900 border-b pb-2">Custom Adjustments</h3>
+                  <div className="space-y-6">
+                    <h3 className={`text-sm font-black border-b pb-2 ${textPrimary} ${borderClass}`}>Custom Adjustments</h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-600 block">Fine-tune Font Size ({preferences.textSize}px)</label>
+                        <label className={`text-xs font-bold block ${textSecondary}`}>Fine-tune Font Size ({preferences.textSize}px)</label>
                         <input
                           type="range"
                           min="16"
                           max="36"
                           value={preferences.textSize}
                           onChange={(e) => onUpdatePreferences({ ...preferences, textSize: parseInt(e.target.value) })}
-                          className="w-full h-2 bg-[#DCD9D0] rounded-lg appearance-none cursor-pointer accent-[#5B8FB9]"
+                          className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-[#5B8FB9] ${isDark ? 'bg-[#2A2D35]' : 'bg-[#DCD9D0]'}`}
                         />
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-600 block">Fine-tune Line Height ({preferences.lineSpacing}x)</label>
+                        <label className={`text-xs font-bold block ${textSecondary}`}>Fine-tune Line Height ({preferences.lineSpacing}x)</label>
                         <input
                           type="range"
                           min="1.2"
@@ -1324,36 +1387,88 @@ export default function Dashboard({
                           step="0.1"
                           value={preferences.lineSpacing}
                           onChange={(e) => onUpdatePreferences({ ...preferences, lineSpacing: parseFloat(e.target.value) })}
-                          className="w-full h-2 bg-[#DCD9D0] rounded-lg appearance-none cursor-pointer accent-[#5B8FB9]"
+                          className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-[#5B8FB9] ${isDark ? 'bg-[#2A2D35]' : 'bg-[#DCD9D0]'}`}
                         />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                      <div className="space-y-2">
+                        <label className={`text-xs font-bold block ${textSecondary}`}>Active Typographic Font</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {["Lexend", "OpenDyslexic", "Atkinson", "Inter"].map((f) => (
+                            <button
+                              key={f}
+                              onClick={() => onUpdatePreferences({ ...preferences, font: f as any })}
+                              className={`p-2 border rounded-xl text-xs font-extrabold transition-all truncate text-left select-none cursor-pointer ${
+                                preferences.font === f
+                                  ? "border-[#5B8FB9] bg-[#5B8FB9]/10 text-[#5B8FB9] ring-2 ring-[#5B8FB9]/20"
+                                  : buttonClass
+                              }`}
+                            >
+                              {f}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className={`text-xs font-bold block ${textSecondary}`}>Active Contrast Theme (Toggle Dark Mode)</label>
+                        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
+                          {[
+                            { id: "cream", label: "Cream Light", bg: "#F7F4EE" },
+                            { id: "yellow", label: "Soft Yellow", bg: "#FFFDE5" },
+                            { id: "blue", label: "Ice Blue", bg: "#EEF5FA" },
+                            { id: "sepia", label: "Sepia Warm", bg: "#F4EAD4" },
+                            { id: "dark", label: "Midnight Dark", bg: "#1E1F22" },
+                          ].map((t) => (
+                            <button
+                              key={t.id}
+                              onClick={() => {
+                                onUpdatePreferences({ ...preferences, theme: t.id as any });
+                              }}
+                              className={`p-2 border rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 cursor-pointer truncate ${
+                                preferences.theme === t.id
+                                  ? "border-[#5B8FB9] bg-[#5B8FB9]/10 text-[#5B8FB9] ring-2 ring-[#5B8FB9]/20"
+                                  : buttonClass
+                              }`}
+                            >
+                              <span
+                                className="w-3.5 h-3.5 rounded-full border border-black/10 flex-shrink-0"
+                                style={{ backgroundColor: t.bg }}
+                              />
+                              <span className="truncate">{t.label}</span>
+                            </button>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
 
                   {/* Motion Toggles */}
                   <div className="space-y-4">
-                    <h3 className="text-sm font-black text-stone-900 border-b pb-2">System Parameters</h3>
+                    <h3 className={`text-sm font-black border-b pb-2 ${textPrimary} ${borderClass}`}>System Parameters</h3>
                     
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+                    <div className={`flex items-center justify-between p-3 rounded-xl ${isDark ? 'bg-[#252830]' : 'bg-gray-50'}`}>
                       <div>
-                        <p className="text-xs font-black text-gray-800">WCAG AAA Reduce Motion</p>
-                        <p className="text-[10px] text-gray-400 mt-0.5">Turns off heavy text fades and slide transitions to avoid visual fatigue.</p>
+                        <p className={`text-xs font-black ${isDark ? 'text-gray-100' : 'text-gray-800'}`}>WCAG AAA Reduce Motion</p>
+                        <p className={`text-[10px] mt-0.5 ${isDark ? 'text-[#8C93A3]' : 'text-gray-400'}`}>Turns off heavy text fades and slide transitions to avoid visual fatigue.</p>
                       </div>
                       <input
                         type="checkbox"
                         checked={preferences.reduceMotion}
                         onChange={(e) => onUpdatePreferences({ ...preferences, reduceMotion: e.target.checked })}
-                        className="w-5 h-5 rounded border-gray-300 text-[#5B8FB9] focus:ring-[#5B8FB9] accent-[#5B8FB9]"
+                        className="w-5 h-5 rounded border-gray-300 text-[#5B8FB9] focus:ring-[#5B8FB9] accent-[#5B8FB9] cursor-pointer"
                       />
                     </div>
                   </div>
 
                   {/* Accessibility Standards list */}
-                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl space-y-2">
-                    <p className="text-xs font-bold text-[#1B2A4A] flex items-center gap-1.5">
+                  <div className={`p-4 rounded-xl space-y-2 border ${isDark ? 'bg-sky-950/20 border-sky-900/40 text-sky-200' : 'bg-blue-50 border-blue-200 text-[#1B2A4A]'}`}>
+                    <p className="text-xs font-bold flex items-center gap-1.5">
                       <CheckCircle className="w-4 h-4 text-[#5B8FB9]" /> WCAG AA compliance audited:
                     </p>
-                    <ul className="text-[11px] text-[#444444] list-disc pl-5 space-y-1">
+                    <ul className={`text-[11px] list-disc pl-5 space-y-1 ${isDark ? 'text-sky-200/80' : 'text-[#444444]'}`}>
                       <li>Color contrast values strictly avoid #FFFFFF backgrounds to relieve macular tension.</li>
                       <li>High contrast focus indicators remain visible at all times.</li>
                       <li>Keyboard inputs provide full mouse-free platform exploration.</li>
