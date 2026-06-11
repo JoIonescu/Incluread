@@ -3,9 +3,15 @@ import { getAuth } from "firebase/auth";
 import { getFirestore, doc, getDocFromServer } from "firebase/firestore";
 import firebaseConfig from "../../firebase-applet-config.json";
 
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+// Securely override apiKey with environment variable if present, keeping it out of commit history
+const resolvedConfig = {
+  ...firebaseConfig,
+  apiKey: (import.meta as any).env?.VITE_FIREBASE_API_KEY || firebaseConfig.apiKey,
+};
+
+const app = getApps().length > 0 ? getApp() : initializeApp(resolvedConfig);
 export const auth = getAuth(app);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const db = getFirestore(app, resolvedConfig.firestoreDatabaseId);
 
 export enum OperationType {
   CREATE = 'create',
