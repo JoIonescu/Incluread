@@ -232,66 +232,90 @@ export default function ReaderView({
   };
 
   // Real interactive browser-native Speech Synthesis (Read Aloud) with live sentence tracking
-  useEffect(() => {
-    // Graceful check for server-side render or non-supported browser contexts
-    if (typeof window === "undefined" || !window.speechSynthesis) {
+useEffect(() => {
+  if (typeof window === "undefined" || !window.speechSynthesis) return;
+
+  if (isPlayingAudio) {
+    const pText = activeChapter.content[activeParagraphIndex] || "";
+    const sentences = pText.match(/[^.!?]+[.!?]+(\s|$)/g) || [pText];
+
+    if (highlightedSentenceIndex >= sentences.length) {
+      setHighlightedSentenceIndex(0);
       return;
     }
 
-    if (isPlayingAudio) {
-      const pText = activeChapter.content[activeParagraphIndex] || "";
-      // Splitting paragraph into sentences
-      const sentences = pText.match(/[^.!?]+[.!?]+(\s|$)/g) || [pText];
+    // Speak remaining sentences as one queued block — no cancel() between them
+    const remaining = sentences.slice(highlightedSentenceIndex);
+    window.speechSynthesis.cancel();
 
-      if (highlightedSentenceIndex >= sentences.length) {
-        setHighlightedSentenceIndex(0);
-        return;
-      }
+    const voices = window.speechSynthesis.getVoices();
+    const scored = [...voices]
+      .filter(v => v.lang.toLowerCase().startsWith("en"))
+      .sort((a, b) => {
+        const score = (n: string) => {
+          let s = 0;
+          if (n.includes("natural") || n.includes("online")) s += 20;
+          if (n.includes("google")) s += 12;
+          if (n.includes("premium") || n.includes("alex")) s += 10;
+          if (n.includes("samantha") || n.includes("daniel") || n.includes("jenny")) s += 5;
+          return s;
+        };
+        return score(b.name.toLowerCase()) - score(a.name.toLowerCase());
+      });
 
-      const activeText = sentences[highlightedSentenceIndex].trim();
+    const preferredVoice =
+      (preferences.narratorVoice ? voices.find(v => v.name === preferences.narratorVoice) : null) ||
+      scored[0] ||
+      voices.find(v => v.lang.startsWith("en")) ||
+      voices[0];
 
-      if (activeText) {
-        // Immediate cancel prior spoken queue to avoid cumulative latency
-        window.speechSynthesis.cancel();
+    remaining.forEach((sentence, i) => {
+      const utterance = new SpeechSynthesisUtterance(sentence.trim());
+      utterance.rate = audioSpeed;
+      utterance.pitch = 1.05;
+      if (preferredVoice) utterance.voice = preferredVoice;
 
-        const utterance = new SpeechSynthesisUtterance(activeText);
-        utterance.rate = audioSpeed;
-
-        // Auto select preferred user-selected voice, or a beautiful English custom voice
-        const voices = window.speechSynthesis.getVoices();
-        
-        // Smart voice rating to pick the absolute highest fidelity natural voice
-        const scored = [...voices]
-          .filter(v => v.lang.toLowerCase().startsWith("en"))
-          .sort((a, b) => {
-            const nameA = a.name.toLowerCase();
-            const nameB = b.name.toLowerCase();
-            
-            let scoreA = 0;
-            let scoreB = 0;
-
-            if (nameA.includes("natural") || nameA.includes("online")) scoreA += 20;
-            if (nameA.includes("google")) scoreA += 12;
-            if (nameA.includes("premium") || nameA.includes("alex")) scoreA += 10;
-            if (nameA.includes("samantha") || nameA.includes("daniel") || nameA.includes("jenny")) scoreA += 5;
-
-            if (nameB.includes("natural") || nameB.includes("online")) scoreB += 20;
-            if (nameB.includes("google")) scoreB += 12;
-            if (nameB.includes("premium") || nameB.includes("alex")) scoreB += 10;
-            if (nameB.includes("samantha") || nameB.includes("daniel") || nameB.includes("jenny")) scoreB += 5;
-
-            return scoreB - scoreA;
-          });
-
-        const preferredVoice = 
-          (preferences.narratorVoice ? voices.find(v => v.name === preferences.narratorVoice) : null) ||
-          scored[0] ||
-          voices.find(v => v.lang.startsWith("en")) ||
-          voices[0];
-
-        if (preferredVoice) {
-          utterance.voice = preferredVoice;
+      utterance.onend = () => {
+        const absoluteIndex = highlightedSentenceIndex + i;
+        if (absoluteIndex < sentences.length - 1) {
+          setHighlightedSentenceIndex(absoluteIndex + 1);
+        } else {
+          if (activeParagraphIndex < activeChapter.content.length - 1) {
+            onUpdatePosition({ ...currentPosition, paragraphIndex: activeParagraphIndex + 1 });
+            setHighlightedSentenceIndex(0);
+          } else {
+            setIsPlayingAudio(false);
+            setHighlightedSentenceIndex(0);
+          }
         }
+      };
+
+      utterance.onerror = (e) => {
+        if (e.error !== "interrupted" && e.error !== "canceled") {
+          const absoluteIndex = highlightedSentenceIndex + i;
+          setTimeout(() => {
+            if (absoluteIndex < sentences.length - 1) {
+              setHighlightedSentenceIndex(absoluteIndex + 1);
+            } else if (activeParagraphIndex < activeChapter.content.length - 1) {
+              onUpdatePosition({ ...currentPosition, paragraphIndex: activeParagraphIndex + 1 });
+              setHighlightedSentenceIndex(0);
+            } else {
+              setIsPlayingAudio(false);
+              setHighlightedSentenceIndex(0);
+            }
+          }, 1200);
+        }
+      };
+
+      window.speechSynthesis.speak(utterance);
+    });
+
+  } else {
+    window.speechSynthesis.cancel();
+  }
+
+  return () => { window.speechSynthesis.cancel(); };
+}, [isPlayingAudio, highlightedSentenceIndex, activeParagraphIndex, activeChapter, audioSpeed]);
 
         // Set callbacks for synchronization
         utterance.onend = () => {
