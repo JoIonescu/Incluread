@@ -47,6 +47,14 @@ export default function ReaderView({
   onUpdatePosition,
   onReadingMinute,
 }: ReaderViewProps) {
+  // Safe defaults for new prefs — backward compatible with old saved preferences
+  const safePrefs = {
+    letterSpacing: 0.05,
+    wordSpacing: 0.1,
+    bionicReading: false,
+    syllableBreaking: false,
+    ...preferences,
+  };
   // Navigation State
   const activeChapterIndex = book.chapters.findIndex((c) => c.id === currentPosition.chapterId);
   const safeChapterIndex = activeChapterIndex >= 0 ? activeChapterIndex : 0;
@@ -88,6 +96,7 @@ export default function ReaderView({
   // AI premium assistance overlays
   const [aiSimplifyOverlay, setAiSimplifyOverlay] = useState<{ paragraphIndex: number; simplifiedText: string } | null>(null);
   const [aiSimplifyLoading, setAiSimplifyLoading] = useState<boolean>(false);
+  const [simplifyLevel, setSimplifyLevel] = useState<"little" | "lot" | "child">("little");
 
   const [aiExplainText, setAiExplainText] = useState<string>("");
   const [aiExplainOutput, setAiExplainOutput] = useState<string | null>(null);
@@ -327,16 +336,18 @@ useEffect(() => {
 
     setAiSimplifyLoading(true);
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const levelPrompt: Record<string, string> = {
+        little: "Rewrite this passage with slightly simpler vocabulary and shorter sentences. Keep the same tone. Return only the rewritten text, nothing else.",
+        lot: "Rewrite this passage using very simple words and short sentences. Remove complex ideas. Return only the rewritten text, nothing else.",
+        child: "Rewrite this passage as if explaining it to a 10-year-old. Use simple everyday words, short sentences, and a friendly tone. Return only the rewritten text, nothing else.",
+      };
+      const res = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
           max_tokens: 1000,
-          messages: [{
-            role: "user",
-            content: `You are a reading assistant for dyslexic readers. Rewrite this passage in simpler, clearer language. Keep the same meaning but use shorter sentences and easier words. Return only the simplified text, nothing else.\n\nPassage: "${text}"`
-          }]
+          messages: [{ role: "user", content: `${levelPrompt[simplifyLevel]}\n\nPassage: "${text}"` }]
         }),
       });
       const data = await res.json();
@@ -357,7 +368,7 @@ useEffect(() => {
     setAiExplainLoading(true);
     setActiveSideDrawer("aichat");
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -384,7 +395,7 @@ useEffect(() => {
     setAiSummaryLoading(true);
     setShowSummaryModal(true);
     try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
+      const res = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -425,6 +436,63 @@ useEffect(() => {
       timestamp: Date.now(),
     };
     onAddBookmark(newBookmark);
+  };
+
+  // Syllable breaking — pattern-based, no library needed
+  // Inserts soft hyphens using consonant cluster rules (English approximation)
+  const syllabify = (word: string): string => {
+    if (word.length <= 3) return word;
+    const clean = word.replace(/[^a-zA-Z]/g, "");
+    if (clean.length <= 3) return word;
+    const vowels = "aeiouAEIOU";
+    const isVowel = (ch: string) => vowels.includes(ch);
+    let result = "";
+    let lastBreak = 0;
+    for (let i = 1; i < clean.length - 1; i++) {
+      const prev = clean[i - 1];
+      const curr = clean[i];
+      const next = clean[i + 1];
+      // Break between vowel→consonant→vowel (V-CV rule)
+      if (!isVowel(prev) && isVowel(curr) && !isVowel(next) && i - lastBreak >= 2) {
+        result += clean.slice(lastBreak, i) + "·";
+        lastBreak = i;
+      }
+      // Break between two consonants between vowels (VC-CV rule)
+      else if (isVowel(prev) && !isVowel(curr) && !isVowel(next) && isVowel(next) && i - lastBreak >= 2) {
+        result += clean.slice(lastBreak, i + 1) + "·";
+        lastBreak = i + 1;
+      }
+    }
+    result += clean.slice(lastBreak);
+    // Preserve punctuation from original word
+    const punctBefore = word.match(/^[^a-zA-Z]*/)?.[0] || "";
+    const punctAfter = word.match(/[^a-zA-Z]*$/)?.[0] || "";
+    return punctBefore + result + punctAfter;
+  };
+
+  // Bionic Reading — bold first half of each word
+  const renderBionicSpans = (text: string, isCurrentParagraph: boolean) => {
+    const sentences = text.match(/[^.!?]+[.!?]+(\s|$)/g) || [text];
+    return sentences.map((sentence, idx) => {
+      const words = sentence.split(" ");
+      const isHighlightedSentence = isCurrentParagraph && isPlayingAudio && idx === highlightedSentenceIndex;
+      return (
+        <span key={idx} className={`transition-all rounded-sm px-1 inline ${isHighlightedSentence ? "bg-[#FFE082]/90 text-[#3E2723] shadow-sm" : ""}`}>
+          {words.map((word, wIdx) => {
+            const cleanWord = word.replace(/[^\w]/g, "");
+            const boldLen = Math.ceil(cleanWord.length / 2);
+            const display = safePrefs.syllableBreaking ? syllabify(word) : word;
+            const boldPart = display.slice(0, boldLen);
+            const restPart = display.slice(boldLen);
+            return (
+              <span key={wIdx} onClick={() => handleWordClick(word)} className="cursor-pointer inline-block mx-0.5 hover:underline" role="button" tabIndex={0} aria-label={`Word: ${cleanWord}`} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleWordClick(word); }}>
+                <strong>{boldPart}</strong>{restPart}{" "}
+              </span>
+            );
+          })}
+        </span>
+      );
+    });
   };
 
   // Utility to highlight active sentence inside active paragraph block
@@ -524,7 +592,7 @@ useEffect(() => {
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 max-w-7xl mx-auto w-full px-4 py-8 gap-8 items-start">
         
         {/* Left main interactive reading column (Max 700px nested) */}
-        <main className="col-span-1 lg:col-span-8 flex flex-col items-center">
+        <main className="col-span-1 lg:col-span-8 flex flex-col items-center max-w-[720px] w-full mx-auto">
           
           {/* Chapter Quick Selector card */}
           <div className={`w-full max-w-[700px] border rounded-2xl p-4 mb-6 flex justify-between items-center shadow-sm ${cardBgClass} transition-all duration-300`}>
@@ -637,23 +705,29 @@ useEffect(() => {
                   >
                     {/* Paragraph visual control pill panel for premium AI tasks */}
                     {isActiveP && (
-                      <div className="flex items-center gap-1.5 mb-3 bg-white/60 dark:bg-black/20 w-fit p-1 rounded-lg border border-black/5">
-                        <button
-                          onClick={() => handleSimplifyParagraph(pIndex, paragraphText)}
-                          className="text-[10px] uppercase font-black tracking-wider text-[#5B8FB9] hover:bg-slate-100 px-2 py-1 rounded"
-                          disabled={aiSimplifyLoading}
-                          title="Simplify with Gemini AI"
-                        >
-                          {aiSimplifyLoading ? "Analyzing..." : isSimplifyApplied ? "Show Original" : "Simplify language ✨"}
-                        </button>
-                        <span className="text-gray-300">|</span>
-                        <button
-                          onClick={() => handleExplainText(paragraphText)}
-                          className="text-[10px] uppercase font-black tracking-wider text-green-700 hover:bg-green-50 px-2 py-1 rounded"
-                          title="AI Explains meanings"
-                        >
-                          Explain Passage
-                        </button>
+                      <div className="flex flex-wrap items-center gap-1.5 mb-3">
+                        {!isSimplifyApplied && (
+                          <div className="flex items-center gap-1 bg-white/70 border border-black/5 p-1 rounded-lg">
+                            {(["little", "lot", "child"] as const).map((level) => (
+                              <button key={level} onClick={(e) => { e.stopPropagation(); setSimplifyLevel(level); }}
+                                className={`text-[9px] font-black px-2 py-1 rounded transition-all uppercase ${simplifyLevel === level ? "bg-[#5B8FB9] text-white" : "text-slate-400 hover:text-[#5B8FB9]"}`}>
+                                {level === "little" ? "A little" : level === "lot" ? "A lot" : "For a child"}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        <div className="flex items-center gap-1 bg-white/70 border border-black/5 p-1 rounded-lg">
+                          <button onClick={(e) => { e.stopPropagation(); handleSimplifyParagraph(pIndex, paragraphText); }}
+                            className="text-[10px] uppercase font-black tracking-wider text-[#5B8FB9] hover:bg-slate-100 px-2 py-1 rounded"
+                            disabled={aiSimplifyLoading}>
+                            {aiSimplifyLoading ? "Simplifying..." : isSimplifyApplied ? "↩ Original" : "Simplify ✨"}
+                          </button>
+                          <span className="text-gray-200">|</span>
+                          <button onClick={(e) => { e.stopPropagation(); handleExplainText(paragraphText); }}
+                            className="text-[10px] uppercase font-black tracking-wider text-green-700 hover:bg-green-50 px-2 py-1 rounded">
+                            Explain
+                          </button>
+                        </div>
                       </div>
                     )}
 
@@ -665,6 +739,8 @@ useEffect(() => {
                           style={{
                             fontSize: `${preferences.textSize}px`,
                             lineHeight: preferences.lineSpacing,
+                            letterSpacing: `${safePrefs.letterSpacing}em`,
+                            wordSpacing: `${safePrefs.wordSpacing}em`,
                           }}
                           className={`${textFontStyles[preferences.font]}`}
                         >
@@ -676,10 +752,14 @@ useEffect(() => {
                         style={{
                           fontSize: `${preferences.textSize}px`,
                           lineHeight: preferences.lineSpacing,
+                          letterSpacing: `${safePrefs.letterSpacing}em`,
+                          wordSpacing: `${safePrefs.wordSpacing}em`,
                         }}
-                        className={`${textFontStyles[preferences.font]} tracking-wide`}
+                        className={`${textFontStyles[preferences.font]}`}
                       >
-                        {renderSentenceSpans(paragraphText, isActiveP)}
+                        {safePrefs.bionicReading
+                          ? renderBionicSpans(paragraphText, isActiveP)
+                          : renderSentenceSpans(paragraphText, isActiveP)}
                       </p>
                     )}
                   </div>
@@ -688,14 +768,24 @@ useEffect(() => {
             </div>
           </div>
 
-          {/* 3. Bottom reader navigation and physical metrics indicator */}
-          <div className="flex flex-col sm:flex-row justify-between items-center max-w-[700px] w-full mt-4 text-xs font-bold text-[#666666] px-4 gap-2">
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-1 bg-white border border-[#DCD9D0] rounded-lg">Difficulty: {book.difficulty}</span>
-              <span className="px-2 py-1 bg-white border border-[#DCD9D0] rounded-lg">Estimated Reading Time: {book.reading_time}m</span>
+          {/* 3. Chapter progress bar + metrics */}
+          <div className="flex flex-col max-w-[700px] w-full mt-4 px-4 gap-3">
+            <div>
+              <div className="flex justify-between items-center mb-1.5">
+                <span className={`text-[10px] font-black uppercase tracking-widest ${isDark ? "text-[#7B818F]" : "text-[#888888]"}`}>Chapter progress</span>
+                <span className={`text-[10px] font-bold ${isDark ? "text-[#BAC1CC]" : "text-[#555555]"}`}>
+                  {activeParagraphIndex + 1} / {activeChapter.content.length} · {Math.round(((activeParagraphIndex + 1) / activeChapter.content.length) * 100)}%
+                </span>
+              </div>
+              <div className={`w-full h-2 rounded-full overflow-hidden ${isDark ? "bg-[#2D3139]" : "bg-[#E8E4DC]"}`}>
+                <div className="h-full rounded-full bg-[#5B8FB9] transition-all duration-500"
+                  style={{ width: `${Math.round(((activeParagraphIndex + 1) / activeChapter.content.length) * 100)}%` }} />
+              </div>
             </div>
-            <div className="text-center sm:text-right">
-              Progress: Paragraph {activeParagraphIndex + 1} of {activeChapter.content.length}
+            <div className="flex items-center gap-2 text-xs font-bold text-[#666666]">
+              <span className={`px-2 py-1 border rounded-lg ${isDark ? "bg-[#1A1D21] border-[#2D3139] text-[#BAC1CC]" : "bg-white border-[#DCD9D0]"}`}>{book.difficulty}</span>
+              <span className={`px-2 py-1 border rounded-lg ${isDark ? "bg-[#1A1D21] border-[#2D3139] text-[#BAC1CC]" : "bg-white border-[#DCD9D0]"}`}>~{book.reading_time}m read</span>
+              <span className={`px-2 py-1 border rounded-lg ${isDark ? "bg-[#1A1D21] border-[#2D3139] text-[#BAC1CC]" : "bg-white border-[#DCD9D0]"}`}>{activeChapter.title}</span>
             </div>
           </div>
         </main>
@@ -811,17 +901,61 @@ useEffect(() => {
                   onClick={() => setFocusMode(f.id as FocusModeType)}
                   className={`text-left p-3 rounded-xl border text-xs transition-all ${
                     focusMode === f.id
-                      ? isDark
-                        ? "bg-amber-500/20 border-amber-400 font-extrabold text-amber-300 shadow-sm"
-                        : "bg-amber-200/50 border-amber-500 font-extrabold text-amber-950"
-                      : isDark
-                        ? "bg-[#2A2715] border-[#5C531E] text-amber-200 hover:bg-[#34301A]"
-                        : "bg-white border-[#DCD9D0] hover:bg-gray-50 text-stone-700 font-medium"
+                      ? isDark ? "bg-amber-500/20 border-amber-400 font-extrabold text-amber-300 shadow-sm" : "bg-amber-200/50 border-amber-500 font-extrabold text-amber-950"
+                      : isDark ? "bg-[#2A2715] border-[#5C531E] text-amber-200 hover:bg-[#34301A]" : "bg-white border-[#DCD9D0] hover:bg-gray-50 text-stone-700 font-medium"
                   }`}
                 >
                   <p>{f.label}</p>
-                  <p className={`text-[9px] font-normal mt-0.5 ${isDark ? 'text-amber-300/50' : 'text-[#888888]'}`}>{f.desc}</p>
+                  <p className={`text-[9px] font-normal mt-0.5 ${isDark ? "text-amber-300/50" : "text-[#888888]"}`}>{f.desc}</p>
                 </button>
+              ))}
+            </div>
+
+            {/* Reading enhancement toggles */}
+            <div className={`mt-4 pt-4 border-t space-y-2 ${isDark ? "border-amber-900/40" : "border-[#EBE6C2]"}`}>
+              {[
+                { key: "bionicReading", label: "Bionic Reading", desc: "Bolds first letters to guide the eye" },
+                { key: "syllableBreaking", label: "Syllable Breaks", desc: "Shows syl·la·ble di·vi·sions" },
+              ].map(({ key, label, desc }) => (
+                <button key={key}
+                  onClick={() => onUpdatePreferences({ ...preferences, [key]: !safePrefs[key as keyof typeof safePrefs] })}
+                  className={`w-full flex items-center justify-between p-3 rounded-xl border text-xs font-bold transition-all ${
+                    safePrefs[key as keyof typeof safePrefs]
+                      ? isDark ? "bg-amber-500/20 border-amber-400 text-amber-300" : "bg-amber-200/50 border-amber-500 text-amber-950"
+                      : isDark ? "bg-[#2A2715] border-[#5C531E] text-amber-200" : "bg-white border-[#DCD9D0] text-stone-700"
+                  }`}>
+                  <div className="text-left">
+                    <p>{label}</p>
+                    <p className={`text-[9px] font-normal mt-0.5 ${isDark ? "text-amber-300/50" : "text-[#888888]"}`}>{desc}</p>
+                  </div>
+                  <span className={`text-[10px] font-black px-2 py-0.5 rounded ${safePrefs[key as keyof typeof safePrefs] ? "bg-amber-500 text-white" : isDark ? "bg-[#1E1C10] text-amber-400" : "bg-[#F7F4EE] text-stone-400"}`}>
+                    {safePrefs[key as keyof typeof safePrefs] ? "ON" : "OFF"}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {/* Letter & Word Spacing sliders */}
+            <div className={`mt-4 pt-4 border-t space-y-4 ${isDark ? "border-amber-900/40" : "border-[#EBE6C2]"}`}>
+              {[
+                { key: "letterSpacing", label: "Letter Spacing", min: 0, max: 0.2, step: 0.01, unit: "em", hint: ["Default", "Wide"] },
+                { key: "wordSpacing", label: "Word Spacing", min: 0, max: 0.5, step: 0.02, unit: "em", hint: ["Default", "Wide"] },
+              ].map(({ key, label, min, max, step, unit, hint }) => (
+                <div key={key}>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <span className={`text-[10px] font-black uppercase tracking-wider ${isDark ? "text-amber-400" : "text-[#666666]"}`}>{label}</span>
+                    <span className={`text-[10px] font-bold ${isDark ? "text-amber-300" : "text-slate-500"}`}>
+                      {(safePrefs[key as keyof typeof safePrefs] as number).toFixed(2)}{unit}
+                    </span>
+                  </div>
+                  <input type="range" min={min} max={max} step={step}
+                    value={safePrefs[key as keyof typeof safePrefs] as number}
+                    onChange={(e) => onUpdatePreferences({ ...preferences, [key]: parseFloat(e.target.value) })}
+                    className="w-full accent-amber-500" />
+                  <div className={`flex justify-between text-[9px] mt-0.5 ${isDark ? "text-amber-300/50" : "text-slate-400"}`}>
+                    <span>{hint[0]}</span><span>{hint[1]}</span>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
