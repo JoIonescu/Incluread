@@ -98,7 +98,7 @@ export default function Dashboard({
       setFetchingSubject(true);
       try {
         const querySubject = selectedSubject.toLowerCase().replace(" ", "_");
-        const response = await fetch(`https://openlibrary.org/subjects/${querySubject}.json?limit=12`);
+        const response = await fetch(`https://openlibrary.org/subjects/${querySubject}.json?limit=36`);
         if (!response.ok) {
           throw new Error("Could not pull subject works from Open Library.");
         }
@@ -1019,19 +1019,19 @@ Return this exact shape:
                           {renderShelfRow(
                             `${subjectOptions.find(o => o.key === selectedSubject)?.label || selectedSubject} — Top Picks`,
                             subjectOptions.find(o => o.key === selectedSubject)?.emoji || "🌎",
-                            subjectBooks.slice(0, Math.ceil(subjectBooks.length / 3)),
+                            subjectBooks.slice(0, 12),
                             true
                           )}
-                          {subjectBooks.length > 4 && renderShelfRow(
+                          {subjectBooks.length >= 8 && renderShelfRow(
                             "More in this genre",
                             "📖",
-                            subjectBooks.slice(Math.ceil(subjectBooks.length / 3), Math.ceil(subjectBooks.length * 2 / 3)),
+                            subjectBooks.slice(12, 24),
                             true
                           )}
-                          {subjectBooks.length > 8 && renderShelfRow(
+                          {subjectBooks.length >= 16 && renderShelfRow(
                             "Hidden gems",
                             "💎",
-                            subjectBooks.slice(Math.ceil(subjectBooks.length * 2 / 3)),
+                            subjectBooks.slice(24),
                             true
                           )}
                         </>
