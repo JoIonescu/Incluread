@@ -98,7 +98,7 @@ export default function Dashboard({
       setFetchingSubject(true);
       try {
         const querySubject = selectedSubject.toLowerCase().replace(" ", "_");
-        const response = await fetch(`https://openlibrary.org/subjects/${querySubject}.json?limit=12`);
+        const response = await fetch(`https://openlibrary.org/subjects/${querySubject}.json?limit=36`);
         if (!response.ok) {
           throw new Error("Could not pull subject works from Open Library.");
         }
@@ -118,6 +118,7 @@ export default function Dashboard({
           const coverColor = gradients[index % gradients.length];
           const coverUrl = work.cover_id ? `https://covers.openlibrary.org/b/id/${work.cover_id}-M.jpg` : undefined;
           // Derive sensible filter values from subject
+          // Maps to exact strings used in filter dropdowns
           const subjectDifficultyMap: Record<string, string> = {
             children: "Easy", fantasy: "Easy", romance: "Moderate",
             mystery: "Moderate", classics: "Challenging",
@@ -135,7 +136,7 @@ export default function Dashboard({
             biographies: "Personal Growth / Science", history: "Beginner Classics"
           };
           const difficulty = subjectDifficultyMap[selectedSubject] || "Moderate";
-          const ageGroup = subjectAgeMap[selectedSubject] || "All Ages";
+          const ageGroup = subjectAgeMap[selectedSubject] || "Adults";
           const category = subjectCategoryMap[selectedSubject] || selectedSubject.charAt(0).toUpperCase() + selectedSubject.slice(1).replace("_", " ");
           return {
             id,
