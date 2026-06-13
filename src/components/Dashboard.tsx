@@ -98,7 +98,7 @@ export default function Dashboard({
       setFetchingSubject(true);
       try {
         const querySubject = selectedSubject.toLowerCase().replace(" ", "_");
-        const response = await fetch(`https://openlibrary.org/subjects/${querySubject}.json?limit=36`);
+        const response = await fetch(`https://openlibrary.org/subjects/${querySubject}.json?limit=12`);
         if (!response.ok) {
           throw new Error("Could not pull subject works from Open Library.");
         }
@@ -117,17 +117,37 @@ export default function Dashboard({
           ];
           const coverColor = gradients[index % gradients.length];
           const coverUrl = work.cover_id ? `https://covers.openlibrary.org/b/id/${work.cover_id}-M.jpg` : undefined;
+          // Derive sensible filter values from subject
+          const subjectDifficultyMap: Record<string, string> = {
+            children: "Easy", fantasy: "Easy", romance: "Moderate",
+            mystery: "Moderate", classics: "Challenging",
+            science_fiction: "Moderate", biographies: "Challenging", history: "Challenging"
+          };
+          const subjectAgeMap: Record<string, string> = {
+            children: "Kids", fantasy: "Teens", romance: "Adults",
+            mystery: "Adults", classics: "Adults",
+            science_fiction: "Teens", biographies: "Adults", history: "Adults"
+          };
+          const subjectCategoryMap: Record<string, string> = {
+            children: "Beginner Classics", fantasy: "Young Adult Classics",
+            romance: "Young Adult Classics", mystery: "Young Adult Classics",
+            classics: "Beginner Classics", science_fiction: "Personal Growth / Science",
+            biographies: "Personal Growth / Science", history: "Beginner Classics"
+          };
+          const difficulty = subjectDifficultyMap[selectedSubject] || "Moderate";
+          const ageGroup = subjectAgeMap[selectedSubject] || "All Ages";
+          const category = subjectCategoryMap[selectedSubject] || selectedSubject.charAt(0).toUpperCase() + selectedSubject.slice(1).replace("_", " ");
           return {
             id,
             title: work.title,
             author: work.authors?.[0]?.name || "Unknown Author",
             coverColor,
             coverIcon: "Book",
-            category: selectedSubject.charAt(0).toUpperCase() + selectedSubject.slice(1).replace("_", " "),
-            difficulty: "Moderate",
-            reading_time: 20,
+            category,
+            difficulty,
+            reading_time: 20 + (index % 3) * 10,
             description: `A classic work in ${selectedSubject.replace("_", " ")} compiled perfectly for dyslexia-optimized reading assistance and live decoding support.`,
-            ageGroup: "All Ages",
+            ageGroup,
             chapters: [],
             characters: [],
             concepts: [],
@@ -260,6 +280,12 @@ Return this exact shape:
         return [...filtered, fullyFormedBook];
       });
       
+      // Cache so App.tsx can find it
+      try {
+        const cached = JSON.parse(localStorage.getItem("lumina_cached_books") || "[]");
+        const without = cached.filter((b: Book) => b.id !== fullyFormedBook.id);
+        localStorage.setItem("lumina_cached_books", JSON.stringify([fullyFormedBook, ...without].slice(0, 20)));
+      } catch {}
       onSelectBook(fullyFormedBook.id);
     } catch (e) {
       console.warn("AI Generation failed, loading standard narrative:", e);
@@ -297,6 +323,11 @@ Return this exact shape:
         const filtered = prev.filter(b => b.id !== onlineBook.id);
         return [...filtered, fallbackBook];
       });
+      try {
+        const cached = JSON.parse(localStorage.getItem("lumina_cached_books") || "[]");
+        const without = cached.filter((b: Book) => b.id !== fallbackBook.id);
+        localStorage.setItem("lumina_cached_books", JSON.stringify([fallbackBook, ...without].slice(0, 20)));
+      } catch {}
       onSelectBook(fallbackBook.id);
     } finally {
       setGeneratingBookId(null);
@@ -1014,24 +1045,24 @@ Return this exact shape:
                           <Loader2 className="w-5 h-5 animate-spin text-[#5B8FB9]" />
                           <span className="text-xs text-slate-400">Loading Open Library titles...</span>
                         </div>
-                      ) : subjectBooks.length > 0 ? (
+                      ) : filteredSubjectBooks.length > 0 ? (
                         <>
                           {renderShelfRow(
                             `${subjectOptions.find(o => o.key === selectedSubject)?.label || selectedSubject} — Top Picks`,
                             subjectOptions.find(o => o.key === selectedSubject)?.emoji || "🌎",
-                            subjectBooks.slice(0, 12),
+                            filteredSubjectBooks.slice(0, 12),
                             true
                           )}
-                          {subjectBooks.length >= 8 && renderShelfRow(
+                          {filteredSubjectBooks.length >= 8 && renderShelfRow(
                             "More in this genre",
                             "📖",
-                            subjectBooks.slice(12, 24),
+                            filteredSubjectBooks.slice(12, 24),
                             true
                           )}
-                          {subjectBooks.length >= 16 && renderShelfRow(
+                          {filteredSubjectBooks.length >= 16 && renderShelfRow(
                             "Hidden gems",
                             "💎",
-                            subjectBooks.slice(24),
+                            filteredSubjectBooks.slice(24),
                             true
                           )}
                         </>

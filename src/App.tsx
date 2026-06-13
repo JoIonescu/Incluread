@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import Onboarding from "./components/Onboarding";
 import Dashboard from "./components/Dashboard";
 import ReaderView from "./components/ReaderView";
-import { UserPreferences, ReadingStats, ReadingPosition, Bookmark } from "./types";
+import { UserPreferences, ReadingStats, ReadingPosition, Bookmark, Book } from "./types";
 import { SAMPLE_BOOKS } from "./data/books";
 import { auth, db, handleFirestoreError, OperationType } from "./lib/firebase";
 import { onAuthStateChanged, isSignInWithEmailLink, signInWithEmailLink, User as FirebaseUser } from "firebase/auth";
@@ -396,7 +396,14 @@ export default function App() {
 
   // Phase B: Immersive Reading Experience Viewer
   if (selectedBookId) {
-    const activeReadingBook = SAMPLE_BOOKS.find((b) => b.id === selectedBookId) || SAMPLE_BOOKS[0];
+    // Check SAMPLE_BOOKS first, then localStorage cache for Open Library books
+    const getCachedBooks = (): Book[] => {
+      try { return JSON.parse(localStorage.getItem("lumina_cached_books") || "[]"); } catch { return []; }
+    };
+    const activeReadingBook =
+      SAMPLE_BOOKS.find((b) => b.id === selectedBookId) ||
+      getCachedBooks().find((b: Book) => b.id === selectedBookId) ||
+      SAMPLE_BOOKS[0];
     return (
       <ReaderView
         book={activeReadingBook}
