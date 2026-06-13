@@ -661,8 +661,9 @@ Return this exact shape:
 
                     {/* Difficulty Score Indicators */}
                     <div className={`border p-4 rounded-xl space-y-1.5 ${diffSpec.badgeColor}`}>
-                      <p className="text-xs uppercase font-extrabold tracking-wider">Level of Difficulty Assessment:</p>
-                      <p className="text-xs font-bold">{diffSpec.desc}</p>
+                      <p className="text-xs uppercase font-extrabold tracking-wider opacity-70">Difficulty Level</p>
+                      <p className="text-sm font-extrabold">{detailBook.difficulty}</p>
+                      <p className="text-xs leading-relaxed opacity-90">{diffSpec.desc}</p>
                     </div>
 
                     {/* IA Mandate: ACCESSIBILITY PREVIEW PANEL */}
@@ -876,7 +877,7 @@ Return this exact shape:
                   {/* Hero Header Greeting with date */}
                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
-                      <h1 className="text-3xl font-extrabold tracking-tight">Open Library Portal</h1>
+                      <h1 className="text-3xl font-extrabold tracking-tight">Nara Library</h1>
                       <p className="text-xs text-[#666666] mt-1 font-bold">
                         Browse, convert, and format millions of free public domain classics instantly with active support layers.
                       </p>
@@ -995,22 +996,30 @@ Return this exact shape:
                         onClick={() => onSelectBook(activeBook.id)}
                         className="bg-white border border-[#DCD9D0] rounded-2xl p-6 flex flex-col md:flex-row gap-6 shadow-xs hover:border-[#5B8FB9] cursor-pointer transition-all"
                       >
-                        <div className={`w-28 h-36 bg-gradient-to-br ${activeBook.coverColor} rounded-xl shadow-md flex-shrink-0 flex items-center justify-center text-center p-3 text-white border border-black/10`}>
-                          <p className="text-xs font-black truncate max-w-full">{activeBook.title}</p>
-                        </div>
-                        <div className="flex-1 flex flex-col justify-between py-1 animate-fadeIn">
+                        {activeBook.coverUrl ? (
+                          <img src={activeBook.coverUrl} alt={activeBook.title} className="w-28 h-36 object-cover rounded-xl shadow-md flex-shrink-0 border border-black/10" />
+                        ) : (
+                          <div className={`w-28 h-36 bg-gradient-to-br ${activeBook.coverColor} rounded-xl shadow-md flex-shrink-0 flex items-center justify-center text-center p-3 text-white border border-black/10`}>
+                            <p className="text-xs font-black leading-tight">{activeBook.title}</p>
+                          </div>
+                        )}
+                        <div className="flex-1 flex flex-col justify-between py-1">
                           <div>
-                            <span className="px-2 py-1 bg-[#EEF5FA] text-[#5B8FB9] text-[9px] font-black rounded uppercase">Current Active Bookshelf</span>
+                            <span className="px-2 py-1 bg-[#EEF5FA] text-[#5B8FB9] text-[9px] font-black rounded uppercase">Continue Reading</span>
                             <h2 className="text-xl font-bold mt-2 text-[#222222]">{activeBook.title}</h2>
                             <p className="text-[#666666] text-xs leading-relaxed max-w-xl mt-1">
-                              Active spot: {activeBook.chapters && activeBook.chapters[0]?.title}. Pick back up with high spacing, read along, and text isolation tools.
+                              Pick up where you left off — chapter {currentPosition.chapterId?.replace("chapter-", "") || "1"}, paragraph {(currentPosition.paragraphIndex || 0) + 1}. Your reading aids and spacing settings are saved.
                             </p>
                           </div>
-                          <div className="flex items-center gap-4 mt-3">
-                            <button className="h-10 px-5 bg-[#5B8FB9] text-white rounded-xl text-xs font-bold hover:bg-[#4A7BA3] flex items-center gap-1.5 shadow-sm">
-                              <span>Resume Reading Space</span>
+                          <div className="flex items-center gap-3 mt-3">
+                            <button
+                              onClick={() => onSelectBook(activeBook.id)}
+                              className="h-10 px-5 bg-[#5B8FB9] text-white rounded-xl text-xs font-bold hover:bg-[#4A7BA3] flex items-center gap-1.5 shadow-sm"
+                            >
+                              <span>Continue Reading</span>
                               <ArrowRight className="w-4 h-4" />
                             </button>
+                            <span className="text-[10px] text-slate-400">{activeBook.author}</span>
                           </div>
                         </div>
                       </div>
@@ -1026,7 +1035,16 @@ Return this exact shape:
                           savedBookIds.length > 0 ? (
                             <div className="flex gap-4 overflow-x-auto pb-3 relative" style={{scrollbarWidth:"none"}}>
                               <div className="absolute right-0 top-0 bottom-3 w-12 bg-gradient-to-l from-[#F7F4EE] to-transparent pointer-events-none z-10" />
-                              {[...books, ...subjectBooks].filter((b, i, arr) => savedBookIds.includes(b.id) && arr.findIndex(x => x.id === b.id) === i).map(b => renderBookCard(b, !books.find(x => x.id === b.id)))}
+                              {[...books, ...subjectBooks].filter((b, i, arr) => savedBookIds.includes(b.id) && arr.findIndex(x => x.id === b.id) === i).map(b => (
+                              <div key={b.id} className="relative flex-shrink-0">
+                                {renderBookCard(b, !books.find(x => x.id === b.id))}
+                                <button
+                                  onClick={() => handleSaveBook(b.id)}
+                                  className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-[9px] font-black flex items-center justify-center hover:bg-red-600 z-20 shadow"
+                                  title="Remove from shelf"
+                                >✕</button>
+                              </div>
+                            ))}
                             </div>
                           ) : (
                             <div className="border border-dashed border-[#DCD9D0] rounded-2xl p-5 text-center">
@@ -1198,6 +1216,7 @@ Return this exact shape:
                       <p className="text-3xl font-black text-amber-700 flex items-center gap-1">
                         <Flame className="w-6 h-6 text-amber-600 fill-current" />
                         <span>{stats.readingStreak} Days</span>
+                        {!currentUser && <span className="text-[9px] text-amber-600 font-bold ml-1">(resets daily)</span>}
                       </p>
                     </div>
                   </div>

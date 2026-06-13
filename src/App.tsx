@@ -422,6 +422,13 @@ export default function App() {
   // Phase C: Platform Dashboard Workspace
   return (
     <>
+      {/* Beta Banner */}
+      <div className="w-full bg-[#1a1a2e] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
+        <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00A795] animate-pulse flex-shrink-0" />
+        Nara is in beta — we\'re actively building. Your feedback shapes what comes next.{" "}
+        <a href="mailto:hello@nara.quest" className="underline text-[#00A795] hover:text-white transition-colors">Share feedback →</a>
+      </div>
+
       {magicLinkStatus && (
         <div className={`fixed top-4 right-4 z-50 p-4 rounded-2xl shadow-lg border text-xs font-bold max-w-sm flex flex-col gap-1 transition-all ${
           magicLinkStatus.type === "success"
