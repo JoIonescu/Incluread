@@ -193,26 +193,26 @@ export default function ReaderView({
   const goToNextChapter = () => {
     if (safeChapterIndex < book.chapters.length - 1) {
       const nextCh = book.chapters[safeChapterIndex + 1];
-      onUpdatePosition({
-        bookId: book.id,
-        chapterId: nextCh.id,
-        paragraphIndex: 0,
-      });
+      // Update local state immediately — don't wait for Firestore
+      const newPos = { bookId: book.id, chapterId: nextCh.id, paragraphIndex: 0 };
+      onUpdatePosition(newPos);
+      // Also force local display to reset
+      setHighlightedSentenceIndex(0);
       setIsPlayingAudio(false);
       setAiSimplifyOverlay(null);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   const goToPrevChapter = () => {
     if (safeChapterIndex > 0) {
       const prevCh = book.chapters[safeChapterIndex - 1];
-      onUpdatePosition({
-        bookId: book.id,
-        chapterId: prevCh.id,
-        paragraphIndex: 0,
-      });
+      const newPos = { bookId: book.id, chapterId: prevCh.id, paragraphIndex: 0 };
+      onUpdatePosition(newPos);
+      setHighlightedSentenceIndex(0);
       setIsPlayingAudio(false);
       setAiSimplifyOverlay(null);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 

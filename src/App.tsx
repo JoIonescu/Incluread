@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Onboarding from "./components/Onboarding";
+import AboutPage from "./components/AboutPage";
 import Dashboard from "./components/Dashboard";
 import ReaderView from "./components/ReaderView";
 import { UserPreferences, ReadingStats, ReadingPosition, Bookmark, Book } from "./types";
@@ -19,6 +20,9 @@ export default function App() {
 
   // Core shelf state tracking
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<"dashboard" | "about">("dashboard");
+  const [showCookieBanner, setShowCookieBanner] = useState<boolean>(() => !localStorage.getItem("nara_cookie_consent"));
+  const [navLockUntil, setNavLockUntil] = useState<number>(0);
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [currentPosition, setCurrentPosition] = useState<ReadingPosition>({
     bookId: "alice-wonderland",
@@ -127,7 +131,7 @@ export default function App() {
     const unsubPositions = onSnapshot(positionsRef, (snapshot) => {
       snapshot.forEach((docSnap) => {
         const pos = docSnap.data() as ReadingPosition;
-        if (pos.bookId === currentPosition.bookId) {
+        if (pos.bookId === currentPosition.bookId && Date.now() > navLockUntil) {
           setCurrentPosition(pos);
         }
       });
@@ -289,6 +293,9 @@ export default function App() {
   };
 
   const handleUpdatePosition = (pos: ReadingPosition) => {
+    if (pos.chapterId !== currentPosition.chapterId) {
+      setNavLockUntil(Date.now() + 3000);
+    }
     setCurrentPosition(pos);
     localStorage.setItem("lumina_position", JSON.stringify(pos));
 
@@ -378,6 +385,10 @@ export default function App() {
     );
   }
 
+  if (currentPage === "about") {
+    return <AboutPage onBack={() => setCurrentPage("dashboard")} />;
+  }
+
   // Phase A: Onboarding Wizard Configuration screen
   if (!hasCompletedOnboarding) {
     return (
@@ -396,6 +407,13 @@ export default function App() {
 
   // Phase B: Immersive Reading Experience Viewer
   if (selectedBookId) {
+    const BetaBanner = () => (
+      <div className="w-full bg-[#1a1a2e] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
+        <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00A795] animate-pulse flex-shrink-0" />
+        Incluread is in beta — we're actively improving. Your feedback shapes what comes next.{" "}
+        <a href="mailto:hello@nara.quest" className="underline text-[#00A795] hover:text-white transition-colors">Share feedback →</a>
+      </div>
+    );
     // Check SAMPLE_BOOKS first, then localStorage cache for Open Library books
     const getCachedBooks = (): Book[] => {
       try { return JSON.parse(localStorage.getItem("lumina_cached_books") || "[]"); } catch { return []; }
@@ -405,7 +423,9 @@ export default function App() {
       getCachedBooks().find((b: Book) => b.id === selectedBookId) ||
       SAMPLE_BOOKS[0];
     return (
-      <ReaderView
+      <>
+        <BetaBanner />
+        <ReaderView
         book={activeReadingBook}
         preferences={preferences!}
         onUpdatePreferences={handleUpdatePreferences}
@@ -416,6 +436,7 @@ export default function App() {
         onUpdatePosition={handleUpdatePosition}
         onReadingMinute={handleReadingMinute}
       />
+      </>
     );
   }
 
@@ -425,7 +446,7 @@ export default function App() {
       {/* Beta Banner */}
       <div className="w-full bg-[#1a1a2e] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00A795] animate-pulse flex-shrink-0" />
-        Incluread is in beta — we\'re actively building. Your feedback shapes what comes next.{" "}
+        Incluread is in beta — we're actively improving. Your feedback shapes what comes next.{" "}
         <a href="mailto:hello@nara.quest" className="underline text-[#00A795] hover:text-white transition-colors">Share feedback →</a>
       </div>
 
@@ -466,6 +487,39 @@ export default function App() {
         onAnswerSatisfaction={handleAnswerSatisfaction}
         satisfactionHistory={satisfactionHistory}
       />
+      {/* Footer */}
+      {!selectedBookId && (
+        <footer className="bg-[#1a1a2e] text-gray-400 text-xs mt-8">
+          <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div>
+              <p className="text-white font-bold mb-2">Incluread</p>
+              <p className="leading-relaxed opacity-70">Accessible reading for every mind. Built for dyslexia, ADHD, and visual stress.</p>
+            </div>
+            <div>
+              <p className="text-white font-bold mb-2">Product</p>
+              <ul className="space-y-1 opacity-70">
+                <li><button onClick={() => setCurrentPage("about")} className="hover:text-white transition-colors">About Incluread</button></li>
+                <li><a href="mailto:hello@nara.quest" className="hover:text-white transition-colors">Contact us</a></li>
+              </ul>
+            </div>
+            <div>
+              <p className="text-white font-bold mb-2">Legal</p>
+              <ul className="space-y-1 opacity-70">
+                <li><button onClick={() => setCurrentPage("about")} className="hover:text-white transition-colors">Privacy Policy</button></li>
+                <li><button onClick={() => setCurrentPage("about")} className="hover:text-white transition-colors">Terms of Use</button></li>
+                <li><button onClick={() => setCurrentPage("about")} className="hover:text-white transition-colors">Cookie Policy</button></li>
+              </ul>
+            </div>
+            <div>
+              <p className="text-white font-bold mb-2">Research</p>
+              <p className="opacity-70 leading-relaxed">Built on peer-reviewed dyslexia research. <button onClick={() => setCurrentPage("about")} className="underline text-[#00A795] hover:text-white">Read our approach →</button></p>
+            </div>
+          </div>
+          <div className="border-t border-[#2d2d4e] px-6 py-4 text-center opacity-50">
+            © {new Date().getFullYear()} Incluread. All rights reserved. · nara.quest
+          </div>
+        </footer>
+      )}
     </>
   );
 }

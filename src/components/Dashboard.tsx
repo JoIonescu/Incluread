@@ -660,10 +660,10 @@ Return this exact shape:
                     </p>
 
                     {/* Difficulty Score Indicators */}
-                    <div className={`border p-4 rounded-xl space-y-1.5 ${diffSpec.badgeColor}`}>
-                      <p className="text-xs uppercase font-extrabold tracking-wider opacity-70">Difficulty Level</p>
+                    <div className="border p-4 rounded-xl space-y-1.5 bg-white border-[#DCD9D0]">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-[#888888]">Difficulty Level</p>
                       <p className="text-sm font-extrabold">{detailBook.difficulty}</p>
-                      <p className="text-xs leading-relaxed opacity-90">{diffSpec.desc}</p>
+                      <p className="text-xs text-[#333333] leading-relaxed mt-1">{diffSpec.desc}</p>
                     </div>
 
                     {/* IA Mandate: ACCESSIBILITY PREVIEW PANEL */}
@@ -877,7 +877,7 @@ Return this exact shape:
                   {/* Hero Header Greeting with date */}
                   <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
-                      <h1 className="text-3xl font-extrabold tracking-tight">Incluread Library</h1>
+                      <h1 className="text-3xl font-extrabold tracking-tight">Your Library</h1>
                       <p className="text-xs text-[#666666] mt-1 font-bold">
                         Browse, convert, and format millions of free public domain classics instantly with active support layers.
                       </p>
@@ -1153,51 +1153,76 @@ Return this exact shape:
               );
             })()}
 
-            {/* Tab 2: Resume */}
+            {/* Tab 2: Continue Reading */}
             {activeTab === "resume" && (
               <div className="space-y-6">
-                <h2 className="text-2xl font-black">Continue Reading Space</h2>
-                <p className="text-xs text-[#666666]">Instantly rejoin your paragraphs with preloaded settings intact.</p>
-
-                <div className="space-y-4">
-                  {books.map((book) => {
-                    const isBookActive = book.id === currentPosition.bookId;
-                    return (
-                      <div
-                        key={book.id}
-                        onClick={() => onSelectBook(book.id)}
-                        className={`bg-white border rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 hover:border-[#5B8FB9] cursor-pointer transition-all ${
-                          isBookActive ? "border-[#5B8FB9] ring-2 ring-[#5B8FB9]/20" : "border-[#DCD9D0]"
-                        }`}
-                      >
-                        <div className="flex flex-col md:flex-row items-center gap-4">
-                          <div className={`w-16 h-20 rounded-lg bg-gradient-to-br ${book.coverColor} flex-shrink-0 flex items-center justify-center p-2 text-center text-white border border-black/10`}>
-                            <span className="text-[10px] font-black">{book.title.slice(0, 15)}</span>
-                          </div>
-                          <div className="text-center md:text-left">
-                            <p className="text-base font-bold">{book.title}</p>
-                            <p className="text-xs text-[#666666] mt-0.5">by {book.author}</p>
-                            {isBookActive ? (
-                              <span className="mt-1 inline-block bg-yellow-100 text-yellow-900 border text-[9px] font-black rounded px-2 py-0.5">
-                                Active Reading Position
-                              </span>
-                            ) : (
-                              <span className="mt-1 inline-block bg-gray-50 border text-[9px] font-black rounded px-2 py-0.5">
-                                Shelf Book
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <button className="h-10 px-5 bg-stone-900 hover:bg-stone-800 text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-1">
-                            <span>Open Reader</span>
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div>
+                  <h2 className="text-2xl font-black">Continue Reading</h2>
+                  <p className="text-xs text-[#666666] mt-1">Pick up exactly where you left off.</p>
                 </div>
+
+                {/* Active book — dynamic from currentPosition */}
+                {activeBook ? (
+                  <div
+                    onClick={() => onSelectBook(activeBook.id)}
+                    className="bg-white border-2 border-[#5B8FB9] rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6 hover:shadow-lg cursor-pointer transition-all ring-2 ring-[#5B8FB9]/20"
+                  >
+                    {activeBook.coverUrl ? (
+                      <img src={activeBook.coverUrl} alt={activeBook.title} className="w-24 h-32 object-cover rounded-xl shadow-md flex-shrink-0" />
+                    ) : (
+                      <div className={`w-24 h-32 rounded-xl bg-gradient-to-br ${activeBook.coverColor} flex-shrink-0 flex items-center justify-center p-3 text-white text-center border border-black/10`}>
+                        <span className="text-xs font-black leading-tight">{activeBook.title.slice(0, 20)}</span>
+                      </div>
+                    )}
+                    <div className="flex-1 text-center md:text-left">
+                      <span className="inline-block px-2 py-0.5 bg-[#EEF5FA] text-[#5B8FB9] text-[9px] font-black rounded uppercase mb-2">Currently Reading</span>
+                      <h3 className="text-xl font-black text-[#111111]">{activeBook.title}</h3>
+                      <p className="text-sm text-[#666666] mt-0.5">by {activeBook.author}</p>
+                      <p className="text-xs text-slate-400 mt-2">
+                        Chapter {currentPosition.chapterId?.replace("chapter-", "") || "1"} · Paragraph {(currentPosition.paragraphIndex || 0) + 1}
+                      </p>
+                      <button
+                        onClick={(e) => { e.stopPropagation(); onSelectBook(activeBook.id); }}
+                        className="mt-4 h-10 px-6 bg-[#5B8FB9] text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-[#4A7BA3] transition-colors inline-flex items-center gap-2"
+                      >
+                        <BookOpen className="w-4 h-4" />
+                        Continue Reading
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border border-dashed border-[#DCD9D0] rounded-2xl p-10 text-center">
+                    <p className="text-slate-400 text-sm">You haven't opened a book yet.</p>
+                    <button onClick={() => setActiveTab("library")} className="mt-3 text-[#5B8FB9] text-xs font-bold underline">Browse the library →</button>
+                  </div>
+                )}
+
+                {/* Recently saved to shelf */}
+                {savedBookIds.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className="text-sm font-black text-slate-600 uppercase tracking-widest">My Shelf</h3>
+                    <div className="flex gap-4 overflow-x-auto pb-2" style={{scrollbarWidth:"none"}}>
+                      {[...books, ...subjectBooks]
+                        .filter((b, i, arr) => savedBookIds.includes(b.id) && arr.findIndex(x => x.id === b.id) === i)
+                        .map(b => (
+                          <div
+                            key={b.id}
+                            onClick={() => onSelectBook(b.id)}
+                            className="flex-shrink-0 w-32 cursor-pointer group"
+                          >
+                            {b.coverUrl ? (
+                              <img src={b.coverUrl} alt={b.title} className="w-32 h-44 object-cover rounded-lg shadow group-hover:shadow-md transition-shadow" />
+                            ) : (
+                              <div className={`w-32 h-44 rounded-lg bg-gradient-to-br ${b.coverColor} flex items-end p-2 text-white`}>
+                                <span className="text-[10px] font-bold line-clamp-2">{b.title}</span>
+                              </div>
+                            )}
+                            <p className="text-xs font-bold text-slate-700 mt-1.5 line-clamp-2 group-hover:text-[#5B8FB9] transition-colors">{b.title}</p>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
