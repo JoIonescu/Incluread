@@ -445,13 +445,6 @@ useEffect(() => {
     setTimeout(() => setBookmarkToast(false), 2000);
   };
 
-  const isCurrentlyBookmarked = bookmarks.some(
-    (bookmark) =>
-      bookmark.bookId === book.id &&
-      bookmark.chapterId === activeChapter.id &&
-      bookmark.paragraphIndex === activeParagraphIndex
-  );
-
   // Syllable breaking — pattern-based, no library needed
   // Inserts soft hyphens using consonant cluster rules (English approximation)
   const syllabify = (word: string): string => {
