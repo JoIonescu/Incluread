@@ -496,6 +496,16 @@ Return this exact shape:
   const handleSignOut = async () => {
     try {
       await signOut(auth);
+      // Clear all user-specific localStorage
+      localStorage.removeItem("lumina_saved_book_ids");
+      localStorage.removeItem("lumina_bookmarks");
+      localStorage.removeItem("lumina_stats");
+      localStorage.removeItem("lumina_position");
+      localStorage.removeItem("lumina_uploaded_docs");
+      localStorage.removeItem("lumina_uploaded_docs_expiry");
+      localStorage.removeItem("lumina_cached_books");
+      // Reset local state immediately
+      setSavedBookIds([]);
     } catch (err) {
       console.error("Sign out error", err);
     }
@@ -581,7 +591,14 @@ Return this exact shape:
   };
 
   // Resolve current read book if exists
-  const activeBook = books.find((b) => b.id === currentPosition.bookId) || books[0];
+  const activeBook = (() => {
+    const savedId = (() => { try { return JSON.parse(localStorage.getItem("lumina_position") || "null")?.bookId || null; } catch { return null; } })();
+    const id = savedId || currentPosition.bookId;
+    if (!id || id === "alice-wonderland") return null;
+    return books.find(b => b.id === id)
+      || (() => { try { return JSON.parse(localStorage.getItem("lumina_cached_books") || "[]").find((b: any) => b.id === id); } catch { return null; } })()
+      || null;
+  })();
 
   // Filters catalog
   const applyFiltersAndSort = (bookList: Book[]) => bookList.filter((book) => {
@@ -617,11 +634,11 @@ Return this exact shape:
   };
 
   return (
-    <div id="dashboard-root" className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between transition-all duration-300`}>
+    <div id="dashboard-root" className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between transition-all duration-300 overflow-x-hidden`}>
       
       {/* HEADER: Geometric navigation toolbar */}
       <nav className={`h-16 border-b px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 ${headerBgClass} ${borderClass} transition-all duration-300`}>
-        <NaraLogo showText={true} />
+        <NaraLogo showText={true} size="lg" />
         
         {/* Navigation tabs */}
         <div className="hidden md:flex gap-8">
@@ -1375,8 +1392,13 @@ Return this exact shape:
                   <p className="text-xs text-[#666666] mt-1">Pick up exactly where you left off.</p>
                 </div>
 
-                {/* Active book — dynamic from currentPosition */}
-                {activeBook ? (
+                {/* Active book — only show if signed in or has real session */}
+                {(!currentUser && !activeBook) ? (
+                  <div className="border border-dashed border-[#DCD9D0] rounded-2xl p-10 text-center">
+                    <p className="text-slate-400 text-sm mb-2">Sign in to track your reading progress.</p>
+                    <button onClick={() => setActiveTab("library")} className="text-[#5B8FB9] text-xs font-bold underline">Browse the library →</button>
+                  </div>
+                ) : activeBook ? (
                   <div
                     onClick={() => onSelectBook(activeBook.id)}
                     className="bg-white border-2 border-[#5B8FB9] rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6 hover:shadow-lg cursor-pointer transition-all ring-2 ring-[#5B8FB9]/20"
@@ -1411,8 +1433,8 @@ Return this exact shape:
                   </div>
                 )}
 
-                {/* Recently saved to shelf */}
-                {savedBookIds.length > 0 && (
+                {/* Recently saved to shelf — only for signed-in users */}
+                {currentUser && savedBookIds.length > 0 && (
                   <div className="space-y-3">
                     <h3 className="text-sm font-black text-slate-600 uppercase tracking-widest">My Shelf</h3>
                     <div className="flex gap-4 overflow-x-auto pb-2" style={{scrollbarWidth:"none"}}>

@@ -17,12 +17,10 @@ export default function AboutPage({ onBack }: AboutPageProps) {
             <ArrowLeft className="w-4 h-4" /> Back to Incluread
           </button>
           <div className="flex gap-1 ml-auto">
-            {(["about", "privacy", "terms", "cookies"] as const).map((s) => (
-              <button key={s} onClick={() => setActiveSection(s)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${activeSection === s ? "bg-[#5B8FB9] text-white" : "text-slate-500 hover:text-slate-800"}`}>
-                {s === "about" ? "About" : s === "privacy" ? "Privacy" : s === "terms" ? "Terms" : "Cookies"}
-              </button>
-            ))}
+            <button onClick={() => setActiveSection("about")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeSection === "about" ? "bg-[#5B8FB9] text-white" : "text-slate-500 hover:text-slate-800"}`}>
+            About Incluread
+          </button>
           </div>
         </div>
       </div>
@@ -251,6 +249,37 @@ export default function AboutPage({ onBack }: AboutPageProps) {
         )}
 
       </div>
+      {/* Footer on About page */}
+      <footer className="bg-[#1a1a2e] text-gray-400 text-xs mt-16">
+        <div className="max-w-4xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div>
+            <img src="/incluread-logo.png" alt="Incluread" className="h-12 w-auto mb-3 opacity-90" />
+            <p className="leading-relaxed opacity-70">Accessible reading for every mind.</p>
+          </div>
+          <div>
+            <p className="text-white font-bold mb-2">Product</p>
+            <ul className="space-y-1 opacity-70">
+              <li><button onClick={() => setActiveSection("about")} className="hover:text-white transition-colors">About Incluread</button></li>
+              <li><a href="mailto:hello@incluread.click" className="hover:text-white transition-colors">Contact us</a></li>
+            </ul>
+          </div>
+          <div>
+            <p className="text-white font-bold mb-2">Legal</p>
+            <ul className="space-y-1 opacity-70">
+              <li><button onClick={() => setActiveSection("privacy")} className="hover:text-white transition-colors">Privacy Policy</button></li>
+              <li><button onClick={() => setActiveSection("terms")} className="hover:text-white transition-colors">Terms of Use</button></li>
+              <li><button onClick={() => setActiveSection("cookies")} className="hover:text-white transition-colors">Cookie Policy</button></li>
+            </ul>
+          </div>
+          <div>
+            <p className="text-white font-bold mb-2">Research</p>
+            <p className="opacity-70 leading-relaxed text-[11px]">Built on peer-reviewed dyslexia research. <button onClick={() => setActiveSection("about")} className="underline text-[#00A795]">Read our approach →</button></p>
+          </div>
+        </div>
+        <div className="border-t border-[#2d2d4e] px-6 py-4 text-center opacity-50">
+          © {new Date().getFullYear()} Incluread. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 }

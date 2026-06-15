@@ -56,7 +56,9 @@ export default function ReaderView({
     syllableBreaking: preferences.syllableBreaking ?? false,
   };
   // Navigation State
-  const activeChapterIndex = book.chapters.findIndex((c) => c.id === currentPosition.chapterId);
+  const [localChapterId, setLocalChapterId] = useState<string | null>(null);
+  const effectiveChapterId = localChapterId || currentPosition.chapterId;
+  const activeChapterIndex = book.chapters.findIndex((c) => c.id === effectiveChapterId);
   const safeChapterIndex = activeChapterIndex >= 0 ? activeChapterIndex : 0;
   const activeChapter = book.chapters[safeChapterIndex];
   const activeParagraphIndex = currentPosition.paragraphIndex;
@@ -193,10 +195,9 @@ export default function ReaderView({
   const goToNextChapter = () => {
     if (safeChapterIndex < book.chapters.length - 1) {
       const nextCh = book.chapters[safeChapterIndex + 1];
-      // Update local state immediately — don't wait for Firestore
-      const newPos = { bookId: book.id, chapterId: nextCh.id, paragraphIndex: 0 };
-      onUpdatePosition(newPos);
-      // Also force local display to reset
+      // Set local state FIRST so UI updates immediately, regardless of Firestore
+      setLocalChapterId(nextCh.id);
+      onUpdatePosition({ bookId: book.id, chapterId: nextCh.id, paragraphIndex: 0 });
       setHighlightedSentenceIndex(0);
       setIsPlayingAudio(false);
       setAiSimplifyOverlay(null);
@@ -207,8 +208,8 @@ export default function ReaderView({
   const goToPrevChapter = () => {
     if (safeChapterIndex > 0) {
       const prevCh = book.chapters[safeChapterIndex - 1];
-      const newPos = { bookId: book.id, chapterId: prevCh.id, paragraphIndex: 0 };
-      onUpdatePosition(newPos);
+      setLocalChapterId(prevCh.id);
+      onUpdatePosition({ bookId: book.id, chapterId: prevCh.id, paragraphIndex: 0 });
       setHighlightedSentenceIndex(0);
       setIsPlayingAudio(false);
       setAiSimplifyOverlay(null);
@@ -425,6 +426,8 @@ useEffect(() => {
   };
 
   const [bookmarkToast, setBookmarkToast] = useState<boolean>(false);
+  const [narratorOpen, setNarratorOpen] = useState<boolean>(false);
+  const [sensoryOpen, setSensoryOpen] = useState<boolean>(false);
 
   // Fast Bookmark handler
   const triggerAddBookmark = () => {
@@ -441,6 +444,13 @@ useEffect(() => {
     setBookmarkToast(true);
     setTimeout(() => setBookmarkToast(false), 2000);
   };
+
+  const isCurrentlyBookmarked = bookmarks.some(
+    (bookmark) =>
+      bookmark.bookId === book.id &&
+      bookmark.chapterId === activeChapter.id &&
+      bookmark.paragraphIndex === activeParagraphIndex
+  );
 
   // Syllable breaking — pattern-based, no library needed
   // Inserts soft hyphens using consonant cluster rules (English approximation)
@@ -631,7 +641,7 @@ useEffect(() => {
               className={`text-xs border flex items-center gap-1 px-3 py-1.5 rounded-lg font-semibold transition-all ${buttonClass}`}
             >
               <BookmarkIcon className="w-4 h-4 text-[#5B8FB9]" />
-              <span>{bookmarkToast ? "Saved!" : "Bookmark"}</span>
+              <span>{bookmarkToast || isCurrentlyBookmarked ? "✓ Saved" : "Bookmark"}</span>
             </button>
           </div>
 
@@ -738,7 +748,7 @@ useEffect(() => {
                     {/* Paragraph Text with integrated custom sizing & line spacing */}
                     {isSimplifyApplied ? (
                       <div className="space-y-2 p-2.5 bg-yellow-100/10 border-l-4 border-amber-600 pl-4 rounded-r-lg">
-                        <span className="text-[9px] uppercase font-black text-amber-800 tracking-widest block">Simpler Language (Gemini AI output)</span>
+                        <span className="text-[9px] uppercase font-black text-amber-800 tracking-widest block">Simplified by IncluRead AI</span>
                         <p
                           style={{
                             fontSize: `${preferences.textSize}px`,
@@ -1285,7 +1295,7 @@ useEffect(() => {
             {aiSummaryLoading ? (
               <div className="py-12 flex flex-col items-center justify-center gap-4 text-center">
                 <div className="w-10 h-10 border-4 border-[#E5E1D8] border-t-[#5B8FB9] rounded-full animate-spin" />
-                <p className="text-xs text-[#555555] font-semibold">Gemini AI compiling chapter elements, key updates, and character tracking...</p>
+                <p className="text-xs text-[#555555] font-semibold">IncluRead is compiling chapter elements, key updates, and character tracking...</p>
               </div>
             ) : aiSummaryOutput ? (
               <div className="space-y-6">
