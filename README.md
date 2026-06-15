@@ -22,7 +22,12 @@ Users can also simplify content at different levels and listen through customiza
 
 IncluRead combines accessibility, AI, and cognitive support into a single reading workspace, helping readers focus on comprehension rather than decoding text.
 
-https://github.com/user-attachments/assets/c8bfa529-a415-4de1-9a89-44df68395007
+📌 Disclaimer:
+IncluRead is currently a work in progress. While the platform is fully functional in many areas, some features may still be under development or behave differently as improvements are introduced. New accessibility tools, refinements, and enhancements are being added regularly, so be sure to check back often to follow its evolution.
+
+
+
+
 
 
 
