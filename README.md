@@ -27,7 +27,9 @@ IncluRead is currently a work in progress. While the platform is fully functiona
 
 Watch IncluRead v1.0.0 release video
 
-Uploading IncluRead Presentation.mp4…
+https://github.com/user-attachments/assets/3a2d3efd-2816-4b4f-ad2c-4944975b3159
+
+
 
 
 
