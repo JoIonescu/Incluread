@@ -69,7 +69,9 @@ export default function Dashboard({
       } else if (file.name.endsWith(".pdf")) {
         // Use pdf.js for PDF extraction
         const pdfjsLib = await import("pdfjs-dist");
-        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        // Use the worker bundled with pdfjs-dist — no CDN dependency
+        const workerUrl = new URL("pdfjs-dist/build/pdf.worker.min.mjs", import.meta.url);
+        pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl.toString();
         const arrayBuffer = await file.arrayBuffer();
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
         const pages: string[] = [];
