@@ -26,7 +26,7 @@ IncluRead combines accessibility, AI, and cognitive support into a single readin
 IncluRead is currently a work in progress. While the platform is fully functional in many areas, some features may still be under development or behave differently as improvements are introduced. New accessibility tools, refinements, and enhancements are being added regularly, so be sure to check back often to follow its evolution.
 
 Watch IncluRead v1.0.0 release video
-sha256:58cca9b82455ddc7c13e4fdd3c72075b3eed2d28138acae3daf802fc8bb48308
+(https://github.com/JoIonescu/Incluread/releases/download/v1.0.0/IncluRead.Presentation.mov)
 
 
 
