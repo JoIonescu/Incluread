@@ -441,7 +441,7 @@ export default function App() {
       <div className="w-full bg-[#1a1a2e] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00A795] animate-pulse flex-shrink-0" />
         Incluread is in beta — we're actively improving. Your feedback shapes what comes next.{" "}
-        <a href="mailto:hello@nara.quest" className="underline text-[#00A795] hover:text-white transition-colors">Share feedback →</a>
+        <a href="mailto:hello@incluread.click" className="underline text-[#00A795] hover:text-white transition-colors">Share feedback →</a>
       </div>
     );
     // Check SAMPLE_BOOKS first, then localStorage cache for Open Library books
@@ -477,7 +477,7 @@ export default function App() {
       <div className="w-full bg-[#1a1a2e] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00A795] animate-pulse flex-shrink-0" />
         Incluread is in beta — we're actively improving. Your feedback shapes what comes next.{" "}
-        <a href="mailto:hello@nara.quest" className="underline text-[#00A795] hover:text-white transition-colors">Share feedback →</a>
+        <a href="mailto:hello@incluread.click" className="underline text-[#00A795] hover:text-white transition-colors">Share feedback →</a>
       </div>
 
       {magicLinkStatus && (
@@ -529,7 +529,7 @@ export default function App() {
               <p className="text-white font-bold mb-2">Product</p>
               <ul className="space-y-1 opacity-70">
                 <li><button onClick={() => setCurrentPage("about")} className="hover:text-white transition-colors">About Incluread</button></li>
-                <li><a href="mailto:hello@nara.quest" className="hover:text-white transition-colors">Contact us</a></li>
+                <li><a href="mailto:hello@incluread.click" className="hover:text-white transition-colors">Contact us</a></li>
               </ul>
             </div>
             <div>
@@ -546,7 +546,7 @@ export default function App() {
             </div>
           </div>
           <div className="border-t border-[#2d2d4e] px-6 py-4 text-center opacity-50">
-            © {new Date().getFullYear()} Incluread. All rights reserved. · nara.quest
+            © {new Date().getFullYear()} Incluread. All rights reserved. · incluread.click
           </div>
         </footer>
       )}
