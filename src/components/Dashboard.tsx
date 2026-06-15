@@ -6,6 +6,7 @@ import { auth } from "../lib/firebase";
 import { onAuthStateChanged, signOut, sendSignInLinkToEmail, User as FirebaseUser } from "firebase/auth";
 import {
   Compass,
+  Upload,
   BookOpen,
   Activity,
   User,
@@ -49,7 +50,107 @@ export default function Dashboard({
   satisfactionHistory,
 }: DashboardProps) {
   // Navigation tabs
-  const [activeTab, setActiveTab] = useState<"library" | "resume" | "stats" | "profile" | "settings">("library");
+  const [uploadedDocs, setUploadedDocs] = useState<Book[]>(() => {
+    try { return JSON.parse(localStorage.getItem("lumina_uploaded_docs") || "[]"); } catch { return []; }
+  });
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadLoading, setUploadLoading] = useState<boolean>(false);
+
+  const handleDocUpload = async (file: File) => {
+    setUploadError(null);
+    setUploadLoading(true);
+    try {
+      const mammoth = await import("mammoth");
+      let text = "";
+      if (file.name.endsWith(".docx") || file.name.endsWith(".doc")) {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        text = result.value;
+      } else if (file.name.endsWith(".pdf")) {
+        // Use pdf.js for PDF extraction
+        const pdfjsLib = await import("pdfjs-dist");
+        pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const pages: string[] = [];
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          pages.push(content.items.map((item: any) => item.str).join(" "));
+        }
+        text = pages.join("\n\n");
+      } else if (file.name.endsWith(".txt")) {
+        text = await file.text();
+      } else {
+        throw new Error("Unsupported file type. Please upload PDF, DOCX, or TXT.");
+      }
+
+      if (!text.trim()) throw new Error("Could not extract text from this file.");
+
+      // Split into chapters of ~500 words each
+      const words = text.split(/\s+/);
+      const chunkSize = 500;
+      const chapters = [];
+      for (let i = 0; i < words.length; i += chunkSize) {
+        const chunkWords = words.slice(i, i + chunkSize);
+        // Split chunk into paragraphs of ~80 words
+        const paraSize = 80;
+        const paragraphs: string[] = [];
+        for (let j = 0; j < chunkWords.length; j += paraSize) {
+          paragraphs.push(chunkWords.slice(j, j + paraSize).join(" "));
+        }
+        chapters.push({
+          id: `chapter-${Math.floor(i / chunkSize) + 1}`,
+          title: `Part ${Math.floor(i / chunkSize) + 1}`,
+          content: paragraphs,
+        });
+      }
+
+      const docBook: Book = {
+        id: `doc-${Date.now()}`,
+        title: file.name.replace(/\.[^/.]+$/, ""),
+        author: "Uploaded document",
+        description: `Uploaded document: ${file.name}. Read with full Incluread accessibility tools.`,
+        coverColor: "from-[#5B8FB9] to-[#2D5A8A]",
+        coverIcon: "FileText",
+        category: "Uploaded",
+        difficulty: "Moderate",
+        reading_time: Math.ceil(words.length / 200),
+        ageGroup: "Adults",
+        chapters,
+        characters: [],
+        concepts: [],
+      };
+
+      const updated = [docBook, ...uploadedDocs];
+      setUploadedDocs(updated);
+      // Save with expiry logic
+      const expiry = currentUser
+        ? Date.now() + 30 * 24 * 60 * 60 * 1000  // 30 days
+        : Date.now() + 24 * 60 * 60 * 1000;       // 1 day
+      localStorage.setItem("lumina_uploaded_docs", JSON.stringify(updated));
+      localStorage.setItem("lumina_uploaded_docs_expiry", String(expiry));
+
+      // Cache so reader can find it
+      try {
+        const cached = JSON.parse(localStorage.getItem("lumina_cached_books") || "[]");
+        localStorage.setItem("lumina_cached_books", JSON.stringify([docBook, ...cached].slice(0, 20)));
+      } catch {}
+
+    } catch (err: any) {
+      setUploadError(err.message || "Failed to process file.");
+    } finally {
+      setUploadLoading(false);
+    }
+  };
+
+  const handleRemoveDoc = (id: string) => {
+    const updated = uploadedDocs.filter(d => d.id !== id);
+    setUploadedDocs(updated);
+    localStorage.setItem("lumina_uploaded_docs", JSON.stringify(updated));
+  };
+
+  const [activeTab, setActiveTab] = useState<"library" | "upload" | "resume" | "stats" | "profile" | "settings">("library");
   
   // Search state
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -393,12 +494,6 @@ Return this exact shape:
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      // Clear user-specific localStorage so next login starts fresh
-      localStorage.removeItem("lumina_saved_book_ids");
-      localStorage.removeItem("lumina_bookmarks");
-      localStorage.removeItem("lumina_stats");
-      localStorage.removeItem("lumina_position");
-      // Keep lumina_preferences (reading comfort settings — not personal data)
     } catch (err) {
       console.error("Sign out error", err);
     }
@@ -418,7 +513,7 @@ Return this exact shape:
 
   // Dynamic system styles for the outer Dashboard shell
   const pageBgClass = 
-    activeTheme === "dark" ? "bg-[#121214] text-[#E1E4EA]" :
+    activeTheme === "dark" ? "bg-[#0F1117] text-[#F0F2F5]" :
     activeTheme === "yellow" ? "bg-[#FFFDE5] text-[#000000]" :
     activeTheme === "blue" ? "bg-[#EEF5FA] text-[#0A192F]" :
     activeTheme === "sepia" ? "bg-[#F4EAD4] text-[#2D1910]" :
@@ -432,7 +527,7 @@ Return this exact shape:
     "border-[#DCD9D0]";
 
   const cardBgClass = 
-    activeTheme === "dark" ? "bg-[#1A1D21] border-[#2D3139] text-[#E1E4EA]" :
+    activeTheme === "dark" ? "bg-[#1E2128] border-[#3D4151] text-[#F0F2F5]" :
     activeTheme === "sepia" ? "bg-[#FDFBF4] border-[#DFCEB3]" :
     "bg-white border-[#DCD9D0]";
 
@@ -458,21 +553,21 @@ Return this exact shape:
     "text-[#666666]";
 
   const headerBgClass = 
-    activeTheme === "dark" ? "bg-[#1C1E22]/90 border-[#2D3139] text-[#FFFFFF]" :
+    activeTheme === "dark" ? "bg-[#23262F] border-[#3D4151] text-[#FFFFFF]" :
     activeTheme === "yellow" ? "bg-[#FFFDE5]/90 border-[#D2CCA9] text-[#000000]" :
     activeTheme === "blue" ? "bg-[#EEF5FA]/90 border-[#AFC3D4] text-[#0A192F]" :
     activeTheme === "sepia" ? "bg-[#F4EAD4]/90 border-[#CCD2B8] text-[#2D1910]" :
     "bg-white/50 border-[#DCD9D0] text-[#111111]";
 
   const inputBgClass = 
-    activeTheme === "dark" ? "bg-[#2A2D35] text-[#FFFFFF] border-[#383A40]" :
+    activeTheme === "dark" ? "bg-[#2D3244] text-[#FFFFFF] border-[#4A5068]" :
     activeTheme === "yellow" ? "bg-[#FFFDE5] text-black border-[#D2CCA9]" :
     activeTheme === "blue" ? "bg-[#EEF5FA] text-[#0A192F] border-[#AFC3D4]" :
     activeTheme === "sepia" ? "bg-[#FDFBF4] text-[#2D1910] border-[#CCD2B8]" :
     "bg-[#F7F4EE]/50 text-stone-900 border-[#DCD9D0]";
 
   const buttonClass =
-    activeTheme === "dark" ? "bg-[#252830] text-[#E1E4EA] hover:bg-[#323642] border-[#2D3139]" :
+    activeTheme === "dark" ? "bg-[#252B38] text-[#F0F2F5] hover:bg-[#2D3447] border-[#3D4558]" :
     activeTheme === "sepia" ? "bg-[#FDFBF4] text-[#2D1910] hover:bg-[#ECE0C6] border-[#DFCEB3]" :
     "bg-white text-stone-700 hover:bg-stone-50 border-[#DCD9D0]";
 
@@ -484,20 +579,7 @@ Return this exact shape:
   };
 
   // Resolve current read book if exists
-  // Only set activeBook if currentPosition.bookId is a real saved book (not default)
-  const savedPositionBookId = (() => {
-    try {
-      const p = JSON.parse(localStorage.getItem("lumina_position") || "null");
-      return p?.bookId || null;
-    } catch { return null; }
-  })();
-  const activeBook = books.find((b) => b.id === (savedPositionBookId || currentPosition.bookId))
-    || (() => {
-        try {
-          const cached = JSON.parse(localStorage.getItem("lumina_cached_books") || "[]");
-          return cached.find((b: any) => b.id === (savedPositionBookId || currentPosition.bookId));
-        } catch { return null; }
-      })() || null;
+  const activeBook = books.find((b) => b.id === currentPosition.bookId) || books[0];
 
   // Filters catalog
   const applyFiltersAndSort = (bookList: Book[]) => bookList.filter((book) => {
@@ -537,12 +619,13 @@ Return this exact shape:
       
       {/* HEADER: Geometric navigation toolbar */}
       <nav className={`h-16 border-b px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 ${headerBgClass} ${borderClass} transition-all duration-300`}>
-        <NaraLogo showText={true} size="lg" />
+        <NaraLogo showText={true} />
         
         {/* Navigation tabs */}
         <div className="hidden md:flex gap-8">
           {[
             { id: "library", label: "Library", icon: Compass },
+            { id: "upload", label: "My Documents", icon: Upload },
             { id: "resume", label: "Continue Reading", icon: BookOpen },
             { id: "stats", label: "Reading Stats", icon: Activity },
             { id: "profile", label: "Profile", icon: User },
@@ -1172,6 +1255,116 @@ Return this exact shape:
               );
             })()}
 
+
+            {/* Upload Tab: My Documents */}
+            {activeTab === "upload" && (
+              <div className="space-y-8">
+                {/* Hero */}
+                <div className={`rounded-2xl p-8 border ${isDark ? "bg-[#1B2E4A] border-[#2A5080]" : "bg-[#EEF5FA] border-[#CCDDED]"}`}>
+                  <div className="flex items-start gap-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${isDark ? "bg-[#2A5080]" : "bg-[#5B8FB9]/20"}`}>
+                      <Upload className="w-6 h-6 text-[#5B8FB9]" />
+                    </div>
+                    <div>
+                      <h2 className={`text-xl font-black mb-1 ${textPrimary}`}>Read Your Own Documents</h2>
+                      <p className={`text-sm leading-relaxed max-w-xl ${textSecondary}`}>
+                        Upload any PDF, Word document, or text file and read it with all of Incluread's accessibility tools — syllable breaks, bionic reading, adjustable spacing, AI Coach, and TTS. Perfect for teachers sharing books with students, or anyone who wants to make their reading materials more accessible.
+                      </p>
+                      <div className={`mt-3 flex flex-wrap gap-3 text-[11px] font-bold ${textTertiary}`}>
+                        <span className={`px-2 py-1 rounded-lg border ${isDark ? "bg-[#252B38] border-[#3D4558]" : "bg-white border-[#DCD9D0]"}`}>📄 PDF</span>
+                        <span className={`px-2 py-1 rounded-lg border ${isDark ? "bg-[#252B38] border-[#3D4558]" : "bg-white border-[#DCD9D0]"}`}>📝 Word (.docx)</span>
+                        <span className={`px-2 py-1 rounded-lg border ${isDark ? "bg-[#252B38] border-[#3D4558]" : "bg-white border-[#DCD9D0]"}`}>📃 Text (.txt)</span>
+                      </div>
+                      {!currentUser && (
+                        <p className={`mt-3 text-[11px] ${isDark ? "text-amber-300" : "text-amber-700"}`}>
+                          ⏱ Not signed in — uploaded documents will be available for 24 hours. Sign in to keep them for 30 days.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Upload area */}
+                <div
+                  className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all cursor-pointer ${
+                    isDark ? "border-[#3D4558] hover:border-[#5B8FB9] bg-[#1A1D24]" : "border-[#DCD9D0] hover:border-[#5B8FB9] bg-white"
+                  }`}
+                  onClick={() => document.getElementById("doc-upload-input")?.click()}
+                  onDragOver={(e) => e.preventDefault()}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const file = e.dataTransfer.files[0];
+                    if (file) handleDocUpload(file);
+                  }}
+                >
+                  <input
+                    id="doc-upload-input"
+                    type="file"
+                    accept=".pdf,.docx,.doc,.txt"
+                    className="hidden"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) handleDocUpload(f); }}
+                  />
+                  {uploadLoading ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <Loader2 className="w-8 h-8 animate-spin text-[#5B8FB9]" />
+                      <p className={`text-sm font-bold ${textSecondary}`}>Processing your document...</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-3">
+                      <Upload className={`w-10 h-10 ${isDark ? "text-[#5B8FB9]" : "text-[#5B8FB9]/60"}`} />
+                      <p className={`text-sm font-bold ${textPrimary}`}>Drop a file here or click to browse</p>
+                      <p className={`text-xs ${textTertiary}`}>PDF, DOCX, or TXT · Max 10MB</p>
+                    </div>
+                  )}
+                </div>
+
+                {uploadError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium">
+                    ⚠ {uploadError}
+                  </div>
+                )}
+
+                {/* Uploaded docs list */}
+                {uploadedDocs.length > 0 && (
+                  <div className="space-y-3">
+                    <h3 className={`text-sm font-black uppercase tracking-widest ${textTertiary}`}>Your Documents</h3>
+                    <div className="flex gap-4 overflow-x-auto pb-3" style={{scrollbarWidth:"none"}}>
+                      {uploadedDocs.map((doc) => (
+                        <div key={doc.id} className="flex-shrink-0 w-40 group relative">
+                          <div
+                            onClick={() => onSelectBook(doc.id)}
+                            className={`w-40 h-52 rounded-xl bg-gradient-to-br ${doc.coverColor} flex flex-col justify-between p-4 cursor-pointer shadow-md hover:shadow-lg transition-shadow border border-black/10`}
+                          >
+                            <Upload className="w-6 h-6 text-white/70" />
+                            <div>
+                              <p className="text-white text-xs font-bold line-clamp-3 leading-tight">{doc.title}</p>
+                              <p className="text-white/60 text-[9px] mt-1">{doc.chapters.length} parts · ~{doc.reading_time}m</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => handleRemoveDoc(doc.id)}
+                            className="absolute top-2 right-2 w-5 h-5 bg-red-500 text-white rounded-full text-[9px] font-black flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow z-10"
+                            title="Remove document"
+                          >✕</button>
+                          <p className={`text-xs font-bold mt-2 line-clamp-2 ${textPrimary}`}>{doc.title}</p>
+                          <button
+                            onClick={() => onSelectBook(doc.id)}
+                            className="mt-1 w-full py-1.5 rounded-lg text-[10px] font-black bg-[#EEF5FA] text-[#5B8FB9] border border-[#5B8FB9]/30 hover:bg-[#5B8FB9] hover:text-white transition-all"
+                          >
+                            Read
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {uploadedDocs.length === 0 && !uploadLoading && (
+                  <p className={`text-center text-xs ${textTertiary} py-4`}>No documents uploaded yet. Drop a file above to get started.</p>
+                )}
+              </div>
+            )}
+
             {/* Tab 2: Continue Reading */}
             {activeTab === "resume" && (
               <div className="space-y-6">
@@ -1250,6 +1443,21 @@ Return this exact shape:
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl font-black">Reading Stats & Milestones</h2>
+                  {!currentUser && (
+                    <div className="flex items-start gap-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
+                      <span className="text-amber-500 text-base flex-shrink-0">⏱</span>
+                      <p className="text-xs text-amber-800 leading-relaxed">
+                        <strong>You're reading as a guest.</strong> Your stats reset every day. 
+                        Sign in to save your reading progress for 30 days and track your growth over time.
+                      </p>
+                    </div>
+                  )}
+                  {currentUser && (
+                    <div className="flex items-center gap-2 p-2 bg-emerald-50 border border-emerald-100 rounded-lg">
+                      <span className="text-emerald-500 text-sm">✓</span>
+                      <p className="text-[11px] text-emerald-700">Your stats are saved and reset every 30 days.</p>
+                    </div>
+                  )}
                   <p className="text-xs text-[#666666]">Keep tracking positive daily routines. Focus on achievements, not comparisons.</p>
                 </div>
 

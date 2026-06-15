@@ -29,7 +29,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     yellow: "bg-[#FFFDE5] text-[#000000] border-[#D2CCA9]",
     blue: "bg-[#EEF5FA] text-[#0A192F] border-[#AFC3D4]",
     sepia: "bg-[#F4EAD4] text-[#2D1910] border-[#CCD2B8]",
-    dark: "bg-[#121214] text-[#FFFFFF] border-[#383A40]",
+    dark: "bg-[#1A1D24] text-[#F0F2F5] border-[#3D4151]",
   };
 
   const isDark = theme === "dark";
@@ -38,7 +38,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   const isSepia = theme === "sepia";
 
   const pageBgClass = isDark 
-    ? "bg-[#121214] text-[#E1E4EA]" 
+    ? "bg-[#0D0F14] text-[#F0F2F7]" 
     : isYellow 
     ? "bg-[#FFFDE5] text-[#1D1B11]" 
     : isBlue 
@@ -48,7 +48,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     : "bg-[#F7F4EE] text-[#111111]";
 
   const borderClass = isDark 
-    ? "border-[#2D3139]" 
+    ? "border-[#404657]" 
     : isYellow 
     ? "border-[#D2CCA9]" 
     : isBlue 
@@ -58,9 +58,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     : "border-[#DCD9D0]";
 
   const cardBgClass = isDark 
-    ? "bg-[#1C1E22]/95 border-[#2D3139] text-[#E1E4EA]" 
+    ? "bg-[#1E2130] border-[#404657] text-[#F0F2F7]" 
     : isYellow 
-    ? "bg-white border-[#E8E3CD]" 
+    ? "bg-white border-[#C4BB8A]" 
     : isBlue 
     ? "bg-white border-[#D0DFEB]" 
     : isSepia 
@@ -68,8 +68,8 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     : "bg-white border-[#DCD9D0]";
 
   const textPrimary = isDark ? "text-white" : isYellow ? "text-black" : isBlue ? "text-[#0A192F]" : isSepia ? "text-[#2D1910]" : "text-[#111111]";
-  const textSecondary = isDark ? "text-[#BAC1CC]" : isYellow ? "text-[#2F2A15]" : isBlue ? "text-[#1E2D4A]" : isSepia ? "text-[#4A3525]" : "text-[#444444]";
-  const textTertiary = isDark ? "text-[#7B818F]" : isYellow ? "text-[#5D5030]" : isBlue ? "text-[#4A5B7E]" : isSepia ? "text-[#6D5A4E]" : "text-[#666666]";
+  const textSecondary = isDark ? "text-[#C8D0E0]" : isYellow ? "text-[#2F2A15]" : isBlue ? "text-[#1E2D4A]" : isSepia ? "text-[#4A3525]" : "text-[#444444]";
+  const textTertiary = isDark ? "text-[#9BA3B5]" : isYellow ? "text-[#5D5030]" : isBlue ? "text-[#4A5B7E]" : isSepia ? "text-[#6D5A4E]" : "text-[#666666]";
 
   const sampleText =
     "The way we read shouldn't be fixed. Some of us need wider spacing, others need larger letters or specialized fonts. With dynamic focus modes and audio assistance, you can build your own comfortable visual path.";
@@ -150,10 +150,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                       className={`text-left p-4 rounded-xl border transition-all hover:border-[#5B8FB9] ${
                         font === f.id
                           ? "bg-[#5B8FB9]/10 border-[#5B8FB9] ring-2 ring-[#5B8FB9]/30"
-                          : "bg-white border-[#DCD9D0]"
+                          : isDark ? "bg-[#252B38] border-[#3D4558] text-[#F0F2F5]" : "bg-white border-[#DCD9D0]"
                       }`}
                     >
-                      <p className={`text-base font-bold text-[#222222] ${fontClasses[f.id as FontOption]}`}>
+                      <p className={`text-base font-bold ${isDark ? "text-[#F0F2F5]" : "text-[#222222]"} ${fontClasses[f.id as FontOption]}`}>
                         {f.title}
                       </p>
                       <p className="text-[11px] text-[#888888] mt-1">{f.desc}</p>
@@ -395,7 +395,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             </p>
           </div>
 
-          <div className={`mt-4 p-3 rounded-xl border text-center text-[10px] font-semibold transition-all duration-300 ${isDark ? 'bg-[#2A2B35] border-[#383A40] text-stone-300' : 'bg-[#F7F4EE] border-[#DCD9D0] text-[#555555]'}`}>
+          <div className={`mt-4 p-3 rounded-xl border text-center text-[10px] font-semibold transition-all duration-300 ${isDark ? 'bg-[#1E2130] border-[#404657] text-[#B0BAD0]' : 'bg-[#F7F4EE] border-[#DCD9D0] text-[#555555]'}`}>
             Watch the font weight, sizes, list distance, and ambient backdrops interact instantly as you choose.
           </div>
         </div>
