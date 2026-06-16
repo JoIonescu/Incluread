@@ -3,10 +3,11 @@ import { ArrowLeft, BookOpen, Brain, Eye, Zap, Users, Heart } from "lucide-react
 
 interface AboutPageProps {
   onBack: () => void;
+  initialSection?: "about" | "privacy" | "terms" | "cookies";
 }
 
-export default function AboutPage({ onBack }: AboutPageProps) {
-  const [activeSection, setActiveSection] = React.useState<"about" | "privacy" | "terms" | "cookies">("about");
+export default function AboutPage({ onBack, initialSection = "about" }: AboutPageProps) {
+  const [activeSection, setActiveSection] = React.useState<"about" | "privacy" | "terms" | "cookies">(initialSection);
 
   return (
     <div className="min-h-screen bg-[#F7F4EE] font-sans">
@@ -253,7 +254,7 @@ export default function AboutPage({ onBack }: AboutPageProps) {
       <footer className="bg-[#1a1a2e] text-gray-400 text-xs mt-16">
         <div className="max-w-4xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
           <div>
-            <img src="/incluread-logo.png" alt="Incluread" className="h-12 w-auto mb-3 opacity-90" />
+            <img src="/incluread-logo.png" alt="Incluread" className="h-14 w-auto mb-3" style={{filter:"brightness(0) invert(1)", opacity:0.9}} />
             <p className="leading-relaxed opacity-70">Accessible reading for every mind.</p>
           </div>
           <div>

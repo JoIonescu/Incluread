@@ -192,7 +192,7 @@ export default function InteractiveTutorialVideo() {
     <div className="bg-stone-900 text-white rounded-2xl overflow-hidden border border-stone-800 shadow-xl flex flex-col">
 
       {/* Screen */}
-      <div className="relative h-60 bg-gradient-to-br from-stone-950 to-stone-900 flex flex-col justify-between p-4 select-none">
+      <div className="relative h-52 bg-gradient-to-br from-stone-950 to-stone-900 flex flex-col justify-between p-4 select-none">
 
         {/* Header */}
         <div className="flex items-center justify-between z-10">
@@ -212,13 +212,15 @@ export default function InteractiveTutorialVideo() {
           </div>
         </div>
 
-        {/* CC captions */}
-        {showCC && (
-          <div className="bg-black/85 border border-white/10 p-2.5 rounded-xl text-center text-[11px] font-medium leading-relaxed text-gray-200 z-10">
-            {videoSteps[activeStep].caption}
-          </div>
-        )}
+
       </div>
+
+      {/* CC captions — below screen, never overlapping controls */}
+      {showCC && (
+        <div className="bg-stone-800/80 px-4 py-2 text-center text-[11px] font-medium leading-relaxed text-gray-300 min-h-[3rem] flex items-center justify-center border-t border-stone-700">
+          {videoSteps[activeStep].caption}
+        </div>
+      )}
 
       {/* Progress bar */}
       <div className="w-full bg-stone-800 h-1.5 overflow-hidden">

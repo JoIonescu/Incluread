@@ -21,6 +21,11 @@ export default function App() {
   // Core shelf state tracking
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<"dashboard" | "about">("dashboard");
+  const [legalSection, setLegalSection] = useState<"about" | "privacy" | "terms" | "cookies">("about");
+  const goToLegal = (section: "about" | "privacy" | "terms" | "cookies") => {
+    setLegalSection(section);
+    setCurrentPage("about");
+  };
   const [showCookieBanner, setShowCookieBanner] = useState<boolean>(() => !localStorage.getItem("nara_cookie_consent"));
   const [navLockUntil, setNavLockUntil] = useState<number>(0);
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
@@ -416,7 +421,7 @@ export default function App() {
   }
 
   if (currentPage === "about") {
-    return <AboutPage onBack={() => setCurrentPage("dashboard")} />;
+    return <AboutPage onBack={() => setCurrentPage("dashboard")} initialSection={legalSection} />;
   }
 
   // Phase A: Onboarding Wizard Configuration screen
@@ -522,22 +527,22 @@ export default function App() {
         <footer className="bg-[#1a1a2e] text-gray-400 text-xs mt-8">
           <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
             <div>
-              <p className="text-white font-bold mb-2">Incluread</p>
+              <img src="/incluread-logo.png" alt="Incluread" className="h-14 w-auto mb-3" style={{filter:"brightness(0) invert(1)", opacity:0.9}} />
               <p className="leading-relaxed opacity-70">Accessible reading for every mind. Built for dyslexia, ADHD, and visual stress.</p>
             </div>
             <div>
               <p className="text-white font-bold mb-2">Product</p>
               <ul className="space-y-1 opacity-70">
-                <li><button onClick={() => setCurrentPage("about")} className="hover:text-white transition-colors">About Incluread</button></li>
+                <li><button onClick={() => goToLegal("about")} className="hover:text-white transition-colors">About Incluread</button></li>
                 <li><a href="mailto:hello@incluread.click" className="hover:text-white transition-colors">Contact us</a></li>
               </ul>
             </div>
             <div>
               <p className="text-white font-bold mb-2">Legal</p>
               <ul className="space-y-1 opacity-70">
-                <li><button onClick={() => setCurrentPage("about")} className="hover:text-white transition-colors">Privacy Policy</button></li>
-                <li><button onClick={() => setCurrentPage("about")} className="hover:text-white transition-colors">Terms of Use</button></li>
-                <li><button onClick={() => setCurrentPage("about")} className="hover:text-white transition-colors">Cookie Policy</button></li>
+                <li><button onClick={() => goToLegal("privacy")} className="hover:text-white transition-colors">Privacy Policy</button></li>
+                <li><button onClick={() => goToLegal("terms")} className="hover:text-white transition-colors">Terms of Use</button></li>
+                <li><button onClick={() => goToLegal("cookies")} className="hover:text-white transition-colors">Cookie Policy</button></li>
               </ul>
             </div>
             <div>

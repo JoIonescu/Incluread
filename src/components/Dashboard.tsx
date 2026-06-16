@@ -198,10 +198,19 @@ export default function Dashboard({
   // Automatically fetch subject books from Open Library when selectedSubject changes
   useEffect(() => {
     const fetchSubjectBooks = async () => {
+      // Check sessionStorage cache first
+      const cacheKey = `incluread_subject_${selectedSubject}`;
+      const cached = sessionStorage.getItem(cacheKey);
+      if (cached) {
+        try {
+          setSubjectBooks(JSON.parse(cached));
+          return;
+        } catch {}
+      }
       setFetchingSubject(true);
       try {
         const querySubject = selectedSubject.toLowerCase().replace(" ", "_");
-        const response = await fetch(`https://openlibrary.org/subjects/${querySubject}.json?limit=36`);
+        const response = await fetch(`https://openlibrary.org/subjects/${querySubject}.json?limit=36`, { cache: "force-cache" });
         if (!response.ok) {
           throw new Error("Could not pull subject works from Open Library.");
         }
