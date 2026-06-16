@@ -464,10 +464,15 @@ Return this exact shape:
   const [authLoading, setAuthLoading] = useState(false);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (usr) => {
-      setCurrentUser(usr);
-    });
-    return () => unsubscribe();
+    let unsubscribe: (() => void) | undefined;
+    try {
+      unsubscribe = onAuthStateChanged(auth, (usr) => {
+        setCurrentUser(usr);
+      });
+    } catch (err) {
+      console.warn("Firebase auth listener could not be established:", err);
+    }
+    return () => { if (unsubscribe) unsubscribe(); };
   }, []);
 
   const handleSendMagicLink = async (e: React.FormEvent) => {
@@ -495,7 +500,7 @@ Return this exact shape:
 
   const handleSignOut = async () => {
     try {
-      await signOut(auth);
+      if (auth) await signOut(auth);
       // Clear all user-specific localStorage
       localStorage.removeItem("lumina_saved_book_ids");
       localStorage.removeItem("lumina_bookmarks");
@@ -1112,7 +1117,8 @@ Return this exact shape:
                   {/* Clean, Non-Flicker Layout matching user search action */}
                   {!searchQuery.trim() ? (
                     <div className="space-y-8">
-                      {/* Active continue reading focus highlight if set */}
+                      {/* Active continue reading focus highlight — only shown when a book is in progress */}
+                      {activeBook && (
                       <div
                         onClick={() => onSelectBook(activeBook.id)}
                         className="bg-white border border-[#DCD9D0] rounded-2xl p-6 flex flex-col md:flex-row gap-6 shadow-xs hover:border-[#5B8FB9] cursor-pointer transition-all"
@@ -1134,7 +1140,7 @@ Return this exact shape:
                           </div>
                           <div className="flex items-center gap-3 mt-3">
                             <button
-                              onClick={() => onSelectBook(activeBook.id)}
+                              onClick={(e) => { e.stopPropagation(); onSelectBook(activeBook.id); }}
                               className="h-10 px-5 bg-[#5B8FB9] text-white rounded-xl text-xs font-bold hover:bg-[#4A7BA3] flex items-center gap-1.5 shadow-sm"
                             >
                               <span>Continue Reading</span>
@@ -1144,6 +1150,7 @@ Return this exact shape:
                           </div>
                         </div>
                       </div>
+                      )}
 
                       {/* My Shelf — only bookmarked books, login-gated */}
                       <div className="space-y-2">
