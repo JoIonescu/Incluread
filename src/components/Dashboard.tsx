@@ -864,6 +864,7 @@ Return this exact shape:
             {activeTab === "library" && (() => {
               // Open Library style: cover-dominant vertical card for horizontal shelf rows
               const renderBookCard = (book: Book, isGlobal = false) => {
+                if (!book) return null;
                 return (
                   <div
                     key={book.id}
@@ -976,7 +977,7 @@ Return this exact shape:
                     ) : (
                       <div className="relative">
                         <div id={rowId} className="flex gap-4 overflow-x-auto pb-3" style={{scrollbarWidth:"none", msOverflowStyle:"none"}}>
-                          {bookList.map((book) => renderBookCard(book, isGlobal))}
+                          {bookList.filter(Boolean).map((book) => renderBookCard(book, isGlobal))}
                         </div>
                         {/* Right fade gradient — signals more content */}
                         <div className="absolute right-0 top-0 bottom-3 w-14 bg-gradient-to-l from-[#F7F4EE] to-transparent pointer-events-none" />
@@ -1163,7 +1164,7 @@ Return this exact shape:
                           savedBookIds.length > 0 ? (
                             <div className="flex gap-4 overflow-x-auto pb-3 relative" style={{scrollbarWidth:"none"}}>
                               <div className="absolute right-0 top-0 bottom-3 w-12 bg-gradient-to-l from-[#F7F4EE] to-transparent pointer-events-none z-10" />
-                              {[...books, ...subjectBooks].filter((b, i, arr) => savedBookIds.includes(b.id) && arr.findIndex(x => x.id === b.id) === i).map(b => (
+                              {[...books, ...subjectBooks].filter((b, i, arr) => b && savedBookIds.includes(b.id) && arr.findIndex(x => x.id === b.id) === i).map(b => (
                               <div key={b.id} className="relative flex-shrink-0">
                                 {renderBookCard(b, !books.find(x => x.id === b.id))}
                                 <button
@@ -1446,7 +1447,7 @@ Return this exact shape:
                     <h3 className="text-sm font-black text-slate-600 uppercase tracking-widest">My Shelf</h3>
                     <div className="flex gap-4 overflow-x-auto pb-2" style={{scrollbarWidth:"none"}}>
                       {[...books, ...subjectBooks]
-                        .filter((b, i, arr) => savedBookIds.includes(b.id) && arr.findIndex(x => x.id === b.id) === i)
+                        .filter((b, i, arr) => b && savedBookIds.includes(b.id) && arr.findIndex(x => x.id === b.id) === i)
                         .map(b => (
                           <div
                             key={b.id}
