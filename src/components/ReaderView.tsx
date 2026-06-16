@@ -56,12 +56,17 @@ export default function ReaderView({
     syllableBreaking: preferences.syllableBreaking ?? false,
   };
   // Navigation State
-  const [localChapterId, setLocalChapterId] = useState<string | null>(null);
-  const effectiveChapterId = localChapterId || currentPosition.chapterId;
   const activeChapterIndex = book.chapters.findIndex((c) => c.id === effectiveChapterId);
   const safeChapterIndex = activeChapterIndex >= 0 ? activeChapterIndex : 0;
   const activeChapter = book.chapters[safeChapterIndex];
+  const [localChapterId, setLocalChapterId] = useState<string | null>(null);
+  const effectiveChapterId = localChapterId || currentPosition.chapterId;
   const activeParagraphIndex = currentPosition.paragraphIndex;
+  const isCurrentlyBookmarked = bookmarks.some(
+    b => b.bookId === book.id &&
+         b.chapterId === effectiveChapterId &&
+         b.paragraphIndex === activeParagraphIndex
+  );
 
   // Reading Mode Aids
   const [focusMode, setFocusMode] = useState<FocusModeType>("normal");
@@ -195,7 +200,6 @@ export default function ReaderView({
   const goToNextChapter = () => {
     if (safeChapterIndex < book.chapters.length - 1) {
       const nextCh = book.chapters[safeChapterIndex + 1];
-      // Set local state FIRST so UI updates immediately, regardless of Firestore
       setLocalChapterId(nextCh.id);
       onUpdatePosition({ bookId: book.id, chapterId: nextCh.id, paragraphIndex: 0 });
       setHighlightedSentenceIndex(0);
