@@ -56,11 +56,12 @@ export default function ReaderView({
     syllableBreaking: preferences.syllableBreaking ?? false,
   };
   // Navigation State
+  // localChapterId must be declared BEFORE effectiveChapterId which depends on it
+  const [localChapterId, setLocalChapterId] = useState<string | null>(null);
+  const effectiveChapterId = localChapterId || currentPosition.chapterId;
   const activeChapterIndex = book.chapters.findIndex((c) => c.id === effectiveChapterId);
   const safeChapterIndex = activeChapterIndex >= 0 ? activeChapterIndex : 0;
   const activeChapter = book.chapters[safeChapterIndex];
-  const [localChapterId, setLocalChapterId] = useState<string | null>(null);
-  const effectiveChapterId = localChapterId || currentPosition.chapterId;
   const activeParagraphIndex = currentPosition.paragraphIndex;
   const isCurrentlyBookmarked = bookmarks.some(
     b => b.bookId === book.id &&
