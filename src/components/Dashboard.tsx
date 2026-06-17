@@ -361,13 +361,13 @@ export default function Dashboard({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
-          max_tokens: 1000,
+          max_tokens: 2500,
           messages: [{
             role: "user",
-            content: `Create a short dyslexia-friendly reading excerpt for the book "${onlineBook.title}" by ${onlineBook.author}. Return ONLY valid JSON, no markdown.
+            content: `Write an original dyslexia-friendly retelling of the opening of "${onlineBook.title}" by ${onlineBook.author}, structured as exactly 4 short chapters so a reader can navigate between them. Each chapter should have 3-4 short paragraphs (2-3 sentences each, simple vocabulary, no copied text — write fresh original prose inspired by the book's themes and characters). Return ONLY valid JSON, no markdown, no commentary.
 
-Return this exact shape:
-{"chapters":[{"id":"chap-1","title":"Opening","content":["paragraph 1","paragraph 2","paragraph 3"]}],"characters":[{"name":"Name","role":"Role","relationships":"Description","events":"Recent events"}],"concepts":[{"term":"Key concept","definition":"Simple definition","keyTerms":["word1","word2"],"examples":["An example sentence"]}]}`
+Return this exact shape with exactly 4 chapters:
+{"chapters":[{"id":"chap-1","title":"Chapter title here","content":["paragraph 1","paragraph 2","paragraph 3"]},{"id":"chap-2","title":"Chapter title here","content":["paragraph 1","paragraph 2"]},{"id":"chap-3","title":"Chapter title here","content":["paragraph 1","paragraph 2"]},{"id":"chap-4","title":"Chapter title here","content":["paragraph 1","paragraph 2"]}],"characters":[{"name":"Name","role":"Role","relationships":"Description","events":"Recent events"}],"concepts":[{"term":"Key concept","definition":"Simple definition","keyTerms":["word1","word2"],"examples":["An example sentence"]}]}`
           }]
         })
       });
@@ -407,11 +407,34 @@ Return this exact shape:
         chapters: [
           {
             id: "chap-1",
-            title: "Chapter I: The Magic Open",
+            title: "Chapter 1: Getting Started",
             content: [
               `This is your customized visual-stress-free edition of "${onlineBook.title}" by ${onlineBook.author}.`,
               "Every journey into classic literature begins with learning to slow down and isolate individual lines of thought.",
-              "Adjust your typeface font to 'OpenDyslexic' or 'Atkinson Hyperlegible' in the Settings, increase line spacing to match, and click any word to see real supportive decoding translations!"
+            ]
+          },
+          {
+            id: "chap-2",
+            title: "Chapter 2: Reading Tools",
+            content: [
+              "Adjust your typeface font to OpenDyslexic or Atkinson Hyperlegible in the Settings panel.",
+              "Increase line spacing, letter spacing, and word spacing to match your comfort level.",
+            ]
+          },
+          {
+            id: "chap-3",
+            title: "Chapter 3: Word Support",
+            content: [
+              "Click any word while reading to see a supportive decoding translation and definition.",
+              "Try Bionic Reading or Syllable Breaks for extra support with longer words.",
+            ]
+          },
+          {
+            id: "chap-4",
+            title: "Chapter 4: AI Reading Coach",
+            content: [
+              "Use the Simplify button to make any paragraph easier to understand, at three different levels.",
+              "Tap Explain for a plain-language breakdown of tricky sentences.",
             ]
           }
         ],
