@@ -652,7 +652,7 @@ Return this exact shape:
       
       {/* HEADER: Geometric navigation toolbar */}
       <nav className={`h-16 border-b px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 ${headerBgClass} ${borderClass} transition-all duration-300`}>
-        <NaraLogo showText={true} size="lg" />
+        <NaraLogo showText={true} size="lg" className="hidden md:flex" /><NaraLogo showText={true} size="sm" className="flex md:hidden" />
         
         {/* Navigation tabs */}
         <div className="hidden md:flex gap-8">
@@ -684,8 +684,23 @@ Return this exact shape:
           })}
         </div>
 
-        {/* User Badge Profile Avatar */}
-        <div className="flex items-center gap-2 font-sans">
+        {/* Mobile-only profile icon in top nav */}
+        <button
+          className="flex md:hidden items-center justify-center w-9 h-9 rounded-full bg-[#5B8FB9]/10 border border-[#5B8FB9]/20"
+          onClick={() => setActiveTab("profile")}
+          aria-label="Profile"
+        >
+          {currentUser ? (
+            <span className="text-[10px] font-black text-[#5B8FB9]">
+              {currentUser.email?.substring(0, 2).toUpperCase() || "U"}
+            </span>
+          ) : (
+            <User className="w-4 h-4 text-[#5B8FB9]" />
+          )}
+        </button>
+
+        {/* User Badge Profile Avatar — hidden on mobile, profile is in bottom nav */}
+        <div className="hidden md:flex items-center gap-2 font-sans">
           {currentUser ? (
             <button
               onClick={() => setActiveTab("profile")}
@@ -713,10 +728,10 @@ Return this exact shape:
       <div className="md:hidden bg-white border-t border-[#DCD9D0] px-4 py-2 fixed bottom-0 left-0 right-0 z-40 flex justify-around">
         {[
           { id: "library", label: "Library", icon: Compass },
+          { id: "upload", label: "Documents", icon: Upload },
           { id: "resume", label: "Resume", icon: BookOpen },
           { id: "stats", label: "Stats", icon: Activity },
           { id: "profile", label: "Profile", icon: User },
-          { id: "settings", label: "Preferences", icon: Sliders },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

@@ -28,6 +28,7 @@ export default function App() {
   };
   const [showCookieBanner, setShowCookieBanner] = useState<boolean>(() => !localStorage.getItem("nara_cookie_consent"));
   const [navLockUntil, setNavLockUntil] = useState<number>(0);
+  const navLockRef = React.useRef<number>(0); // ref so Firestore closure always sees latest
   const [bookmarks, setBookmarks] = useState<Bookmark[]>([]);
   const [currentPosition, setCurrentPosition] = useState<ReadingPosition>({
     bookId: "alice-wonderland",
@@ -136,7 +137,7 @@ export default function App() {
     const unsubPositions = onSnapshot(positionsRef, (snapshot) => {
       snapshot.forEach((docSnap) => {
         const pos = docSnap.data() as ReadingPosition;
-        if (pos.bookId === currentPosition.bookId && Date.now() > navLockUntil) {
+        if (pos.bookId === currentPosition.bookId && Date.now() > navLockRef.current) {
           setCurrentPosition(pos);
         }
       });
@@ -329,7 +330,9 @@ export default function App() {
 
   const handleUpdatePosition = (pos: ReadingPosition) => {
     if (pos.chapterId !== currentPosition.chapterId) {
-      setNavLockUntil(Date.now() + 3000);
+      const lockUntil = Date.now() + 3000;
+      setNavLockUntil(lockUntil);
+      navLockRef.current = lockUntil;
     }
     setCurrentPosition(pos);
     localStorage.setItem("lumina_position", JSON.stringify(pos));
