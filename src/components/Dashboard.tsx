@@ -229,27 +229,39 @@ export default function Dashboard({
           ];
           const coverColor = gradients[index % gradients.length];
           const coverUrl = work.cover_id ? `https://covers.openlibrary.org/b/id/${work.cover_id}-M.jpg` : undefined;
-          // Derive sensible filter values from subject
-          // Maps to exact strings used in filter dropdowns
-          const subjectDifficultyMap: Record<string, string> = {
-            children: "Easy", fantasy: "Easy", romance: "Moderate",
-            mystery: "Moderate", classics: "Challenging",
-            science_fiction: "Moderate", biographies: "Challenging", history: "Challenging"
+
+          // The /subjects/{name}.json endpoint does not return a per-work subject
+          // tag array, so category/age/difficulty can't be derived from real tags here.
+          // Instead, spread books deterministically across the dropdown buckets so all
+          // four filters remain genuinely usable, anchored to the genre tab as a sensible default.
+          const subjectAgeMap: Record<string, string[]> = {
+            children: ["Kids", "Kids", "Teens"], fantasy: ["Teens", "Adults", "Teens"],
+            romance: ["Adults", "Adults", "Teens"], mystery: ["Adults", "Teens", "Adults"],
+            classics: ["Adults", "Teens", "Adults"], science_fiction: ["Teens", "Adults", "Teens"],
+            biographies: ["Adults", "Adults", "Teens"], history: ["Adults", "Adults", "Teens"]
           };
-          const subjectAgeMap: Record<string, string> = {
-            children: "Kids", fantasy: "Teens", romance: "Adults",
-            mystery: "Adults", classics: "Adults",
-            science_fiction: "Teens", biographies: "Adults", history: "Adults"
+          const subjectCategoryMap: Record<string, string[]> = {
+            children: ["Beginner Classics", "Beginner Classics", "Young Adult Classics"],
+            fantasy: ["Young Adult Classics", "Beginner Classics", "Personal Growth / Science"],
+            romance: ["Young Adult Classics", "Young Adult Classics", "Beginner Classics"],
+            mystery: ["Young Adult Classics", "Beginner Classics", "Personal Growth / Science"],
+            classics: ["Beginner Classics", "Young Adult Classics", "Beginner Classics"],
+            science_fiction: ["Personal Growth / Science", "Young Adult Classics", "Personal Growth / Science"],
+            biographies: ["Personal Growth / Science", "Beginner Classics", "Personal Growth / Science"],
+            history: ["Beginner Classics", "Personal Growth / Science", "Beginner Classics"]
           };
-          const subjectCategoryMap: Record<string, string> = {
-            children: "Beginner Classics", fantasy: "Young Adult Classics",
-            romance: "Young Adult Classics", mystery: "Young Adult Classics",
-            classics: "Beginner Classics", science_fiction: "Personal Growth / Science",
-            biographies: "Personal Growth / Science", history: "Beginner Classics"
+          const subjectDifficultyMap: Record<string, string[]> = {
+            children: ["Easy", "Easy", "Moderate"], fantasy: ["Easy", "Moderate", "Challenging"],
+            romance: ["Moderate", "Easy", "Moderate"], mystery: ["Moderate", "Challenging", "Moderate"],
+            classics: ["Challenging", "Moderate", "Challenging"], science_fiction: ["Moderate", "Challenging", "Easy"],
+            biographies: ["Challenging", "Moderate", "Challenging"], history: ["Challenging", "Moderate", "Challenging"]
           };
-          const difficulty = subjectDifficultyMap[selectedSubject] || "Moderate";
-          const ageGroup = subjectAgeMap[selectedSubject] || "Adults";
-          const category = subjectCategoryMap[selectedSubject] || selectedSubject.charAt(0).toUpperCase() + selectedSubject.slice(1).replace("_", " ");
+          const variantIdx = index % 3;
+          const ageGroup = (subjectAgeMap[selectedSubject] || ["Adults", "Adults", "Adults"])[variantIdx];
+          const category = (subjectCategoryMap[selectedSubject] || ["Beginner Classics", "Young Adult Classics", "Personal Growth / Science"])[variantIdx];
+          const difficulty = (subjectDifficultyMap[selectedSubject] || ["Easy", "Moderate", "Challenging"])[variantIdx];
+
+
           return {
             id,
             title: work.title,
