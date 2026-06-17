@@ -236,6 +236,22 @@ export default function ReaderView({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // Shared logic: advance/retreat one page within the chapter, or roll over to the next/prev chapter
+  const goToNextPage = () => {
+    if (activeParagraphIndex < activeChapter.content.length - 1) {
+      onUpdatePosition({ ...currentPosition, paragraphIndex: activeParagraphIndex + 1 });
+    } else {
+      goToNextChapter();
+    }
+  };
+  const goToPrevPage = () => {
+    if (activeParagraphIndex > 0) {
+      onUpdatePosition({ ...currentPosition, paragraphIndex: activeParagraphIndex - 1 });
+    } else {
+      goToPrevChapter();
+    }
+  };
+
   // Swipe gesture support — touch (mobile) and mouse drag (desktop)
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
@@ -256,8 +272,8 @@ export default function ReaderView({
   };
   const handleTouchEnd = () => {
     if (touchStartX.current === null) return;
-    if (swipeOffset > SWIPE_THRESHOLD) goToPrevChapter();
-    else if (swipeOffset < -SWIPE_THRESHOLD) goToNextChapter();
+    if (swipeOffset > SWIPE_THRESHOLD) goToPrevPage();
+    else if (swipeOffset < -SWIPE_THRESHOLD) goToNextPage();
     touchStartX.current = null;
     touchStartY.current = null;
     setSwipeOffset(0);
@@ -276,8 +292,8 @@ export default function ReaderView({
   };
   const handleMouseUp = () => {
     if (!isDragging.current) return;
-    if (swipeOffset > SWIPE_THRESHOLD) goToPrevChapter();
-    else if (swipeOffset < -SWIPE_THRESHOLD) goToNextChapter();
+    if (swipeOffset > SWIPE_THRESHOLD) goToPrevPage();
+    else if (swipeOffset < -SWIPE_THRESHOLD) goToNextPage();
     isDragging.current = false;
     mouseStartX.current = null;
     setSwipeOffset(0);
@@ -683,13 +699,20 @@ useEffect(() => {
             </div>
           )}
 
-          {/* Chapter Quick Selector card */}
+          {/* Chapter Quick Selector card — arrows move page-by-page within this chapter */}
           <div className={`w-full max-w-[700px] border rounded-2xl p-4 mb-3 flex justify-between items-center shadow-sm ${cardBgClass} transition-all duration-300`}>
             <button
-              onClick={(e) => { e.stopPropagation(); goToPrevChapter(); }}
-              disabled={safeChapterIndex === 0}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (activeParagraphIndex > 0) {
+                  onUpdatePosition({ ...currentPosition, paragraphIndex: activeParagraphIndex - 1 });
+                } else {
+                  goToPrevChapter();
+                }
+              }}
+              disabled={safeChapterIndex === 0 && activeParagraphIndex === 0}
               className={`p-2 border rounded-xl disabled:opacity-40 transition-all ${buttonClass}`}
-              aria-label="Go to previous chapter"
+              aria-label="Previous page"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
@@ -697,20 +720,27 @@ useEffect(() => {
             <div className="text-center">
               <p className={`text-[10px] font-black uppercase tracking-widest ${textTertiary}`}>Active Chapter</p>
               <p className="text-sm font-bold mt-0.5">{activeChapter.title}</p>
-              <p className={`text-[9px] mt-0.5 ${textTertiary}`}>Chapter {safeChapterIndex + 1} of {book.chapters.length} · swipe or tap arrows</p>
+              <p className={`text-[9px] mt-0.5 ${textTertiary}`}>Page {activeParagraphIndex + 1} of {activeChapter.content.length} · swipe or tap arrows</p>
             </div>
             
             <button
-              onClick={(e) => { e.stopPropagation(); goToNextChapter(); }}
-              disabled={safeChapterIndex === book.chapters.length - 1}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (activeParagraphIndex < activeChapter.content.length - 1) {
+                  onUpdatePosition({ ...currentPosition, paragraphIndex: activeParagraphIndex + 1 });
+                } else {
+                  goToNextChapter();
+                }
+              }}
+              disabled={safeChapterIndex === book.chapters.length - 1 && activeParagraphIndex === activeChapter.content.length - 1}
               className={`p-2 border rounded-xl disabled:opacity-40 transition-all ${buttonClass}`}
-              aria-label="Go to next chapter"
+              aria-label="Next page"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
 
-          {/* Chapter tabs — jump directly to any chapter, scrollable row */}
+          {/* Chapter tabs — labeled "Chapter N", jump directly to any chapter */}
           {book.chapters.length > 1 && (
             <div className="w-full max-w-[700px] flex items-center gap-1.5 overflow-x-auto pb-2 mb-3" style={{ scrollbarWidth: "none" }}>
               {book.chapters.map((ch, idx) => (
@@ -724,11 +754,12 @@ useEffect(() => {
                   }`}
                   title={ch.title}
                 >
-                  {idx + 1}
+                  Chapter {idx + 1}
                 </button>
               ))}
             </div>
           )}
+
 
           {/* Bookmarking notification or interactive button */}
           <div className="w-full max-w-[700px] flex justify-end gap-2 mb-3">
