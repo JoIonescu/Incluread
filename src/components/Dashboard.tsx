@@ -875,20 +875,38 @@ Return this exact shape with exactly 4 chapters:
                         </p>
                       </div>
                     ) : detailBook.chapters && detailBook.chapters.length > 0 ? (
-                      <button
-                        onClick={() => {
-                          try {
-                            const cached = JSON.parse(localStorage.getItem("lumina_cached_books") || "[]");
-                            const without = cached.filter((b: Book) => b.id !== detailBook.id);
-                            localStorage.setItem("lumina_cached_books", JSON.stringify([detailBook, ...without].slice(0, 20)));
-                          } catch {}
-                          onSelectBook(detailBook.id);
-                        }}
-                        className="w-full h-14 bg-[#5B8FB9] text-white font-black text-sm uppercase rounded-2xl tracking-widest hover:bg-[#497A9E] transition-all flex items-center justify-center gap-2 shadow-lg hover:translate-y-[-1px] cursor-pointer"
-                      >
-                        <span>Start Reading Experience</span>
-                        <ArrowRight className="w-5 h-5" />
-                      </button>
+                      <div className="space-y-2">
+                        <button
+                          onClick={() => {
+                            try {
+                              const cached = JSON.parse(localStorage.getItem("lumina_cached_books") || "[]");
+                              const without = cached.filter((b: Book) => b.id !== detailBook.id);
+                              localStorage.setItem("lumina_cached_books", JSON.stringify([detailBook, ...without].slice(0, 20)));
+                            } catch {}
+                            onSelectBook(detailBook.id);
+                          }}
+                          className="w-full h-14 bg-[#5B8FB9] text-white font-black text-sm uppercase rounded-2xl tracking-widest hover:bg-[#497A9E] transition-all flex items-center justify-center gap-2 shadow-lg hover:translate-y-[-1px] cursor-pointer"
+                        >
+                          <span>Start Reading Experience</span>
+                          <ArrowRight className="w-5 h-5" />
+                        </button>
+                        {detailBook.id.startsWith("openlib-") && (
+                          <button
+                            onClick={() => {
+                              // Clear any cached version so a fresh AI generation runs
+                              try {
+                                const cached = JSON.parse(localStorage.getItem("lumina_cached_books") || "[]");
+                                localStorage.setItem("lumina_cached_books", JSON.stringify(cached.filter((b: Book) => b.id !== detailBook.id)));
+                              } catch {}
+                              setBooks(prev => prev.filter(b => b.id !== detailBook.id));
+                              handleGenerateAndReadBook({ ...detailBook, chapters: [] });
+                            }}
+                            className="w-full text-center text-[11px] font-bold text-slate-400 hover:text-[#5B8FB9] transition-colors py-1"
+                          >
+                            Regenerate chapters with AI
+                          </button>
+                        )}
+                      </div>
                     ) : (
                       <button
                         onClick={() => handleGenerateAndReadBook(detailBook)}
