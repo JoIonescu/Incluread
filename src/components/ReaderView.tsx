@@ -58,6 +58,11 @@ export default function ReaderView({
   // Navigation State
   // localChapterId must be declared BEFORE effectiveChapterId which depends on it
   const [localChapterId, setLocalChapterId] = useState<string | null>(null);
+  // Reset local override whenever the book itself changes — prevents stale chapter ID
+  // from a previous book leaking into a new book's index resolution
+  useEffect(() => {
+    setLocalChapterId(null);
+  }, [book.id]);
   const effectiveChapterId = localChapterId || currentPosition.chapterId;
   const activeChapterIndex = book.chapters.findIndex((c) => c.id === effectiveChapterId);
   const safeChapterIndex = activeChapterIndex >= 0 ? activeChapterIndex : 0;
@@ -632,11 +637,39 @@ useEffect(() => {
             </button>
           </div>
 
-          {/* Bookmarking notification or interactive button */}
-          <div className="w-full max-w-[700px] flex justify-end gap-2 mb-3">
+          {/* Bookmarking notification + Chapter jump tabs */}
+          <div className="w-full max-w-[700px] flex flex-wrap items-center justify-between gap-2 mb-3">
+            {/* Chapter tabs — jump directly to any chapter */}
+            {book.chapters.length > 1 && (
+              <div className="flex items-center gap-1 overflow-x-auto pb-1 max-w-full" style={{scrollbarWidth: "none"}}>
+                {book.chapters.map((ch, idx) => (
+                  <button
+                    key={ch.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setLocalChapterId(ch.id);
+                      onUpdatePosition({ bookId: book.id, chapterId: ch.id, paragraphIndex: 0 });
+                      setHighlightedSentenceIndex(0);
+                      setIsPlayingAudio(false);
+                      setAiSimplifyOverlay(null);
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }}
+                    className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all ${
+                      idx === safeChapterIndex
+                        ? "bg-[#5B8FB9] text-white border-[#5B8FB9]"
+                        : `${buttonClass} hover:border-[#5B8FB9]/50`
+                    }`}
+                    title={ch.title}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+
             <button
               onClick={triggerAddBookmark}
-              className={`text-xs border flex items-center gap-1 px-3 py-1.5 rounded-lg font-semibold transition-all ${buttonClass}`}
+              className={`text-xs border flex items-center gap-1 px-3 py-1.5 rounded-lg font-semibold transition-all flex-shrink-0 ${buttonClass}`}
             >
               <BookmarkIcon className="w-4 h-4 text-[#5B8FB9]" />
               <span>{bookmarkToast || isCurrentlyBookmarked ? "✓ Saved" : "Bookmark"}</span>
