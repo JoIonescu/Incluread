@@ -58,8 +58,8 @@ export default function ReaderView({
   // Navigation State
   // localChapterId must be declared BEFORE effectiveChapterId which depends on it
   const [localChapterId, setLocalChapterId] = useState<string | null>(null);
-  // Reset local override whenever the book itself changes — prevents stale chapter ID
-  // from a previous book leaking into a new book's index resolution
+  // Reset local override whenever the book changes — prevents a stale chapter id
+  // from a previously-opened book leaking into a new book's chapter resolution
   useEffect(() => {
     setLocalChapterId(null);
   }, [book.id]);
@@ -225,6 +225,62 @@ export default function ReaderView({
       setAiSimplifyOverlay(null);
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
+  };
+
+  const jumpToChapter = (chapterId: string) => {
+    setLocalChapterId(chapterId);
+    onUpdatePosition({ bookId: book.id, chapterId, paragraphIndex: 0 });
+    setHighlightedSentenceIndex(0);
+    setIsPlayingAudio(false);
+    setAiSimplifyOverlay(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Swipe gesture support — touch (mobile) and mouse drag (desktop)
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const SWIPE_THRESHOLD = 70;
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX.current === null) return;
+    const dx = e.touches[0].clientX - touchStartX.current;
+    const dy = touchStartY.current !== null ? e.touches[0].clientY - touchStartY.current : 0;
+    // Ignore mostly-vertical scrolling gestures
+    if (Math.abs(dy) > Math.abs(dx)) return;
+    setSwipeOffset(dx);
+  };
+  const handleTouchEnd = () => {
+    if (touchStartX.current === null) return;
+    if (swipeOffset > SWIPE_THRESHOLD) goToPrevChapter();
+    else if (swipeOffset < -SWIPE_THRESHOLD) goToNextChapter();
+    touchStartX.current = null;
+    touchStartY.current = null;
+    setSwipeOffset(0);
+  };
+
+  // Mouse drag support for desktop trackpads/click-drag
+  const mouseStartX = useRef<number | null>(null);
+  const isDragging = useRef(false);
+  const handleMouseDown = (e: React.MouseEvent) => {
+    mouseStartX.current = e.clientX;
+    isDragging.current = true;
+  };
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current || mouseStartX.current === null) return;
+    setSwipeOffset(e.clientX - mouseStartX.current);
+  };
+  const handleMouseUp = () => {
+    if (!isDragging.current) return;
+    if (swipeOffset > SWIPE_THRESHOLD) goToPrevChapter();
+    else if (swipeOffset < -SWIPE_THRESHOLD) goToNextChapter();
+    isDragging.current = false;
+    mouseStartX.current = null;
+    setSwipeOffset(0);
   };
 
   // Draggable reading ruler helper via mouse clicks or keys
@@ -609,10 +665,26 @@ useEffect(() => {
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 max-w-7xl mx-auto w-full px-4 py-8 gap-8 items-start">
         
         {/* Left main interactive reading column (Max 700px nested) */}
-        <main className="col-span-1 lg:col-span-8 flex flex-col items-center max-w-[720px] w-full mx-auto">
-          
+        <main
+          className="col-span-1 lg:col-span-8 flex flex-col items-center max-w-[720px] w-full mx-auto select-none"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          style={{ transform: `translateX(${swipeOffset * 0.3}px)`, transition: swipeOffset === 0 ? "transform 0.25s ease-out" : "none" }}
+        >
+          {/* Swipe direction hint, shown only while dragging */}
+          {Math.abs(swipeOffset) > 20 && (
+            <div className={`fixed top-1/2 ${swipeOffset > 0 ? "left-6" : "right-6"} -translate-y-1/2 z-30 bg-[#5B8FB9] text-white rounded-full p-3 shadow-lg opacity-80 pointer-events-none`}>
+              {swipeOffset > 0 ? <ChevronLeft className="w-6 h-6" /> : <ChevronRight className="w-6 h-6" />}
+            </div>
+          )}
+
           {/* Chapter Quick Selector card */}
-          <div className={`w-full max-w-[700px] border rounded-2xl p-4 mb-6 flex justify-between items-center shadow-sm ${cardBgClass} transition-all duration-300`}>
+          <div className={`w-full max-w-[700px] border rounded-2xl p-4 mb-3 flex justify-between items-center shadow-sm ${cardBgClass} transition-all duration-300`}>
             <button
               onClick={(e) => { e.stopPropagation(); goToPrevChapter(); }}
               disabled={safeChapterIndex === 0}
@@ -625,6 +697,7 @@ useEffect(() => {
             <div className="text-center">
               <p className={`text-[10px] font-black uppercase tracking-widest ${textTertiary}`}>Active Chapter</p>
               <p className="text-sm font-bold mt-0.5">{activeChapter.title}</p>
+              <p className={`text-[9px] mt-0.5 ${textTertiary}`}>Chapter {safeChapterIndex + 1} of {book.chapters.length} · swipe or tap arrows</p>
             </div>
             
             <button
@@ -637,39 +710,31 @@ useEffect(() => {
             </button>
           </div>
 
-          {/* Bookmarking notification + Chapter jump tabs */}
-          <div className="w-full max-w-[700px] flex flex-wrap items-center justify-between gap-2 mb-3">
-            {/* Chapter tabs — jump directly to any chapter */}
-            {book.chapters.length > 1 && (
-              <div className="flex items-center gap-1 overflow-x-auto pb-1 max-w-full" style={{scrollbarWidth: "none"}}>
-                {book.chapters.map((ch, idx) => (
-                  <button
-                    key={ch.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setLocalChapterId(ch.id);
-                      onUpdatePosition({ bookId: book.id, chapterId: ch.id, paragraphIndex: 0 });
-                      setHighlightedSentenceIndex(0);
-                      setIsPlayingAudio(false);
-                      setAiSimplifyOverlay(null);
-                      window.scrollTo({ top: 0, behavior: "smooth" });
-                    }}
-                    className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all ${
-                      idx === safeChapterIndex
-                        ? "bg-[#5B8FB9] text-white border-[#5B8FB9]"
-                        : `${buttonClass} hover:border-[#5B8FB9]/50`
-                    }`}
-                    title={ch.title}
-                  >
-                    {idx + 1}
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Chapter tabs — jump directly to any chapter, scrollable row */}
+          {book.chapters.length > 1 && (
+            <div className="w-full max-w-[700px] flex items-center gap-1.5 overflow-x-auto pb-2 mb-3" style={{ scrollbarWidth: "none" }}>
+              {book.chapters.map((ch, idx) => (
+                <button
+                  key={ch.id}
+                  onClick={(e) => { e.stopPropagation(); jumpToChapter(ch.id); }}
+                  className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${
+                    idx === safeChapterIndex
+                      ? "bg-[#5B8FB9] text-white border-[#5B8FB9]"
+                      : `${buttonClass} hover:border-[#5B8FB9]/50`
+                  }`}
+                  title={ch.title}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+            </div>
+          )}
 
+          {/* Bookmarking notification or interactive button */}
+          <div className="w-full max-w-[700px] flex justify-end gap-2 mb-3">
             <button
               onClick={triggerAddBookmark}
-              className={`text-xs border flex items-center gap-1 px-3 py-1.5 rounded-lg font-semibold transition-all flex-shrink-0 ${buttonClass}`}
+              className={`text-xs border flex items-center gap-1 px-3 py-1.5 rounded-lg font-semibold transition-all ${buttonClass}`}
             >
               <BookmarkIcon className="w-4 h-4 text-[#5B8FB9]" />
               <span>{bookmarkToast || isCurrentlyBookmarked ? "✓ Saved" : "Bookmark"}</span>
