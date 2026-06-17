@@ -334,22 +334,37 @@ export default function Dashboard({
         ];
         const coverColor = gradients[index % gradients.length];
         const coverUrl = doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg` : undefined;
-        
+
+        // Normalize into the same fixed categories the dropdown filter uses —
+        // raw Open Library subject tags (e.g. "American wit and humor") never
+        // match the dropdown options, so search results were unfilterable before.
+        const subjectTags: string[] = (doc.subject || []).map((s: string) => s.toLowerCase());
+        const hasAny = (...needles: string[]) => needles.some(n => subjectTags.some(t => t.includes(n)));
+
+        let category: string;
+        if (hasAny("juvenile", "children", "kids", "picture book", "fairy tale")) category = "Beginner Classics";
+        else if (hasAny("young adult", "teen", "ya fiction", "coming of age")) category = "Young Adult Classics";
+        else if (hasAny("science", "philosophy", "psychology", "self-help", "biography", "memoir")) category = "Personal Growth / Science";
+        else category = "Beginner Classics";
+
+        // Broader Kids detection — Open Library almost always tags children's books
+        // as "Juvenile fiction" / "Juvenile literature" / "Children's stories", not "kid"
+        let ageGroup: string;
+        if (hasAny("juvenile", "children's stories", "picture book", "early reader", "beginning reader")) ageGroup = "Kids";
+        else if (hasAny("young adult", "teen", "ya fiction")) ageGroup = "Teens";
+        else ageGroup = "Adults";
+
         return {
           id,
           title: doc.title,
           author: doc.author_name?.[0] || "Unknown Author",
           coverColor,
           coverIcon: "Book",
-          category: doc.subject?.[0] || "Global Literature",
+          category,
           difficulty: doc.number_of_pages && doc.number_of_pages < 150 ? "Easy" : doc.number_of_pages && doc.number_of_pages < 350 ? "Moderate" : "Challenging",
           reading_time: Math.round((doc.number_of_pages_median || doc.number_of_pages || 180) / 10),
           description: doc.first_sentence?.[0] || (doc.subject ? `A classic narrative detailing: ${doc.subject.slice(0, 3).join(", ")}.` : "A popular work of global literature, ready for accessible reading adjustments."),
-          ageGroup: doc.subject?.some((s: string) => s.toLowerCase().includes("kid") || s.toLowerCase().includes("juvenile"))
-            ? "Kids"
-            : doc.subject?.some((s: string) => s.toLowerCase().includes("teen") || s.toLowerCase().includes("young adult"))
-            ? "Teens"
-            : "Adults",
+          ageGroup,
           chapters: [],
           characters: [],
           concepts: [],
