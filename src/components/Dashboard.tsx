@@ -683,6 +683,10 @@ Return this exact shape with exactly 4 chapters:
   });
   const filteredBooks = applyFiltersAndSort(books);
   const filteredSubjectBooks = applyFiltersAndSort(subjectBooks);
+  // Live Open Library search results — previously rendered raw, bypassing
+  // Difficulty/Category/Age Group/Sort entirely. Now filtered/sorted the same
+  // way as every other book list in the dashboard.
+  const filteredOnlineBooks = applyFiltersAndSort(onlineBooks);
 
 
 
@@ -1355,9 +1359,15 @@ Return this exact shape with exactly 4 chapters:
                             <p className="text-xs font-bold text-slate-700 mt-3 uppercase tracking-wider">Connecting to Open Library & Gutenberg database...</p>
                             <p className="text-[10px] text-slate-500 mt-0.5">Searching for covers, authors, metadata, and books matching "{searchQuery}" automatically.</p>
                           </div>
-                        ) : onlineBooks.length > 0 ? (
+                        ) : filteredOnlineBooks.length > 0 ? (
                           <div className="flex gap-4 overflow-x-auto pb-3" style={{scrollbarWidth:'none'}}>
-                            {[...onlineBooks, ...filteredSubjectBooks].filter((b,i,arr) => arr.findIndex(x=>x.id===b.id)===i).map((book) => renderBookCard(book, true))}
+                            {filteredOnlineBooks.map((book) => renderBookCard(book, true))}
+                          </div>
+                        ) : onlineBooks.length > 0 ? (
+                          <div className="text-center py-8 bg-[#F7F4EE]/40 rounded-2xl border border-dashed border-[#DCD9D0]">
+                            <p className="text-xs text-[#666666] font-bold">
+                              Found {onlineBooks.length} match{onlineBooks.length === 1 ? "" : "es"} for "{searchQuery}", but none fit the current Difficulty / Category / Age Group filters. Try widening them.
+                            </p>
                           </div>
                         ) : (
                           <div className="text-center py-8 bg-[#F7F4EE]/40 rounded-2xl border border-dashed border-[#DCD9D0]">
