@@ -238,10 +238,10 @@ export default function ReaderView({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
-          max_tokens: 800,
+          max_tokens: 1200,
           messages: [{
             role: "user",
-            content: `Write Chapter ${chapterIndex + 1} of an original dyslexia-friendly reading guide for "${book.title}" by ${book.author}. This chapter is titled "${chapter.title}". Write exactly 5 short paragraphs (2-3 sentences each, plain vocabulary). Do NOT copy text from the original — write fresh original prose inspired by the book's themes and characters. Return ONLY valid JSON:\n{"content":["paragraph 1","paragraph 2","paragraph 3","paragraph 4","paragraph 5"]}`
+            content: `Write Chapter ${chapterIndex + 1} of an original dyslexia-friendly reading guide for "${book.title}" by ${book.author}. This chapter is titled "${chapter.title}". Write a natural number of short paragraphs (2-3 sentences each, plain vocabulary) — let the chapter's own pacing decide the length, typically 3 to 10 paragraphs. An eventful chapter can run longer; a short transitional one can be brief. Don't pad it artificially and don't cut it short to hit a target. Do NOT copy text from the original — write fresh original prose inspired by the book's themes and characters. Return ONLY valid JSON in this shape: {"content":["paragraph text","paragraph text"]} — include as many array entries as the chapter naturally needs.`
           }]
         })
       });
