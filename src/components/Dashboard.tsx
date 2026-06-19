@@ -383,109 +383,70 @@ export default function Dashboard({
   const handleGenerateAndReadBook = async (onlineBook: Book) => {
     setGeneratingBookId(onlineBook.id);
     try {
+      // Fast call: generate 12-chapter structure (titles only, no content).
+      // Content generated lazily in ReaderView one chapter at a time — reader opens immediately.
       const response = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
-          max_tokens: 2500,
+          max_tokens: 600,
           messages: [{
             role: "user",
-            content: `Write an original dyslexia-friendly retelling of the opening of "${onlineBook.title}" by ${onlineBook.author}, structured as exactly 4 short chapters so a reader can navigate between them. Each chapter should have 3-4 short paragraphs (2-3 sentences each, simple vocabulary, no copied text — write fresh original prose inspired by the book's themes and characters). Return ONLY valid JSON, no markdown, no commentary.
-
-Return this exact shape with exactly 4 chapters:
-{"chapters":[{"id":"chap-1","title":"Chapter title here","content":["paragraph 1","paragraph 2","paragraph 3"]},{"id":"chap-2","title":"Chapter title here","content":["paragraph 1","paragraph 2"]},{"id":"chap-3","title":"Chapter title here","content":["paragraph 1","paragraph 2"]},{"id":"chap-4","title":"Chapter title here","content":["paragraph 1","paragraph 2"]}],"characters":[{"name":"Name","role":"Role","relationships":"Description","events":"Recent events"}],"concepts":[{"term":"Key concept","definition":"Simple definition","keyTerms":["word1","word2"],"examples":["An example sentence"]}]}`
+            content: `Create a 12-chapter reading guide structure for "${onlineBook.title}" by ${onlineBook.author}. Return ONLY valid JSON, no markdown, no preamble:\n{"chapters":[{"id":"chap-1","title":"Chapter title"},{"id":"chap-2","title":"Chapter title"},{"id":"chap-3","title":"Chapter title"},{"id":"chap-4","title":"Chapter title"},{"id":"chap-5","title":"Chapter title"},{"id":"chap-6","title":"Chapter title"},{"id":"chap-7","title":"Chapter title"},{"id":"chap-8","title":"Chapter title"},{"id":"chap-9","title":"Chapter title"},{"id":"chap-10","title":"Chapter title"},{"id":"chap-11","title":"Chapter title"},{"id":"chap-12","title":"Chapter title"}],"characters":[{"name":"Name","role":"Role","relationships":"Description","events":"Recent events"}],"concepts":[{"term":"Key concept","definition":"Simple definition","keyTerms":["word1","word2"],"examples":["An example sentence"]}]}\nExactly 12 chapters. Evocative chapter titles only — no paragraph content.`
           }]
         })
       });
-      
-      if (!response.ok) {
-        throw new Error("Failed to format the book content.");
-      }
-      
+
+      if (!response.ok) throw new Error("Failed to generate chapter structure.");
+
       const data = await response.json();
-      const text = data.content?.[0]?.text || "{}";
-      const clean = text.replace(/```json|```/g, "").trim();
+      const rawText = data.content?.[0]?.text || "{}";
+      const clean = rawText.replace(/```json|```/g, "").trim();
       const parsed = JSON.parse(clean);
-      
-      const fullyFormedBook: Book = {
+
+      const bookWithStubs: Book = {
         ...onlineBook,
-        chapters: parsed.chapters || [],
+        chapters: (parsed.chapters || []).map((ch: { id: string; title: string }) => ({
+          id: ch.id,
+          title: ch.title,
+          content: [] // Empty stub — ReaderView generates content on demand
+        })),
         characters: parsed.characters || [],
         concepts: parsed.concepts || []
       };
-      
-      setBooks(prev => {
-        const filtered = prev.filter(b => b.id !== onlineBook.id);
-        return [...filtered, fullyFormedBook];
-      });
-      
-      // Cache so App.tsx can find it
+
+      setBooks(prev => [...prev.filter(b => b.id !== onlineBook.id), bookWithStubs]);
       try {
         const cached = JSON.parse(localStorage.getItem("lumina_cached_books") || "[]");
-        const without = cached.filter((b: Book) => b.id !== fullyFormedBook.id);
-        localStorage.setItem("lumina_cached_books", JSON.stringify([fullyFormedBook, ...without].slice(0, 20)));
+        const without = cached.filter((b: Book) => b.id !== bookWithStubs.id);
+        localStorage.setItem("lumina_cached_books", JSON.stringify([bookWithStubs, ...without].slice(0, 20)));
       } catch {}
-      onSelectBook(fullyFormedBook.id);
+      onSelectBook(bookWithStubs.id);
     } catch (e) {
-      console.warn("AI Generation failed, loading standard narrative:", e);
+      console.warn("Chapter structure generation failed, using fallback:", e);
+      // Fallback: 12 generic stubs — content still generated lazily in ReaderView
       const fallbackBook: Book = {
         ...onlineBook,
-        chapters: [
-          {
-            id: "chap-1",
-            title: "Chapter 1: Getting Started",
-            content: [
-              `This is your customized visual-stress-free edition of "${onlineBook.title}" by ${onlineBook.author}.`,
-              "Every journey into classic literature begins with learning to slow down and isolate individual lines of thought.",
-            ]
-          },
-          {
-            id: "chap-2",
-            title: "Chapter 2: Reading Tools",
-            content: [
-              "Adjust your typeface font to OpenDyslexic or Atkinson Hyperlegible in the Settings panel.",
-              "Increase line spacing, letter spacing, and word spacing to match your comfort level.",
-            ]
-          },
-          {
-            id: "chap-3",
-            title: "Chapter 3: Word Support",
-            content: [
-              "Click any word while reading to see a supportive decoding translation and definition.",
-              "Try Bionic Reading or Syllable Breaks for extra support with longer words.",
-            ]
-          },
-          {
-            id: "chap-4",
-            title: "Chapter 4: AI Reading Coach",
-            content: [
-              "Use the Simplify button to make any paragraph easier to understand, at three different levels.",
-              "Tap Explain for a plain-language breakdown of tricky sentences.",
-            ]
-          }
-        ],
-        characters: [
-          {
-            name: "The Protagonist",
-            role: "Determined Leader",
-            relationships: "The central voice of this classic tale.",
-            events: "Emerged at the start of the narrative to face new questions."
-          }
-        ],
-        concepts: [
-          {
-            term: "Discovery",
-            definition: "The act of finding, learning, or experiencing something brand new for the first time.",
-            keyTerms: ["Finding", "Opening", "Learning"],
-            examples: ["Finding a secret passageway in a library."]
-          }
-        ]
+        chapters: Array.from({ length: 12 }, (_, i) => ({
+          id: `chap-${i + 1}`,
+          title: `Chapter ${i + 1}`,
+          content: []
+        })),
+        characters: [{
+          name: "The Protagonist",
+          role: "Main character",
+          relationships: "The central voice of the narrative.",
+          events: "Begins their journey at the opening of the story."
+        }],
+        concepts: [{
+          term: "Discovery",
+          definition: "The act of finding something new for the first time.",
+          keyTerms: ["Finding", "Learning", "Opening"],
+          examples: ["Discovering a hidden path in the forest."]
+        }]
       };
-      setBooks(prev => {
-        const filtered = prev.filter(b => b.id !== onlineBook.id);
-        return [...filtered, fallbackBook];
-      });
+      setBooks(prev => [...prev.filter(b => b.id !== onlineBook.id), fallbackBook]);
       try {
         const cached = JSON.parse(localStorage.getItem("lumina_cached_books") || "[]");
         const without = cached.filter((b: Book) => b.id !== fallbackBook.id);

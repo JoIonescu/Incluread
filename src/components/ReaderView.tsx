@@ -21,7 +21,8 @@ import {
   FileText,
   RotateCcw,
   BookOpen,
-  User
+  User,
+  Loader2
 } from "lucide-react";
 
 interface ReaderViewProps {
@@ -73,6 +74,20 @@ export default function ReaderView({
          b.chapterId === effectiveChapterId &&
          b.paragraphIndex === activeParagraphIndex
   );
+
+  // ── Lazy chapter loading ─────────────────────────────────────────────────
+  // Chapters arrive as empty stubs (content: []) from the library.
+  // Content is generated one chapter at a time, on demand, as the user reads.
+  const [chapterContents, setChapterContents] = useState<Record<string, string[]>>({});
+  const [chapterLoadingId, setChapterLoadingId] = useState<string | null>(null);
+  const [chapterErrorId, setChapterErrorId] = useState<string | null>(null);
+
+  // Resolve the active chapter's text: prefer freshly-generated content,
+  // fall back to whatever the book already contains (SAMPLE_BOOKS or cached).
+  const activeChapterContent: string[] =
+    (chapterContents[activeChapter?.id] ?? []).length > 0
+      ? chapterContents[activeChapter.id]
+      : (activeChapter?.content ?? []);
 
   // Reading Mode Aids
   const [focusMode, setFocusMode] = useState<FocusModeType>("normal");
@@ -202,6 +217,80 @@ export default function ReaderView({
   const textSecondary = isDark ? "text-[#BAC1CC]" : isYellow ? "text-[#2F2A15]" : isBlue ? "text-[#1E2D4A]" : isSepia ? "text-[#4A3525]" : "text-[#444444]";
   const textTertiary = isDark ? "text-[#7B818F]" : isYellow ? "text-[#5D5030]" : isBlue ? "text-[#4A5B7E]" : isSepia ? "text-[#6D5A4E]" : "text-[#666666]";
 
+  // ── Per-chapter content generation ──────────────────────────────────────
+  // Called when a user taps a chapter tab that has no content yet.
+  // Only one generation runs at a time; subsequent taps queue naturally.
+  const generateChapterContent = async (
+    chapter: { id: string; title: string; content?: string[] },
+    chapterIndex: number
+  ) => {
+    if (chapterLoadingId) return; // one at a time
+    const alreadyLoaded =
+      (chapterContents[chapter.id] ?? []).length > 0 ||
+      (chapter.content?.length ?? 0) > 0;
+    if (alreadyLoaded) return;
+
+    setChapterLoadingId(chapter.id);
+    setChapterErrorId(null);
+    try {
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 800,
+          messages: [{
+            role: "user",
+            content: `Write Chapter ${chapterIndex + 1} of an original dyslexia-friendly reading guide for "${book.title}" by ${book.author}. This chapter is titled "${chapter.title}". Write exactly 5 short paragraphs (2-3 sentences each, plain vocabulary). Do NOT copy text from the original — write fresh original prose inspired by the book's themes and characters. Return ONLY valid JSON:\n{"content":["paragraph 1","paragraph 2","paragraph 3","paragraph 4","paragraph 5"]}`
+          }]
+        })
+      });
+      if (!res.ok) throw new Error("API error");
+      const data = await res.json();
+      const rawText = data.content?.[0]?.text || "{}";
+      const parsed = JSON.parse(rawText.replace(/```json|```/g, "").trim());
+      const paragraphs: string[] = parsed.content ?? [];
+      if (!paragraphs.length) throw new Error("Empty response");
+
+      setChapterContents(prev => ({ ...prev, [chapter.id]: paragraphs }));
+
+      // Persist generated content to localStorage so it survives navigation away and back
+      try {
+        const cached = JSON.parse(localStorage.getItem("lumina_cached_books") || "[]");
+        const bIdx = cached.findIndex((b: Book) => b.id === book.id);
+        if (bIdx >= 0) {
+          cached[bIdx] = {
+            ...cached[bIdx],
+            chapters: (cached[bIdx].chapters as Array<{ id: string; title: string; content: string[] }>).map(ch =>
+              ch.id === chapter.id ? { ...ch, content: paragraphs } : ch
+            )
+          };
+          localStorage.setItem("lumina_cached_books", JSON.stringify(cached));
+        }
+      } catch {}
+    } catch {
+      setChapterErrorId(chapter.id);
+    } finally {
+      setChapterLoadingId(null);
+    }
+  };
+
+  // Auto-load whichever chapter the user is currently on.
+  // Fires on mount and whenever the active chapter changes (tap, swipe, arrow).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!activeChapter) return;
+    const hasContent =
+      (chapterContents[activeChapter.id] ?? []).length > 0 ||
+      (activeChapter.content?.length ?? 0) > 0;
+    if (!hasContent && chapterLoadingId !== activeChapter.id) {
+      generateChapterContent(activeChapter, safeChapterIndex);
+    }
+  // We intentionally exclude generateChapterContent from deps (redefined each render)
+  // and use activeChapter.id + safeChapterIndex as the meaningful signals.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeChapter?.id, safeChapterIndex]);
+
   // Chapter Navigation Handler
   const goToNextChapter = () => {
     if (safeChapterIndex < book.chapters.length - 1) {
@@ -238,7 +327,7 @@ export default function ReaderView({
 
   // Shared logic: advance/retreat one page within the chapter, or roll over to the next/prev chapter
   const goToNextPage = () => {
-    if (activeParagraphIndex < activeChapter.content.length - 1) {
+    if (activeParagraphIndex < activeChapterContent.length - 1) {
       onUpdatePosition({ ...currentPosition, paragraphIndex: activeParagraphIndex + 1 });
     } else {
       goToNextChapter();
@@ -328,7 +417,7 @@ useEffect(() => {
   if (typeof window === "undefined" || !window.speechSynthesis) return;
 
   if (isPlayingAudio) {
-    const pText = activeChapter.content[activeParagraphIndex] || "";
+    const pText = activeChapterContent[activeParagraphIndex] || "";
     const sentences = pText.match(/[^.!?]+[.!?]+(\s|$)/g) || [pText];
 
     if (highlightedSentenceIndex >= sentences.length) {
@@ -372,7 +461,7 @@ useEffect(() => {
         if (absoluteIndex < sentences.length - 1) {
           setHighlightedSentenceIndex(absoluteIndex + 1);
         } else {
-          if (activeParagraphIndex < activeChapter.content.length - 1) {
+          if (activeParagraphIndex < activeChapterContent.length - 1) {
             onUpdatePosition({ ...currentPosition, paragraphIndex: activeParagraphIndex + 1 });
             setHighlightedSentenceIndex(0);
           } else {
@@ -388,7 +477,7 @@ useEffect(() => {
           setTimeout(() => {
             if (absoluteIndex < sentences.length - 1) {
               setHighlightedSentenceIndex(absoluteIndex + 1);
-            } else if (activeParagraphIndex < activeChapter.content.length - 1) {
+            } else if (activeParagraphIndex < activeChapterContent.length - 1) {
               onUpdatePosition({ ...currentPosition, paragraphIndex: activeParagraphIndex + 1 });
               setHighlightedSentenceIndex(0);
             } else {
@@ -459,7 +548,7 @@ useEffect(() => {
           max_tokens: 1000,
           messages: [{
             role: "user",
-            content: `You are a warm, encouraging reading coach helping a dyslexic reader. Explain this text in simple, friendly language using short sentences.\n\nText: "${textToExplain}"\n\nContext: "${activeChapter.content.slice(0, 2).join(" ")}"`
+            content: `You are a warm, encouraging reading coach helping a dyslexic reader. Explain this text in simple, friendly language using short sentences.\n\nText: "${textToExplain}"\n\nContext: "${activeChapterContent.slice(0, 2).join(" ")}"`
           }]
         }),
       });
@@ -486,7 +575,7 @@ useEffect(() => {
           max_tokens: 1000,
           messages: [{
             role: "user",
-            content: `You are a reading coach for dyslexic readers. Summarize this book chapter in a structured JSON format. Return ONLY valid JSON, no markdown, no explanation.\n\nChapter: "${activeChapter.title}"\nContent: "${activeChapter.content.join(" ")}"\n\nReturn this exact JSON shape:\n{"chapterSummary":{"keyIdeas":["idea1","idea2","idea3"],"mainEvents":["event1","event2","event3"],"characterUpdates":["update1","update2"]}}`
+            content: `You are a reading coach for dyslexic readers. Summarize this book chapter in a structured JSON format. Return ONLY valid JSON, no markdown, no explanation.\n\nChapter: "${activeChapter.title}"\nContent: "${activeChapterContent.join(" ")}"\n\nReturn this exact JSON shape:\n{"chapterSummary":{"keyIdeas":["idea1","idea2","idea3"],"mainEvents":["event1","event2","event3"],"characterUpdates":["update1","update2"]}}`
           }]
         }),
       });
@@ -513,7 +602,7 @@ useEffect(() => {
 
   // Fast Bookmark handler
   const triggerAddBookmark = () => {
-    const activeText = activeChapter.content[activeParagraphIndex] || "";
+    const activeText = activeChapterContent[activeParagraphIndex] || "";
     const newBookmark: Bookmark = {
       id: `bm-${Date.now()}`,
       bookId: book.id,
@@ -710,7 +799,7 @@ useEffect(() => {
                   goToPrevChapter();
                 }
               }}
-              disabled={safeChapterIndex === 0 && activeParagraphIndex === 0}
+              disabled={chapterLoadingId === activeChapter.id || (safeChapterIndex === 0 && activeParagraphIndex === 0)}
               className={`p-2 border rounded-xl disabled:opacity-40 transition-all ${buttonClass}`}
               aria-label="Previous page"
             >
@@ -720,19 +809,23 @@ useEffect(() => {
             <div className="text-center">
               <p className={`text-[10px] font-black uppercase tracking-widest ${textTertiary}`}>Active Chapter</p>
               <p className="text-sm font-bold mt-0.5">{activeChapter.title}</p>
-              <p className={`text-[9px] mt-0.5 ${textTertiary}`}>Page {activeParagraphIndex + 1} of {activeChapter.content.length} · swipe or tap arrows</p>
+              <p className={`text-[9px] mt-0.5 ${textTertiary}`}>
+                {chapterLoadingId === activeChapter.id
+                  ? "Preparing this chapter…"
+                  : `Page ${activeParagraphIndex + 1} of ${activeChapterContent.length || "…"} · swipe or tap arrows`}
+              </p>
             </div>
             
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                if (activeParagraphIndex < activeChapter.content.length - 1) {
+                if (activeParagraphIndex < activeChapterContent.length - 1) {
                   onUpdatePosition({ ...currentPosition, paragraphIndex: activeParagraphIndex + 1 });
                 } else {
                   goToNextChapter();
                 }
               }}
-              disabled={safeChapterIndex === book.chapters.length - 1 && activeParagraphIndex === activeChapter.content.length - 1}
+              disabled={chapterLoadingId === activeChapter.id || (safeChapterIndex === book.chapters.length - 1 && activeParagraphIndex === activeChapterContent.length - 1)}
               className={`p-2 border rounded-xl disabled:opacity-40 transition-all ${buttonClass}`}
               aria-label="Next page"
             >
@@ -740,24 +833,51 @@ useEffect(() => {
             </button>
           </div>
 
-          {/* Chapter tabs — labeled "Chapter N", jump directly to any chapter */}
+          {/* Chapter tabs — ALL chapters visible, horizontally scrollable so a 12+ chapter
+              book never gets cut off. Touch/mouse events are stopped here so scrolling this
+              strip doesn't get mistaken for a page-turn swipe by the parent reading column. */}
           {book.chapters.length > 1 && (
-            <div className="w-full max-w-[700px] flex items-center gap-1.5 overflow-x-auto pb-2 mb-3" style={{ scrollbarWidth: "none" }}>
-              {book.chapters.map((ch, idx) => (
-                <button
-                  key={ch.id}
-                  onClick={(e) => { e.stopPropagation(); jumpToChapter(ch.id); }}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${
-                    idx === safeChapterIndex
-                      ? "bg-[#5B8FB9] text-white border-[#5B8FB9]"
-                      : `${buttonClass} hover:border-[#5B8FB9]/50`
-                  }`}
-                  title={ch.title}
-                >
-                  Chapter {idx + 1}
-                </button>
-              ))}
+            <div
+              className="w-full max-w-[700px] flex items-center gap-1.5 overflow-x-auto pb-2 mb-3"
+              style={{ scrollbarWidth: "none" }}
+              onTouchStart={(e) => e.stopPropagation()}
+              onTouchMove={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              {book.chapters.map((ch, idx) => {
+                const isLoaded = (chapterContents[ch.id]?.length ?? 0) > 0 || (ch.content?.length ?? 0) > 0;
+                const isLoading = chapterLoadingId === ch.id;
+                const isErrored = chapterErrorId === ch.id;
+                const isActive = idx === safeChapterIndex;
+                return (
+                  <button
+                    key={ch.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      jumpToChapter(ch.id);
+                      if (isErrored) generateChapterContent(ch, idx);
+                    }}
+                    className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${
+                      isActive
+                        ? "bg-[#5B8FB9] text-white border-[#5B8FB9]"
+                        : isErrored
+                        ? "border-rose-300 text-rose-500 hover:border-rose-400"
+                        : isLoaded
+                        ? `${buttonClass} hover:border-[#5B8FB9]/50`
+                        : `${buttonClass} opacity-60 hover:opacity-100 hover:border-[#5B8FB9]/50`
+                    }`}
+                    title={isErrored ? "Couldn't load — tap to retry" : ch.title}
+                  >
+                    {isLoading && <Loader2 className="w-3 h-3 animate-spin" />}
+                    Chapter {idx + 1}
+                  </button>
+                );
+              })}
             </div>
+          )}
+          {book.chapters.length > 4 && (
+            <p className={`text-[10px] -mt-2 mb-2 ${textTertiary}`}>← Scroll for all {book.chapters.length} chapters →</p>
           )}
 
 
@@ -816,7 +936,24 @@ useEffect(() => {
             )}
 
             <div className="space-y-8 relative z-20">
-              {activeChapter.content.map((paragraphText, pIndex) => {
+              {activeChapterContent.length === 0 && chapterLoadingId === activeChapter.id && (
+                <div className="flex flex-col items-center justify-center py-16 gap-3">
+                  <Loader2 className="w-7 h-7 animate-spin text-[#5B8FB9]" />
+                  <p className="text-sm font-bold text-slate-500">Preparing "{activeChapter.title}"…</p>
+                </div>
+              )}
+              {activeChapterContent.length === 0 && chapterErrorId === activeChapter.id && (
+                <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                  <p className="text-sm font-bold text-rose-500">This chapter couldn't be prepared.</p>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); generateChapterContent(activeChapter, safeChapterIndex); }}
+                    className="text-xs font-bold px-4 py-2 rounded-lg border border-rose-300 text-rose-500 hover:bg-rose-50"
+                  >
+                    Try again
+                  </button>
+                </div>
+              )}
+              {activeChapterContent.map((paragraphText, pIndex) => {
                 const isActiveP = pIndex === activeParagraphIndex;
                 const isSimplifyApplied = aiSimplifyOverlay && aiSimplifyOverlay.paragraphIndex === pIndex;
 
@@ -915,12 +1052,12 @@ useEffect(() => {
               <div className="flex justify-between items-center mb-1.5">
                 <span className={`text-[10px] font-black uppercase tracking-widest ${isDark ? "text-[#7B818F]" : "text-[#888888]"}`}>Chapter progress</span>
                 <span className={`text-[10px] font-bold ${isDark ? "text-[#BAC1CC]" : "text-[#555555]"}`}>
-                  {activeParagraphIndex + 1} / {activeChapter.content.length} · {Math.round(((activeParagraphIndex + 1) / activeChapter.content.length) * 100)}%
+                  {activeParagraphIndex + 1} / {activeChapterContent.length || "…"} · {activeChapterContent.length ? Math.round(((activeParagraphIndex + 1) / activeChapterContent.length) * 100) : 0}%
                 </span>
               </div>
               <div className={`w-full h-2 rounded-full overflow-hidden ${isDark ? "bg-[#2D3139]" : "bg-[#E8E4DC]"}`}>
                 <div className="h-full rounded-full bg-[#5B8FB9] transition-all duration-500"
-                  style={{ width: `${Math.round(((activeParagraphIndex + 1) / activeChapter.content.length) * 100)}%` }} />
+                  style={{ width: `${activeChapterContent.length ? Math.round(((activeParagraphIndex + 1) / activeChapterContent.length) * 100) : 0}%` }} />
               </div>
             </div>
             <div className="flex items-center gap-2 text-xs font-bold text-[#666666]">
