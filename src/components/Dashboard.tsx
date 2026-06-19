@@ -382,18 +382,31 @@ export default function Dashboard({
 
   const handleGenerateAndReadBook = async (onlineBook: Book) => {
     setGeneratingBookId(onlineBook.id);
+    // Realistic chapter count, not a flat magic number.
+    // `reading_time` already encodes real Open Library page-count data for search
+    // results (number_of_pages_median / number_of_pages), and a difficulty-scaled
+    // estimate for genre-tab books (Open Library's /subjects/ endpoint has no page
+    // count at all). Either way, we use it as the proxy for the book's real size —
+    // short books get fewer chapters, long classics get more, instead of every
+    // book getting the same chapter count regardless of length.
+    const estimatedPages = (onlineBook.reading_time || 20) * 10;
+    const targetChapters = Math.max(3, Math.min(24, Math.round(estimatedPages / 25)));
     try {
-      // Fast call: generate 12-chapter structure (titles only, no content).
-      // Content generated lazily in ReaderView one chapter at a time — reader opens immediately.
+      const chapterStubsJson = Array.from({ length: targetChapters }, (_, i) =>
+        `{"id":"chap-${i + 1}","title":"Chapter title"}`
+      ).join(",");
+
+      // Fast call: generate chapter structure only (titles, no content).
+      // Content is generated lazily in ReaderView, one chapter at a time — reader opens immediately.
       const response = await fetch("/api/ai", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
-          max_tokens: 600,
+          max_tokens: 700,
           messages: [{
             role: "user",
-            content: `Create a 12-chapter reading guide structure for "${onlineBook.title}" by ${onlineBook.author}. Return ONLY valid JSON, no markdown, no preamble:\n{"chapters":[{"id":"chap-1","title":"Chapter title"},{"id":"chap-2","title":"Chapter title"},{"id":"chap-3","title":"Chapter title"},{"id":"chap-4","title":"Chapter title"},{"id":"chap-5","title":"Chapter title"},{"id":"chap-6","title":"Chapter title"},{"id":"chap-7","title":"Chapter title"},{"id":"chap-8","title":"Chapter title"},{"id":"chap-9","title":"Chapter title"},{"id":"chap-10","title":"Chapter title"},{"id":"chap-11","title":"Chapter title"},{"id":"chap-12","title":"Chapter title"}],"characters":[{"name":"Name","role":"Role","relationships":"Description","events":"Recent events"}],"concepts":[{"term":"Key concept","definition":"Simple definition","keyTerms":["word1","word2"],"examples":["An example sentence"]}]}\nExactly 12 chapters. Evocative chapter titles only — no paragraph content.`
+            content: `Create a reading guide chapter structure for "${onlineBook.title}" by ${onlineBook.author}, sized to match this book's real approximate length (roughly ${estimatedPages} pages). Return ONLY valid JSON, no markdown, no preamble:\n{"chapters":[${chapterStubsJson}],"characters":[{"name":"Name","role":"Role","relationships":"Description","events":"Recent events"}],"concepts":[{"term":"Key concept","definition":"Simple definition","keyTerms":["word1","word2"],"examples":["An example sentence"]}]}\nReturn exactly ${targetChapters} chapters — don't add filler chapters or omit any, this count is calibrated to the book's real size. Short evocative chapter titles only — no paragraph content yet.`
           }]
         })
       });
@@ -425,10 +438,10 @@ export default function Dashboard({
       onSelectBook(bookWithStubs.id);
     } catch (e) {
       console.warn("Chapter structure generation failed, using fallback:", e);
-      // Fallback: 12 generic stubs — content still generated lazily in ReaderView
+      // Fallback: same calibrated chapter count, generic titles — content still generated lazily in ReaderView
       const fallbackBook: Book = {
         ...onlineBook,
-        chapters: Array.from({ length: 12 }, (_, i) => ({
+        chapters: Array.from({ length: targetChapters }, (_, i) => ({
           id: `chap-${i + 1}`,
           title: `Chapter ${i + 1}`,
           content: []
