@@ -382,6 +382,47 @@ export default function Dashboard({
 
   const handleGenerateAndReadBook = async (onlineBook: Book) => {
     setGeneratingBookId(onlineBook.id);
+
+    // Step 0 — try the REAL text first (Project Gutenberg, server-side, legally
+    // gated to confirmed public-domain matches only). If found, the book opens
+    // with its actual real chapters and real content — no AI involved at all.
+    // If nothing is found (or this check fails for any reason), execution falls
+    // straight through to the existing AI-generated pipeline below, completely
+    // unchanged — that pipeline is the safety net, not something this step replaces.
+    try {
+      const realTextRes = await fetch("/api/booktext", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: onlineBook.title, author: onlineBook.author })
+      });
+      if (realTextRes.ok) {
+        const realTextData = await realTextRes.json();
+        if (realTextData.found && Array.isArray(realTextData.chapters) && realTextData.chapters.length > 0) {
+          const realBook: Book = {
+            ...onlineBook,
+            title: realTextData.title || onlineBook.title,
+            author: realTextData.author || onlineBook.author,
+            chapters: realTextData.chapters,
+            characters: [],
+            concepts: [],
+            source: "gutenberg"
+          };
+          setBooks(prev => [...prev.filter(b => b.id !== onlineBook.id), realBook]);
+          try {
+            const cached = JSON.parse(localStorage.getItem("lumina_cached_books") || "[]");
+            const without = cached.filter((b: Book) => b.id !== realBook.id);
+            localStorage.setItem("lumina_cached_books", JSON.stringify([realBook, ...without].slice(0, 20)));
+          } catch {}
+          onSelectBook(realBook.id);
+          setGeneratingBookId(null);
+          return; // Real text found and loaded — skip the AI pipeline entirely.
+        }
+      }
+    } catch (realTextErr) {
+      console.warn("Real-text lookup failed, falling back to AI generation:", realTextErr);
+      // Intentionally fall through to the AI pipeline below.
+    }
+
     // Realistic chapter count, not a flat magic number.
     // `reading_time` already encodes real Open Library page-count data for search
     // results (number_of_pages_median / number_of_pages), and a difficulty-scaled

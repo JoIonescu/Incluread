@@ -52,6 +52,7 @@ export interface Book {
   concepts: ConceptCard[];
   ageGroup?: "Kids" | "Teens" | "Adults";
   coverUrl?: string;
+  source?: "gutenberg" | "ai-generated"; // where the chapter content actually came from
 }
 
 export interface ReadingPosition {
