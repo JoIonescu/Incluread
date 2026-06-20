@@ -703,6 +703,16 @@ export default function Dashboard({
   // way as every other book list in the dashboard.
   const filteredOnlineBooks = applyFiltersAndSort(onlineBooks);
 
+  // The actual "My Bookshelf" — books the user explicitly starred via savedBookIds,
+  // not just whatever happens to be in the built-in SAMPLE_BOOKS catalog. Resolved
+  // across every source a saved ID could point to (built-in library, a previously
+  // browsed genre tab, or a live search result), then run through the same
+  // filter/sort pipeline as everything else so it respects the search box and dropdowns.
+  const savedBooksResolved = [...books, ...subjectBooks, ...onlineBooks].filter(
+    (b, i, arr) => b && savedBookIds.includes(b.id) && arr.findIndex(x => x.id === b.id) === i
+  );
+  const savedMatches = applyFiltersAndSort(savedBooksResolved);
+
 
 
 
@@ -1275,7 +1285,7 @@ export default function Dashboard({
                           savedBookIds.length > 0 ? (
                             <div className="flex gap-4 overflow-x-auto pb-3 relative" style={{scrollbarWidth:"none"}}>
                               <div className="absolute right-0 top-0 bottom-3 w-12 bg-gradient-to-l from-[#F7F4EE] to-transparent pointer-events-none z-10" />
-                              {[...books, ...subjectBooks].filter((b, i, arr) => b && savedBookIds.includes(b.id) && arr.findIndex(x => x.id === b.id) === i).map(b => (
+                              {[...books, ...subjectBooks, ...onlineBooks].filter((b, i, arr) => b && savedBookIds.includes(b.id) && arr.findIndex(x => x.id === b.id) === i).map(b => (
                               <div key={b.id} className="relative flex-shrink-0">
                                 {renderBookCard(b, !books.find(x => x.id === b.id))}
                                 <button
@@ -1331,16 +1341,36 @@ export default function Dashboard({
                     </div>
                   ) : (
                     <div className="space-y-8 animate-fadeIn">
-                      {/* Search results subdivision */}
+                      {/* My Bookshelf — actually filtered by savedBookIds now, not just the built-in catalog */}
                       <div>
                         <h3 className="text-xs font-extrabold uppercase text-[#777777] tracking-widest mb-4">Matches in My Bookshelf</h3>
+                        {!currentUser ? (
+                          <p className="text-xs text-gray-500 italic p-4 bg-white rounded-xl border border-[#DCD9D0]">
+                            Sign in to save books to your shelf — once you do, tap ☆ on any book to add it here.
+                          </p>
+                        ) : savedMatches.length > 0 ? (
+                          <div className="flex gap-4 overflow-x-auto pb-3" style={{scrollbarWidth:'none'}}>
+                            {savedMatches.map((book) => renderBookCard(book, !books.find(b => b.id === book.id)))}
+                          </div>
+                        ) : (
+                          <p className="text-xs text-gray-500 italic p-4 bg-white rounded-xl border border-[#DCD9D0]">
+                            None of your saved books match "{searchQuery}". Tap ☆ on any book below to save it here.
+                          </p>
+                        )}
+                      </div>
+
+                      {/* From Your Built-in Library — this is the section that used to be mislabeled
+                          "Matches in My Bookshelf." It's the SAMPLE_BOOKS catalog plus anything
+                          previously opened from Open Library — never had anything to do with starring. */}
+                      <div className="border-t border-[#DCD9D0]/60 pt-6">
+                        <h3 className="text-xs font-extrabold uppercase text-[#777777] tracking-widest mb-4">From Your Built-in Library</h3>
                         {filteredBooks.length > 0 ? (
                           <div className="flex gap-4 overflow-x-auto pb-3" style={{scrollbarWidth:'none'}}>
                             {filteredBooks.map((book) => renderBookCard(book, false))}
                           </div>
                         ) : (
                           <p className="text-xs text-gray-500 italic p-4 bg-white rounded-xl border border-[#DCD9D0]">
-                            No pre-loaded bookshelf titles match your criteria. Searching the global library below...
+                            No pre-loaded library titles match your criteria. Searching the global library below...
                           </p>
                         )}
                       </div>
@@ -1563,7 +1593,7 @@ export default function Dashboard({
                   <div className="space-y-3">
                     <h3 className="text-sm font-black text-slate-600 uppercase tracking-widest">My Shelf</h3>
                     <div className="flex gap-4 overflow-x-auto pb-2" style={{scrollbarWidth:"none"}}>
-                      {[...books, ...subjectBooks]
+                      {[...books, ...subjectBooks, ...onlineBooks]
                         .filter((b, i, arr) => b && savedBookIds.includes(b.id) && arr.findIndex(x => x.id === b.id) === i)
                         .map(b => (
                           <div
