@@ -1131,7 +1131,7 @@ export default function Dashboard({
                       </p>
                     </div>
                     <span className="text-xs font-bold text-[#666666] bg-white border px-3 py-1.5 rounded-xl">
-                      Today is Thursday, Jun 11
+                      Today is {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'short' })}
                     </span>
                   </div>
 
