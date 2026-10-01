@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Onboarding from "./components/Onboarding";
-import AboutPage from "./components/AboutPage";
+import OurApproachPage from "./components/OurApproachPage";
+import LegalPage from "./components/LegalPage";
 import Dashboard from "./components/Dashboard";
 import ReaderView from "./components/ReaderView";
 import { UserPreferences, ReadingStats, ReadingPosition, Bookmark, Book } from "./types";
@@ -20,12 +21,31 @@ export default function App() {
 
   // Core shelf state tracking
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState<"dashboard" | "about">("dashboard");
-  const [legalSection, setLegalSection] = useState<"about" | "privacy" | "terms" | "cookies">("about");
-  const goToLegal = (section: "about" | "privacy" | "terms" | "cookies") => {
-    setLegalSection(section);
+  // Page routing: "/about" is a real URL (deep-linkable); legal pages are still in-app views.
+  const isAboutPath = () => window.location.pathname.replace(/\/+$/, "") === "/about";
+  const [currentPage, setCurrentPage] = useState<"dashboard" | "about" | "legal">(() => (isAboutPath() ? "about" : "dashboard"));
+  const [legalSection, setLegalSection] = useState<"privacy" | "terms" | "cookies">("privacy");
+  const goToAbout = () => {
+    if (!isAboutPath()) window.history.pushState({}, "", "/about");
+    window.scrollTo(0, 0);
     setCurrentPage("about");
   };
+  const goToDashboard = () => {
+    if (isAboutPath()) window.history.pushState({}, "", "/");
+    window.scrollTo(0, 0);
+    setCurrentPage("dashboard");
+  };
+  const goToLegal = (section: "privacy" | "terms" | "cookies") => {
+    setLegalSection(section);
+    setCurrentPage("legal");
+  };
+
+  // Keep the page in sync with the browser's back/forward buttons
+  useEffect(() => {
+    const onPopState = () => setCurrentPage(isAboutPath() ? "about" : "dashboard");
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
   const [showCookieBanner, setShowCookieBanner] = useState<boolean>(() => !localStorage.getItem("nara_cookie_consent"));
   const [navLockUntil, setNavLockUntil] = useState<number>(0);
   const navLockRef = React.useRef<number>(0); // ref so Firestore closure always sees latest
@@ -411,6 +431,15 @@ export default function App() {
     setHasCompletedOnboarding(false);
   };
 
+  // Public pages render before the loader/onboarding gate so /about is always reachable
+  if (currentPage === "about") {
+    return <OurApproachPage />;
+  }
+
+  if (currentPage === "legal") {
+    return <LegalPage onBack={goToDashboard} onGoToAbout={goToAbout} initialSection={legalSection} />;
+  }
+
   // Render Loader screen until localStorage finishes mounting
   if (!preferences && hasCompletedOnboarding) {
     return (
@@ -421,10 +450,6 @@ export default function App() {
         </div>
       </div>
     );
-  }
-
-  if (currentPage === "about") {
-    return <AboutPage onBack={() => setCurrentPage("dashboard")} initialSection={legalSection} />;
   }
 
   // Phase A: Onboarding Wizard Configuration screen
@@ -536,7 +561,7 @@ export default function App() {
             <div>
               <p className="text-white font-bold mb-2">Product</p>
               <ul className="space-y-1 opacity-70">
-                <li><button onClick={() => goToLegal("about")} className="hover:text-white transition-colors">About Incluread</button></li>
+                <li><button onClick={goToAbout} className="hover:text-white transition-colors">About Incluread</button></li>
                 <li><a href="mailto:hello@incluread.click" className="hover:text-white transition-colors">Contact us</a></li>
               </ul>
             </div>
@@ -550,7 +575,7 @@ export default function App() {
             </div>
             <div>
               <p className="text-white font-bold mb-2">Research</p>
-              <p className="opacity-70 leading-relaxed">Built on peer-reviewed dyslexia research. <button onClick={() => setCurrentPage("about")} className="underline text-[#00A795] hover:text-white">Read our approach →</button></p>
+              <p className="opacity-70 leading-relaxed">Built on peer-reviewed dyslexia research. <button onClick={goToAbout} className="underline text-[#00A795] hover:text-white">Read our approach →</button></p>
             </div>
           </div>
           <div className="border-t border-[#2d2d4e] px-6 py-4 text-center opacity-50">
