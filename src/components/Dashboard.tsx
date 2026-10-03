@@ -729,7 +729,7 @@ export default function Dashboard({
   };
 
   return (
-    <div id="dashboard-root" className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between transition-all duration-300 overflow-x-hidden`}>
+    <div id="dashboard-root" className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between transition-all duration-300 overflow-x-clip`}>
       
       {/* HEADER: Geometric navigation toolbar */}
       <nav className={`h-16 border-b px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 ${headerBgClass} ${borderClass} transition-all duration-300`}>
