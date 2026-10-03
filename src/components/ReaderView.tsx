@@ -733,7 +733,7 @@ useEffect(() => {
           </button>
           
           <div className="hidden sm:flex items-center gap-2">
-            <NaraLogo showText={true} size="sm" />
+            <NaraLogo showText={true} size="sm" onClick={onBackToDashboard} />
           </div>
         </div>
 

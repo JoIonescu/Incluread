@@ -135,7 +135,7 @@ export default function LegalPage({ onBack, onGoToAbout, initialSection = "priva
       <footer className="bg-[#1a1a2e] text-gray-400 text-xs mt-16">
         <div className="max-w-4xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
           <div>
-            <img src="/incluread-logo.png" alt="Incluread" className="h-14 w-auto mb-3" style={{filter:"brightness(0) invert(1)", opacity:0.9}} />
+            <img src="/incluread-logo-white.png" alt="Incluread" className="h-14 w-auto mb-3" style={{opacity:0.9}} />
             <p className="leading-relaxed opacity-70">Accessible reading for every mind.</p>
           </div>
           <div>

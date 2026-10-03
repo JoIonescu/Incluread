@@ -728,12 +728,19 @@ export default function Dashboard({
     setSatisfactionInput("");
   };
 
+  // Clicking the logo always returns to the Library tab
+  const goToLibrary = () => {
+    setActiveTab("library");
+    setDetailedBookId(null);
+    window.scrollTo(0, 0);
+  };
+
   return (
     <div id="dashboard-root" className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between transition-all duration-300 overflow-x-clip`}>
       
       {/* HEADER: Geometric navigation toolbar */}
       <nav className={`h-16 border-b px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 ${headerBgClass} ${borderClass} transition-all duration-300`}>
-        <NaraLogo showText={true} size="lg" className="hidden md:flex" /><NaraLogo showText={true} size="sm" className="flex md:hidden" />
+        <NaraLogo showText={true} size="lg" className="hidden md:flex" onClick={goToLibrary} /><NaraLogo showText={true} size="sm" className="flex md:hidden" onClick={goToLibrary} />
         
         {/* Navigation tabs */}
         <div className="hidden md:flex gap-8">

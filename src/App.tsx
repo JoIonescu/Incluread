@@ -496,7 +496,7 @@ export default function App() {
         book={activeReadingBook}
         preferences={preferences!}
         onUpdatePreferences={handleUpdatePreferences}
-        onBackToDashboard={() => setSelectedBookId(null)}
+        onBackToDashboard={() => { setSelectedBookId(null); setDashboardTab("library"); }}
         bookmarks={bookmarks}
         onAddBookmark={handleAddBookmark}
         currentPosition={currentPosition}

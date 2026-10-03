@@ -44,7 +44,7 @@ export default function SiteHeader({ onOpenTab }: SiteHeaderProps) {
       </div>
 
       <nav className="h-16 border-b px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 bg-white/50 border-[#DCD9D0] text-[#111111] font-sans">
-        <NaraLogo showText={true} size="lg" className="hidden md:flex" /><NaraLogo showText={true} size="sm" className="flex md:hidden" />
+        <NaraLogo showText={true} size="lg" className="hidden md:flex" onClick={() => onOpenTab("library")} /><NaraLogo showText={true} size="sm" className="flex md:hidden" onClick={() => onOpenTab("library")} />
 
         <div className="hidden md:flex gap-8">
           {TABS.map((tab) => {
