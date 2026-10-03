@@ -36,6 +36,7 @@ interface DashboardProps {
   onRestartOnboarding: () => void;
   onAnswerSatisfaction: (feeling: string) => void;
   satisfactionHistory: string[];
+  initialTab?: "library" | "upload" | "resume" | "stats" | "profile" | "settings";
 }
 
 export default function Dashboard({
@@ -48,6 +49,7 @@ export default function Dashboard({
   onRestartOnboarding,
   onAnswerSatisfaction,
   satisfactionHistory,
+  initialTab = "library",
 }: DashboardProps) {
   // Navigation tabs
   const [uploadedDocs, setUploadedDocs] = useState<Book[]>(() => {
@@ -152,7 +154,7 @@ export default function Dashboard({
     localStorage.setItem("lumina_uploaded_docs", JSON.stringify(updated));
   };
 
-  const [activeTab, setActiveTab] = useState<"library" | "upload" | "resume" | "stats" | "profile" | "settings">("library");
+  const [activeTab, setActiveTab] = useState<"library" | "upload" | "resume" | "stats" | "profile" | "settings">(initialTab);
   
   // Search state
   const [searchQuery, setSearchQuery] = useState<string>("");

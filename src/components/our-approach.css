@@ -3,8 +3,6 @@
    every other selector is prefixed with .about-approach so nothing leaks into the app. */
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap');
 
-.about-approach { min-height: 100vh; }
-
 .about-approach {
     --brand: #1A1A2E;
     --accent: #5B8FB9;
@@ -16,8 +14,6 @@
     --light-bg: #EEF5FA;
     --white: #ffffff;
     box-sizing: border-box;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
   :where(.about-approach) *, :where(.about-approach) *::before, :where(.about-approach) *::after { box-sizing: inherit; margin: 0; padding: 0; }
 
@@ -29,43 +25,6 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* ── NAV ── */
-  .about-approach nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(247,244,238,0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 14px 32px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .about-approach .nav-logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 800;
-    font-size: 18px;
-    color: var(--brand);
-    text-decoration: none;
-  }
-  .about-approach .nav-logo span.dot { color: var(--accent); }
-  .about-approach .nav-cta {
-    background: var(--accent);
-    color: white;
-    font-family: 'Lexend', sans-serif;
-    font-weight: 700;
-    font-size: 13px;
-    border: none;
-    border-radius: 12px;
-    padding: 10px 20px;
-    cursor: pointer;
-    text-decoration: none;
-    transition: opacity .15s;
-  }
-  .about-approach .nav-cta:hover { opacity: .85; }
 
   /* ── HERO ── */
   .about-approach .hero {
@@ -299,7 +258,6 @@
 
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
-    .about-approach nav { padding: 12px 20px; }
     .about-approach .hero { padding: 56px 20px 48px; }
     .about-approach section { padding: 48px 20px; }
     .about-approach .hero-stat-row { gap: 28px; }
