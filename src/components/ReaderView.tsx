@@ -154,7 +154,7 @@ export default function ReaderView({
   };
 
   const themeClasses: Record<string, string> = {
-    cream: "bg-[#F7F4EE] text-[#111111] border-[#C5C2B8]",
+    cream: "bg-[#FFFFFF] text-[#111111] border-[#C5C2B8]",
     yellow: "bg-[#FFFDE5] text-[#000000] border-[#D2CCA9]",
     blue: "bg-[#EEF5FA] text-[#0A192F] border-[#AFC3D4]",
     sepia: "bg-[#F4EAD4] text-[#2D1910] border-[#CCD2B8]",
@@ -162,7 +162,7 @@ export default function ReaderView({
   };
 
   const themeConfigNames = {
-    cream: "Organic Cream",
+    cream: "White",
     yellow: "Soft Yellow",
     blue: "Soft Ice Blue",
     sepia: "Classic Sepia",
@@ -183,7 +183,7 @@ export default function ReaderView({
     ? "bg-[#EEF5FA] text-[#1B2A4A]" 
     : isSepia 
     ? "bg-[#F4EAD4] text-[#3E2723]" 
-    : "bg-[#F7F4EE] text-[#111111]"; // Organic Cream
+    : "bg-[#FFFFFF] text-[#111111]"; // White
 
   const headerBgClass = isDark 
     ? "bg-[#1C1E22]/90 border-[#2D3139] text-[#FFFFFF]" 
@@ -1089,8 +1089,8 @@ useEffect(() => {
                 {/* Narrator Playback Controls */}
                 <button
                   onClick={() => setIsPlayingAudio(!isPlayingAudio)}
-                  className={`w-12 h-12 rounded-full border flex items-center justify-center text-white font-bold hover:scale-105 transition-all ${
-                    isPlayingAudio ? "bg-amber-600 hover:bg-amber-700" : "bg-[#5B8FB9] hover:bg-[#4C7C9E]"
+                  className={`w-12 h-12 rounded-full border flex items-center justify-center font-bold hover:scale-105 transition-all ${
+                    isPlayingAudio ? "bg-amber-600 hover:bg-amber-700 text-white" : "bg-[#FE987A] hover:bg-[#F5865F] text-[#19334A]"
                   }`}
                   aria-label={isPlayingAudio ? "Pause live speech synthesis" : "Play live speech synthesis"}
                 >
@@ -1103,7 +1103,7 @@ useEffect(() => {
                   <select
                     value={audioSpeed}
                     onChange={(e) => setAudioSpeed(parseFloat(e.target.value))}
-                    className="mt-1 text-xs font-black bg-[#F7F4EE] border border-[#DCD9D0] p-1.5 rounded-lg"
+                    className="mt-1 text-xs font-black bg-[#FFFFFF] border border-[#DCD9D0] p-1.5 rounded-lg"
                   >
                     <option value="0.75">0.75x Slow</option>
                     <option value="1.0">1.0x Normal</option>
@@ -1123,7 +1123,7 @@ useEffect(() => {
                 <select
                   value={preferences.narratorVoice || ""}
                   onChange={(e) => onUpdatePreferences({ ...preferences, narratorVoice: e.target.value })}
-                  className={`w-full text-xs p-1.5 rounded-lg font-bold truncate ${isDark ? 'bg-[#252830] border-[#383A40] text-stone-200' : 'bg-[#F7F4EE] border-[#DCD9D0] text-stone-700'}`}
+                  className={`w-full text-xs p-1.5 rounded-lg font-bold truncate ${isDark ? 'bg-[#252830] border-[#383A40] text-stone-200' : 'bg-[#FFFFFF] border-[#DCD9D0] text-stone-700'}`}
                 >
                   <option value="">Default Human Reader</option>
                   {(() => {
@@ -1206,7 +1206,7 @@ useEffect(() => {
                     <p>{label}</p>
                     <p className={`text-[9px] font-normal mt-0.5 ${isDark ? "text-amber-300/50" : "text-[#888888]"}`}>{desc}</p>
                   </div>
-                  <span className={`text-[10px] font-black px-2 py-0.5 rounded ${safePrefs[key as keyof typeof safePrefs] ? "bg-amber-500 text-white" : isDark ? "bg-[#1E1C10] text-amber-400" : "bg-[#F7F4EE] text-stone-400"}`}>
+                  <span className={`text-[10px] font-black px-2 py-0.5 rounded ${safePrefs[key as keyof typeof safePrefs] ? "bg-amber-500 text-white" : isDark ? "bg-[#1E1C10] text-amber-400" : "bg-[#FFFFFF] text-stone-400"}`}>
                     {safePrefs[key as keyof typeof safePrefs] ? "ON" : "OFF"}
                   </span>
                 </button>
@@ -1408,7 +1408,7 @@ useEffect(() => {
 
                     <button
                       onClick={() => handleExplainText(selectedWord || "")}
-                      className="w-full mt-2 py-2 bg-[#5B8FB9] text-white rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-[#4C7C9E] transition-colors"
+                      className="w-full mt-2 py-2 bg-[#FE987A] text-[#19334A] rounded-xl text-[10px] font-black uppercase tracking-wider hover:bg-[#F5865F] transition-colors"
                       title="Generate deep AI help"
                     >
                       Ask AI Advanced Literature Detail
@@ -1516,7 +1516,7 @@ useEffect(() => {
                     style={{
                       backgroundColor:
                         t === "cream"
-                          ? "#F7F4EE"
+                          ? "#FFFFFF"
                           : t === "yellow"
                           ? "#FFFDE5"
                           : t === "blue"

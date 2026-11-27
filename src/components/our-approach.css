@@ -4,12 +4,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800;900&display=swap');
 
 .about-approach {
-    --brand: #1A1A2E;
+    --brand: #0B1A2D;
     --accent: #5B8FB9;
     --teal: #00A795;
-    --cream: #F7F4EE;
+    --cream: #FFFFFF;
     --border: #DCD9D0;
-    --text: #1A1A2E;
+    --text: #0B1A2D;
     --muted: #666666;
     --light-bg: #EEF5FA;
     --white: #ffffff;
@@ -156,7 +156,7 @@
   @media (max-width: 600px) { .about-approach .mv-grid { grid-template-columns: 1fr; } }
   .about-approach .card-dark {
     background: var(--brand);
-    border: 1px solid #2d2d4e;
+    border: 1px solid #1D3049;
     border-radius: 20px;
     padding: 28px;
   }

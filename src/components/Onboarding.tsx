@@ -25,7 +25,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   const themeClasses: Record<ThemeOption, string> = {
-    cream: "bg-[#F7F4EE] text-[#111111] border-[#C5C2B8]",
+    cream: "bg-[#FFFFFF] text-[#111111] border-[#C5C2B8]",
     yellow: "bg-[#FFFDE5] text-[#000000] border-[#D2CCA9]",
     blue: "bg-[#EEF5FA] text-[#0A192F] border-[#AFC3D4]",
     sepia: "bg-[#F4EAD4] text-[#2D1910] border-[#CCD2B8]",
@@ -45,7 +45,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     ? "bg-[#EEF5FA] text-[#1B2A4A]" 
     : isSepia 
     ? "bg-[#F4EAD4] text-[#3E2723]" 
-    : "bg-[#F7F4EE] text-[#111111]";
+    : "bg-[#FFFFFF] text-[#111111]";
 
   const borderClass = isDark 
     ? "border-[#404657]" 
@@ -117,7 +117,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                   <InteractiveTutorialVideo />
                 </div>
 
-                <div className="p-3 bg-[#F7F4EE] rounded-xl border border-[#DCD9D0] text-[11px] text-[#444444] flex items-start gap-2">
+                <div className="p-3 bg-[#FFFFFF] rounded-xl border border-[#DCD9D0] text-[11px] text-[#444444] flex items-start gap-2">
                   <Sparkles className="w-4 h-4 text-[#5B8FB9] flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-bold">Next Setup Steps:</p>
@@ -226,7 +226,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {[
-                    { id: "cream", label: "Organic Cream", code: "#F7F4EE" },
+                    { id: "cream", label: "White", code: "#FFFFFF" },
                     { id: "yellow", label: "Soft Yellow", code: "#FFFDE5" },
                     { id: "blue", label: "Soft Ice Blue", code: "#EEF5FA" },
                     { id: "sepia", label: "Sepia Warmth", code: "#F4EAD4" },
@@ -351,7 +351,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 <button
                   type="button"
                   onClick={() => setStep(step + 1)}
-                  className="px-6 py-2.5 bg-[#5B8FB9] text-white font-bold text-xs rounded-xl hover:bg-[#497A9E] shadow-sm flex items-center gap-2"
+                  className="px-6 py-2.5 bg-[#FE987A] text-[#19334A] font-bold text-xs rounded-xl hover:bg-[#F5865F] shadow-sm flex items-center gap-2"
                 >
                   <span>Continue</span>
                   <ChevronRight className="w-4 h-4" />
@@ -360,7 +360,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 <button
                   type="button"
                   onClick={handleFinish}
-                  className="px-6 py-2.5 bg-[#5B8FB9] text-white font-black text-xs rounded-xl hover:bg-green-700 shadow-md uppercase tracking-wider"
+                  className="px-6 py-2.5 bg-[#FE987A] text-[#19334A] font-black text-xs rounded-xl hover:bg-[#F5865F] shadow-md uppercase tracking-wider"
                 >
                   Start Reading Platform
                 </button>
@@ -395,7 +395,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             </p>
           </div>
 
-          <div className={`mt-4 p-3 rounded-xl border text-center text-[10px] font-semibold transition-all duration-300 ${isDark ? 'bg-[#1E2130] border-[#404657] text-[#B0BAD0]' : 'bg-[#F7F4EE] border-[#DCD9D0] text-[#555555]'}`}>
+          <div className={`mt-4 p-3 rounded-xl border text-center text-[10px] font-semibold transition-all duration-300 ${isDark ? 'bg-[#1E2130] border-[#404657] text-[#B0BAD0]' : 'bg-[#FFFFFF] border-[#DCD9D0] text-[#555555]'}`}>
             Watch the font weight, sizes, list distance, and ambient backdrops interact instantly as you choose.
           </div>
         </div>

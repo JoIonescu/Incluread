@@ -37,7 +37,7 @@ export default function SiteHeader({ onOpenTab }: SiteHeaderProps) {
   return (
     <>
       {/* Beta Banner */}
-      <div className="w-full bg-[#1a1a2e] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
+      <div className="w-full bg-[#0B1A2D] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00A795] animate-pulse flex-shrink-0" />
         Incluread is in beta — we're actively improving. Your feedback shapes what comes next.{" "}
         <a href="mailto:hello@incluread.click" className="underline text-[#00A795] hover:text-white transition-colors">Share feedback →</a>
@@ -92,7 +92,7 @@ export default function SiteHeader({ onOpenTab }: SiteHeaderProps) {
           ) : (
             <button
               onClick={() => onOpenTab("profile")}
-              className="px-4 h-10 rounded-full bg-[#5B8FB9] hover:bg-[#4C7C9E] text-white font-black text-xs transition-all cursor-pointer shadow-xs touch-target"
+              className="px-4 h-10 rounded-full bg-[#FE987A] hover:bg-[#F5865F] text-[#19334A] font-black text-xs transition-all cursor-pointer shadow-xs touch-target"
               aria-label="Register or sign in"
             >
               Register or sign in

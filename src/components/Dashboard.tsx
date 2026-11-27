@@ -594,7 +594,7 @@ export default function Dashboard({
 
   // Core visual theme names mapped
   const themeClasses: Record<string, string> = {
-    cream: "bg-[#F7F4EE] text-[#111111] border-[#C5C2B8]",
+    cream: "bg-[#FFFFFF] text-[#111111] border-[#C5C2B8]",
     yellow: "bg-[#FFFDE5] text-[#000000] border-[#D2CCA9]",
     blue: "bg-[#EEF5FA] text-[#0A192F] border-[#AFC3D4]",
     sepia: "bg-[#F4EAD4] text-[#2D1910] border-[#CCD2B8]",
@@ -610,7 +610,7 @@ export default function Dashboard({
     activeTheme === "yellow" ? "bg-[#FFFDE5] text-[#000000]" :
     activeTheme === "blue" ? "bg-[#EEF5FA] text-[#0A192F]" :
     activeTheme === "sepia" ? "bg-[#F4EAD4] text-[#2D1910]" :
-    "bg-[#F7F4EE] text-[#111111]"; // Organic Cream
+    "bg-[#FFFFFF] text-[#111111]"; // White
 
   const borderClass = 
     activeTheme === "dark" ? "border-[#2D3139]" :
@@ -657,7 +657,7 @@ export default function Dashboard({
     activeTheme === "yellow" ? "bg-[#FFFDE5] text-black border-[#D2CCA9]" :
     activeTheme === "blue" ? "bg-[#EEF5FA] text-[#0A192F] border-[#AFC3D4]" :
     activeTheme === "sepia" ? "bg-[#FDFBF4] text-[#2D1910] border-[#CCD2B8]" :
-    "bg-[#F7F4EE]/50 text-stone-900 border-[#DCD9D0]";
+    "bg-[#FFFFFF]/50 text-stone-900 border-[#DCD9D0]";
 
   const buttonClass =
     activeTheme === "dark" ? "bg-[#252B38] text-[#F0F2F5] hover:bg-[#2D3447] border-[#3D4558]" :
@@ -803,7 +803,7 @@ export default function Dashboard({
           ) : (
             <button
               onClick={() => setActiveTab("profile")}
-              className="px-4 h-10 rounded-full bg-[#5B8FB9] hover:bg-[#4C7C9E] text-white font-black text-xs transition-all cursor-pointer shadow-xs touch-target"
+              className="px-4 h-10 rounded-full bg-[#FE987A] hover:bg-[#F5865F] text-[#19334A] font-black text-xs transition-all cursor-pointer shadow-xs touch-target"
               aria-label="Register or sign in"
             >
               Register or sign in
@@ -950,7 +950,7 @@ export default function Dashboard({
                             } catch {}
                             onSelectBook(detailBook.id);
                           }}
-                          className="w-full h-14 bg-[#5B8FB9] text-white font-black text-sm uppercase rounded-2xl tracking-widest hover:bg-[#497A9E] transition-all flex items-center justify-center gap-2 shadow-lg hover:translate-y-[-1px] cursor-pointer"
+                          className="w-full h-14 bg-[#FE987A] text-[#19334A] font-black text-sm uppercase rounded-2xl tracking-widest hover:bg-[#F5865F] transition-all flex items-center justify-center gap-2 shadow-lg hover:translate-y-[-1px] cursor-pointer"
                         >
                           <span>Start Reading Experience</span>
                           <ArrowRight className="w-5 h-5" />
@@ -1110,7 +1110,7 @@ export default function Dashboard({
                           {bookList.filter(Boolean).map((book) => renderBookCard(book, isGlobal))}
                         </div>
                         {/* Right fade gradient — signals more content */}
-                        <div className="absolute right-0 top-0 bottom-3 w-14 bg-gradient-to-l from-[#F7F4EE] to-transparent pointer-events-none" />
+                        <div className="absolute right-0 top-0 bottom-3 w-14 bg-gradient-to-l from-[#FFFFFF] to-transparent pointer-events-none" />
                       </div>
                     )}
                   </div>
@@ -1153,7 +1153,7 @@ export default function Dashboard({
                         placeholder="Search millions of books by title, author..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full text-xs pl-9 pr-3 py-2.5 bg-[#F7F4EE]/50 border border-[#DCD9D0] rounded-xl focus:outline-none focus:border-[#5B8FB9]"
+                        className="w-full text-xs pl-9 pr-3 py-2.5 bg-[#FFFFFF]/50 border border-[#DCD9D0] rounded-xl focus:outline-none focus:border-[#5B8FB9]"
                       />
                     </div>
 
@@ -1272,7 +1272,7 @@ export default function Dashboard({
                           <div className="flex items-center gap-3 mt-3">
                             <button
                               onClick={(e) => { e.stopPropagation(); onSelectBook(activeBook.id); }}
-                              className="h-10 px-5 bg-[#5B8FB9] text-white rounded-xl text-xs font-bold hover:bg-[#4A7BA3] flex items-center gap-1.5 shadow-sm"
+                              className="h-10 px-5 bg-[#FE987A] text-[#19334A] rounded-xl text-xs font-bold hover:bg-[#F5865F] flex items-center gap-1.5 shadow-sm"
                             >
                               <span>Continue Reading</span>
                               <ArrowRight className="w-4 h-4" />
@@ -1293,7 +1293,7 @@ export default function Dashboard({
                         {currentUser ? (
                           savedBookIds.length > 0 ? (
                             <div className="flex gap-4 overflow-x-auto pb-3 relative" style={{scrollbarWidth:"none"}}>
-                              <div className="absolute right-0 top-0 bottom-3 w-12 bg-gradient-to-l from-[#F7F4EE] to-transparent pointer-events-none z-10" />
+                              <div className="absolute right-0 top-0 bottom-3 w-12 bg-gradient-to-l from-[#FFFFFF] to-transparent pointer-events-none z-10" />
                               {[...books, ...subjectBooks, ...onlineBooks].filter((b, i, arr) => b && savedBookIds.includes(b.id) && arr.findIndex(x => x.id === b.id) === i).map(b => (
                               <div key={b.id} className="relative flex-shrink-0">
                                 {renderBookCard(b, !books.find(x => x.id === b.id))}
@@ -1418,13 +1418,13 @@ export default function Dashboard({
                             {filteredOnlineBooks.map((book) => renderBookCard(book, true))}
                           </div>
                         ) : onlineBooks.length > 0 ? (
-                          <div className="text-center py-8 bg-[#F7F4EE]/40 rounded-2xl border border-dashed border-[#DCD9D0]">
+                          <div className="text-center py-8 bg-[#FFFFFF]/40 rounded-2xl border border-dashed border-[#DCD9D0]">
                             <p className="text-xs text-[#666666] font-bold">
                               Found {onlineBooks.length} match{onlineBooks.length === 1 ? "" : "es"} for "{searchQuery}", but none fit the current Difficulty / Category / Age Group filters. Try widening them.
                             </p>
                           </div>
                         ) : (
-                          <div className="text-center py-8 bg-[#F7F4EE]/40 rounded-2xl border border-dashed border-[#DCD9D0]">
+                          <div className="text-center py-8 bg-[#FFFFFF]/40 rounded-2xl border border-dashed border-[#DCD9D0]">
                             <p className="text-xs text-[#666666] font-bold">
                               {searchingOnline ? "Updating live database entries..." : `No additional global public domain matches were found for "${searchQuery}".`}
                             </p>
@@ -1583,7 +1583,7 @@ export default function Dashboard({
                       </p>
                       <button
                         onClick={(e) => { e.stopPropagation(); onSelectBook(activeBook.id); }}
-                        className="mt-4 h-10 px-6 bg-[#5B8FB9] text-white rounded-xl text-xs font-black uppercase tracking-wider hover:bg-[#4A7BA3] transition-colors inline-flex items-center gap-2"
+                        className="mt-4 h-10 px-6 bg-[#FE987A] text-[#19334A] rounded-xl text-xs font-black uppercase tracking-wider hover:bg-[#F5865F] transition-colors inline-flex items-center gap-2"
                       >
                         <BookOpen className="w-4 h-4" />
                         Continue Reading
@@ -1797,7 +1797,7 @@ export default function Dashboard({
                               placeholder="you@domain.com"
                               value={authEmail}
                               onChange={(e) => setAuthEmail(e.target.value)}
-                              className="w-full text-xs p-3 bg-[#F7F4EE]/50 border border-[#DCD9D0] rounded-xl focus:outline-none focus:border-[#5B8FB9]"
+                              className="w-full text-xs p-3 bg-[#FFFFFF]/50 border border-[#DCD9D0] rounded-xl focus:outline-none focus:border-[#5B8FB9]"
                             />
                           </div>
 
@@ -1816,7 +1816,7 @@ export default function Dashboard({
                           <button
                             type="submit"
                             disabled={authLoading}
-                            className={`w-full py-2.5 bg-[#5B8FB9] hover:bg-[#4C7C9E] text-white rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
+                            className={`w-full py-2.5 bg-[#FE987A] hover:bg-[#F5865F] text-[#19334A] rounded-xl text-xs font-black uppercase tracking-wider transition-all cursor-pointer ${
                               authLoading ? "opacity-60 cursor-not-allowed" : ""
                             }`}
                           >
@@ -1847,22 +1847,22 @@ export default function Dashboard({
                           <h3 className="text-xs font-extrabold uppercase text-[#666666] tracking-widest mb-3">Locked Preferences</h3>
                           
                           <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-[#F7F4EE] p-4 rounded-xl border border-[#DCD9D0]">
+                            <div className="bg-[#FFFFFF] p-4 rounded-xl border border-[#DCD9D0]">
                               <p className="text-[10px] text-gray-400 font-extrabold uppercase">Typeface Font</p>
                               <p className={`text-base font-black ${fontClasses[preferences.font] || ""} mt-1`}>{preferences.font}</p>
                             </div>
 
-                            <div className="bg-[#F7F4EE] p-4 rounded-xl border border-[#DCD9D0]">
+                            <div className="bg-[#FFFFFF] p-4 rounded-xl border border-[#DCD9D0]">
                               <p className="text-[10px] text-gray-400 font-extrabold uppercase">Render Size</p>
                               <p className="text-base font-black mt-1">{preferences.textSize}px</p>
                             </div>
 
-                            <div className="bg-[#F7F4EE] p-4 rounded-xl border border-[#DCD9D0]">
+                            <div className="bg-[#FFFFFF] p-4 rounded-xl border border-[#DCD9D0]">
                               <p className="text-[10px] text-gray-400 font-extrabold uppercase">Contrast Theme</p>
                               <p className="text-base font-black mt-1 capitalize">{preferences.theme}</p>
                             </div>
 
-                            <div className="bg-[#F7F4EE] p-4 rounded-xl border border-[#DCD9D0]">
+                            <div className="bg-[#FFFFFF] p-4 rounded-xl border border-[#DCD9D0]">
                               <p className="text-[10px] text-gray-400 font-extrabold uppercase">Line Spacing multiplier</p>
                               <p className="text-base font-black mt-1">{preferences.lineSpacing}x</p>
                             </div>
@@ -1880,7 +1880,7 @@ export default function Dashboard({
                             Sign up or sign in using the passwordless email form to see your synced reader account and lock in custom settings permanently.
                           </p>
                         </div>
-                        <div className="bg-[#F7F4EE] text-gray-700 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border border-[#DCD9D0]">
+                        <div className="bg-[#FFFFFF] text-gray-700 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full border border-[#DCD9D0]">
                           Reading as Guest
                         </div>
                       </div>
@@ -1964,7 +1964,7 @@ export default function Dashboard({
                         <label className={`text-xs font-bold block ${textSecondary}`}>Active Contrast Theme (Toggle Dark Mode)</label>
                         <div className="grid grid-cols-2 lg:grid-cols-3 gap-2">
                           {[
-                            { id: "cream", label: "Cream Light", bg: "#F7F4EE" },
+                            { id: "cream", label: "White", bg: "#FFFFFF" },
                             { id: "yellow", label: "Soft Yellow", bg: "#FFFDE5" },
                             { id: "blue", label: "Ice Blue", bg: "#EEF5FA" },
                             { id: "sepia", label: "Sepia Warm", bg: "#F4EAD4" },

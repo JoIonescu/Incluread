@@ -13,7 +13,7 @@ export default function LegalPage({ onBack, onGoToAbout, initialSection = "priva
   const [activeSection, setActiveSection] = React.useState<LegalSection>(initialSection);
 
   return (
-    <div className="min-h-screen bg-[#F7F4EE] font-sans">
+    <div className="min-h-screen bg-[#FFFFFF] font-sans">
       {/* Header */}
       <div className="bg-white border-b border-[#DCD9D0] sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-4">
@@ -94,7 +94,7 @@ export default function LegalPage({ onBack, onGoToAbout, initialSection = "priva
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse">
                 <thead>
-                  <tr className="bg-[#F7F4EE]">
+                  <tr className="bg-[#FFFFFF]">
                     <th className="text-left p-3 border border-[#DCD9D0] font-bold">Name</th>
                     <th className="text-left p-3 border border-[#DCD9D0] font-bold">Type</th>
                     <th className="text-left p-3 border border-[#DCD9D0] font-bold">Purpose</th>
@@ -132,7 +132,7 @@ export default function LegalPage({ onBack, onGoToAbout, initialSection = "priva
 
       </div>
       {/* Footer on About page */}
-      <footer className="bg-[#1a1a2e] text-gray-400 text-xs mt-16">
+      <footer className="bg-[#0B1A2D] text-gray-400 text-xs mt-16">
         <div className="max-w-4xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
           <div>
             <img src="/incluread-logo-white.png" alt="Incluread" className="h-14 w-auto mb-3" style={{opacity:0.9}} />
@@ -158,7 +158,7 @@ export default function LegalPage({ onBack, onGoToAbout, initialSection = "priva
             <p className="opacity-70 leading-relaxed text-[11px]">Built on peer-reviewed dyslexia research. <button onClick={onGoToAbout} className="underline text-[#00A795]">Read our approach →</button></p>
           </div>
         </div>
-        <div className="border-t border-[#2d2d4e] px-6 py-4 text-center opacity-50">
+        <div className="border-t border-[#1D3049] px-6 py-4 text-center opacity-50">
           © {new Date().getFullYear()} Incluread. All rights reserved.
         </div>
       </footer>

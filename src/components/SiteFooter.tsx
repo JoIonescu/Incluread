@@ -5,7 +5,7 @@ interface SiteFooterProps {
 
 export default function SiteFooter({ onGoToAbout, onGoToLegal }: SiteFooterProps) {
   return (
-    <footer className="bg-[#1a1a2e] text-gray-400 text-xs mt-8">
+    <footer className="bg-[#0B1A2D] text-gray-400 text-xs mt-8">
       <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-2 md:grid-cols-4 gap-6">
         <div>
           <img src="/incluread-logo-white.png" alt="Incluread" className="h-14 w-auto mb-3" style={{opacity:0.9}} />
@@ -31,7 +31,7 @@ export default function SiteFooter({ onGoToAbout, onGoToLegal }: SiteFooterProps
           <p className="opacity-70 leading-relaxed">Built on peer-reviewed dyslexia research. <button onClick={onGoToAbout} className="underline text-[#00A795] hover:text-white">Read our approach →</button></p>
         </div>
       </div>
-      <div className="border-t border-[#2d2d4e] px-6 py-4 text-center opacity-50">
+      <div className="border-t border-[#1D3049] px-6 py-4 text-center opacity-50">
         © {new Date().getFullYear()} Incluread. All rights reserved. · incluread.click
       </div>
     </footer>

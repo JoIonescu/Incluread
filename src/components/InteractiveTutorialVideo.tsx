@@ -233,7 +233,7 @@ export default function InteractiveTutorialVideo() {
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${
-              isPlaying ? "bg-[#00A795] text-stone-950 hover:bg-[#00c4ad]" : "bg-[#5B8FB9] text-white hover:bg-[#497A9E]"
+              isPlaying ? "bg-[#00A795] text-stone-950 hover:bg-[#00c4ad]" : "bg-[#FE987A] text-[#19334A] hover:bg-[#F5865F]"
             }`}
           >
             {isPlaying ? <Pause className="w-4 h-4 fill-current" /> : <Play className="w-4 h-4 fill-current ml-0.5" />}

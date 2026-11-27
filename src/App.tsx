@@ -447,7 +447,7 @@ export default function App() {
   // Render Loader screen until localStorage finishes mounting
   if (!preferences && hasCompletedOnboarding) {
     return (
-      <div className="min-h-screen bg-[#F7F4EE] flex items-center justify-center">
+      <div className="min-h-screen bg-[#FFFFFF] flex items-center justify-center">
         <div className="text-center space-y-4">
           <div className="w-8 h-8 border-4 border-[#E5E1D8] border-t-[#5B8FB9] rounded-full animate-spin mx-auto" />
           <p className="text-xs font-bold text-gray-500">Compiling high-contrast layout parameters...</p>
@@ -475,7 +475,7 @@ export default function App() {
   // Phase B: Immersive Reading Experience Viewer
   if (selectedBookId) {
     const BetaBanner = () => (
-      <div className="w-full bg-[#1a1a2e] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
+      <div className="w-full bg-[#0B1A2D] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00A795] animate-pulse flex-shrink-0" />
         Incluread is in beta — we're actively improving. Your feedback shapes what comes next.{" "}
         <a href="mailto:hello@incluread.click" className="underline text-[#00A795] hover:text-white transition-colors">Share feedback →</a>
@@ -511,7 +511,7 @@ export default function App() {
   return (
     <>
       {/* Beta Banner */}
-      <div className="w-full bg-[#1a1a2e] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
+      <div className="w-full bg-[#0B1A2D] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00A795] animate-pulse flex-shrink-0" />
         Incluread is in beta — we're actively improving. Your feedback shapes what comes next.{" "}
         <a href="mailto:hello@incluread.click" className="underline text-[#00A795] hover:text-white transition-colors">Share feedback →</a>
