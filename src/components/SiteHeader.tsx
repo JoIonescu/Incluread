@@ -38,7 +38,7 @@ export default function SiteHeader({ onOpenTab }: SiteHeaderProps) {
     <>
       {/* Beta Banner */}
       <div className="w-full bg-[#0B1A2D] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
-        <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00A795] animate-pulse flex-shrink-0" />
+        <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#FE987A] animate-pulse flex-shrink-0" />
         Incluread is in beta — we're actively improving. Your feedback shapes what comes next.{" "}
         <a href="mailto:hello@incluread.click" className="underline text-[#FE987A] hover:text-white transition-colors">Share feedback →</a>
       </div>

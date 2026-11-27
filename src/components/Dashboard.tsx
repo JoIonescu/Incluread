@@ -1443,10 +1443,10 @@ export default function Dashboard({
             {activeTab === "upload" && (
               <div className="space-y-8">
                 {/* Hero */}
-                <div className={`rounded-2xl p-8 border ${isDark ? "bg-[#1B2E4A] border-[#FE987A]/30" : "bg-[#FEEAE3] border-[#FE987A]/40"}`}>
+                <div className={`rounded-2xl p-8 border ${isDark ? "bg-[#1B2E4A] border-[#FE987A]/30" : "bg-[#CBDDF3] border-[#CBDDF3]"}`}>
                   <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${isDark ? "bg-[#FE987A]/25" : "bg-[#FE987A]/20"}`}>
-                      <Upload className="w-6 h-6 text-[#FE987A]" />
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${isDark ? "bg-[#FE987A]/25" : "bg-white"}`}>
+                      <Upload className={`w-6 h-6 ${isDark ? "text-[#FE987A]" : "text-[#19334A]"}`} />
                     </div>
                     <div>
                       <h2 className={`text-xl font-black mb-1 ${textPrimary}`}>Read Your Own Documents</h2>
