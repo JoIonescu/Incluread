@@ -38,13 +38,54 @@
   outline-color: #4E929C !important;
 }
 
-/* Dropdown highlight: browsers that honour it use the brand teal with a white label */
+/* Dropdown (select) list: selected option = solid #016271, hovered option = #016271 at 60%, white labels */
 select {
   accent-color: #016271;
 }
 select option:checked {
   background-color: #016271;
   color: #ffffff;
+}
+select option:hover {
+  background-color: rgb(1 98 113 / 0.6);
+  color: #ffffff;
+}
+
+/* Chrome / Edge 135+ let the open list be styled for real (the older native list always paints
+   its hover row in the system blue). Other browsers ignore this block and keep the rules above. */
+@supports (appearance: base-select) {
+  select,
+  select::picker(select) {
+    appearance: base-select;
+  }
+  select::picker(select) {
+    background: #ffffff;
+    border: 1px solid #DCD9D0;
+    border-radius: 12px;
+    padding: 4px;
+    box-shadow: 0 8px 24px rgb(11 26 45 / 0.12);
+  }
+  select option {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #111111;
+    background: transparent;
+  }
+  select option::checkmark {
+    display: none;
+  }
+  select option:checked {
+    background-color: #016271;
+    color: #ffffff;
+  }
+  select option:hover,
+  select option:focus-visible {
+    background-color: rgb(1 98 113 / 0.6);
+    color: #ffffff;
+    outline: none !important;
+  }
 }
 
 /* Keyboard navigable styles */
