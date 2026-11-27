@@ -725,19 +725,21 @@ useEffect(() => {
         <div className="flex items-center gap-4">
           <button
             onClick={onBackToDashboard}
+            style={{ borderColor: "#FE987A" }}
             className={`flex items-center gap-1 text-xs font-black uppercase transition-all border px-3 py-2 rounded-xl touch-target ${buttonClass}`}
             aria-label="Return to library shelf"
           >
             <ArrowLeft className="w-4 h-4 text-[#FE987A]" />
-            <span>Library Shelf</span>
+            <span className="hidden sm:inline">Library Shelf</span>
           </button>
           
-          <div className="hidden sm:flex items-center gap-2">
-            <NaraLogo showText={true} size="sm" onClick={onBackToDashboard} />
+          <div className="flex items-center gap-2">
+            <NaraLogo showText={true} size="lg" className="hidden lg:flex" onClick={onBackToDashboard} />
+            <NaraLogo showText={true} size="md" className="flex lg:hidden" onClick={onBackToDashboard} />
           </div>
         </div>
 
-        <div className="text-center font-bold text-xs truncate max-w-sm">
+        <div className="hidden sm:block text-center font-bold text-xs truncate max-w-sm">
           <span className="text-[#666666]">{book.title}</span> &bull; <span className="text-[color:var(--accent-text)]">{activeChapter.title}</span>
         </div>
 
@@ -860,7 +862,7 @@ useEffect(() => {
                     }}
                     className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${
                       isActive
-                        ? "bg-[#FE987A] text-[#19334A] border-[#FE987A]"
+                        ? "bg-[#016271]/70 text-white border-[#016271]/70"
                         : isErrored
                         ? "border-rose-300 text-rose-500 hover:border-rose-400"
                         : isLoaded
@@ -1089,8 +1091,8 @@ useEffect(() => {
                 {/* Narrator Playback Controls */}
                 <button
                   onClick={() => setIsPlayingAudio(!isPlayingAudio)}
-                  className={`w-12 h-12 rounded-full border flex items-center justify-center font-bold hover:scale-105 transition-all ${
-                    isPlayingAudio ? "bg-amber-600 hover:bg-amber-700 text-white" : "bg-[#FE987A] hover:bg-[#F5865F] text-[#19334A]"
+                  className={`w-12 h-12 rounded-full border-2 border-white flex items-center justify-center font-bold hover:scale-105 transition-all ${
+                    isPlayingAudio ? "bg-amber-600 hover:bg-amber-700 text-white" : "bg-[#016271]/70 hover:bg-[#016271]/80 text-white"
                   }`}
                   aria-label={isPlayingAudio ? "Pause live speech synthesis" : "Play live speech synthesis"}
                 >
@@ -1158,7 +1160,7 @@ useEffect(() => {
           </div>
 
           {/* Quick interactive Focus Modes block */}
-          <div className={`rounded-3xl p-6 shadow-xs border transition-all duration-300 ${isDark ? 'bg-[#211E10] border-[#5C531E] text-amber-200' : 'bg-[#FFFDEB] border-[#EBE6C2] text-[#2D1910]'}`}>
+          <div className={`rounded-3xl p-6 shadow-xs border transition-all duration-300 ${isDark ? 'bg-[#211E10] border-[#5C531E] text-amber-200' : 'bg-[#FFB26A]/10 border-[#EBE6C2] text-[#2D1910]'}`}>
             <h3 className={`text-xs font-extrabold uppercase tracking-widest mb-4 flex items-center gap-1 ${isDark ? 'text-amber-400' : 'text-[#777777]'}`}>
               <Highlighter className="w-4 h-4 text-amber-500" /> Sensory Focus Modes
             </h3>
@@ -1265,14 +1267,14 @@ useEffect(() => {
                 onClick={() => setActiveSideDrawer(activeSideDrawer === "aichat" ? "none" : "aichat")}
                 className={`w-full p-3 rounded-xl border text-left flex items-center justify-between text-xs font-bold transition-all ${
                   activeSideDrawer === "aichat" 
-                    ? "border-green-600 bg-green-50/20 text-green-700" 
+                    ? "border-[#016271] bg-[#016271]/10 text-[#016271]" 
                     : buttonClass
                 }`}
               >
                 <span className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-green-700 font-semibold" /> Ask AI Language Assistant
+                  <Sparkles className={`w-4 h-4 ${isDark ? "text-[#4E929C]" : "text-[#016271]"}`} /> Ask AI Language Assistant
                 </span>
-                <span className={`text-[10px] px-2 py-0.5 rounded font-black ${isDark ? 'bg-green-950/50 text-green-400' : 'bg-green-50 text-green-700'}`}>Open</span>
+                <span className={`text-[10px] px-2 py-0.5 rounded font-black ${isDark ? 'bg-[#016271]/30 text-[#4E929C]' : 'bg-[#016271]/10 text-[#016271]'}`}>Open</span>
               </button>
             </div>
 
