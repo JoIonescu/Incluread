@@ -1494,7 +1494,7 @@ export default function Dashboard({
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-3">
-                      <Upload className={`w-10 h-10 ${isDark ? "text-[#FE987A]" : "text-[#FE987A]/60"}`} />
+                      <Upload className={`w-10 h-10 ${isDark ? "text-[#FE987A]" : "text-[#19334A]"}`} />
                       <p className={`text-sm font-bold ${textPrimary}`}>Drop a file here or click to browse</p>
                       <p className={`text-xs ${textTertiary}`}>PDF, DOCX, or TXT · Max 10MB</p>
                     </div>
