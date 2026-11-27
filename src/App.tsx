@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Onboarding from "./components/Onboarding";
+import LandingPage from "./components/LandingPage";
 import OurApproachPage from "./components/OurApproachPage";
 import LegalPage from "./components/LegalPage";
 import SiteFooter from "./components/SiteFooter";
@@ -23,21 +24,33 @@ export default function App() {
 
   // Core shelf state tracking
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
-  // Page routing: "/about" is a real URL (deep-linkable); legal pages are still in-app views.
-  const isAboutPath = () => window.location.pathname.replace(/\/+$/, "") === "/about";
-  const [currentPage, setCurrentPage] = useState<"dashboard" | "about" | "legal">(() => (isAboutPath() ? "about" : "dashboard"));
-  const [legalSection, setLegalSection] = useState<"privacy" | "terms" | "cookies">("privacy");
-  const goToAbout = () => {
-    if (!isAboutPath()) window.history.pushState({}, "", "/about");
-    window.scrollTo(0, 0);
-    setCurrentPage("about");
+  // Page routing. Real URLs: "/" landing, "/library" main page, "/walkthrough", "/about". Legal pages are in-app views.
+  type Page = "landing" | "dashboard" | "about" | "legal" | "walkthrough";
+  const PATHS = { landing: "/", dashboard: "/library", about: "/about", walkthrough: "/walkthrough" } as const;
+  const currentPath = () => window.location.pathname.replace(/\/+$/, "") || "/";
+  const pageFromPath = (): Page => {
+    const p = currentPath();
+    if (p === PATHS.about) return "about";
+    if (p === PATHS.walkthrough) return "walkthrough";
+    if (p === PATHS.dashboard) return "dashboard";
+    return "landing";
   };
+  // Someone arriving from a magic sign-in email goes straight to the main page
+  const [currentPage, setCurrentPage] = useState<Page>(() =>
+    isSignInWithEmailLink(auth, window.location.href) ? "dashboard" : pageFromPath()
+  );
+  const [legalSection, setLegalSection] = useState<"privacy" | "terms" | "cookies">("privacy");
+  const go = (page: keyof typeof PATHS) => {
+    if (currentPath() !== PATHS[page]) window.history.pushState({}, "", PATHS[page]);
+    window.scrollTo(0, 0);
+    setCurrentPage(page);
+  };
+  const goToAbout = () => go("about");
+  const goToWalkthrough = () => go("walkthrough");
   const [dashboardTab, setDashboardTab] = useState<DashboardTab>("library");
   const goToDashboard = (tab: DashboardTab = "library") => {
-    if (isAboutPath()) window.history.pushState({}, "", "/");
-    window.scrollTo(0, 0);
     setDashboardTab(tab);
-    setCurrentPage("dashboard");
+    go("dashboard");
   };
   const goToLegal = (section: "privacy" | "terms" | "cookies") => {
     setLegalSection(section);
@@ -46,7 +59,7 @@ export default function App() {
 
   // Keep the page in sync with the browser's back/forward buttons
   useEffect(() => {
-    const onPopState = () => setCurrentPage(isAboutPath() ? "about" : "dashboard");
+    const onPopState = () => setCurrentPage(pageFromPath());
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
@@ -94,7 +107,7 @@ export default function App() {
               type: "success",
               message: `Success! Signed in as ${result.user?.email || "Incluread user"}!`
             });
-            window.history.replaceState({}, document.title, window.location.pathname);
+            window.history.replaceState({}, document.title, PATHS.dashboard);
           })
           .catch((err: any) => {
             console.error(err);
@@ -435,7 +448,47 @@ export default function App() {
     setHasCompletedOnboarding(false);
   };
 
-  // Public pages render before the loader/onboarding gate so /about is always reachable
+  // "Start Reading": straight to the main page. First-time visitors get the default reading setup
+  // (the same defaults the walkthrough starts from); they can change it any time in Settings.
+  const handleStartReading = () => {
+    if (!preferences && !currentUser) {
+      savePreferences({
+        letterSpacing: 0.05,
+        wordSpacing: 0.1,
+        bionicReading: false,
+        syllableBreaking: false,
+        font: "Lexend",
+        textSize: 20,
+        lineSpacing: 1.6,
+        theme: "cream",
+        support: "read-audio",
+        reduceMotion: false,
+      });
+      handleUpdatePosition({ bookId: "alice-wonderland", chapterId: "chapter-1", paragraphIndex: 0 });
+    }
+    goToDashboard();
+  };
+
+  // Public pages render before the loader/onboarding gate so they are always reachable
+  if (currentPage === "landing") {
+    return <LandingPage onStartReading={handleStartReading} onWalkthrough={goToWalkthrough} />;
+  }
+
+  if (currentPage === "walkthrough") {
+    return (
+      <Onboarding
+        onComplete={(newPrefs) => {
+          const isFirstSetup = !preferences;
+          savePreferences(newPrefs);
+          if (isFirstSetup) {
+            handleUpdatePosition({ bookId: "alice-wonderland", chapterId: "chapter-1", paragraphIndex: 0 });
+          }
+          goToDashboard();
+        }}
+      />
+    );
+  }
+
   if (currentPage === "about") {
     return <OurApproachPage onOpenTab={goToDashboard} onGoToAbout={goToAbout} onGoToLegal={goToLegal} />;
   }
