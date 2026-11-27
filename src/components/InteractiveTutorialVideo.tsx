@@ -18,16 +18,16 @@ export default function InteractiveTutorialVideo() {
       title: "1. Your Library — Millions of Books",
       desc: "Browse thousands of accessible public-domain titles by genre, or upload your own PDF, Word doc, or text file to read with all Incluread tools.",
       caption: "Welcome to Incluread. Your library holds millions of public-domain books — and anything you upload. Every title opens with your personal reading settings already applied.",
-      color: "from-[#EEF5FA] to-[#D0DFEB]",
-      icon: <BookOpen className="w-5 h-5 text-[#5B8FB9]" />,
+      color: "from-[#FEEAE3] to-[#FE987A]/30",
+      icon: <BookOpen className="w-5 h-5 text-[#FE987A]" />,
       contentComp: (
         <div className="space-y-2">
-          <p className="text-[9px] font-black uppercase tracking-widest text-[#5B8FB9]">Your Library</p>
+          <p className="text-[9px] font-black uppercase tracking-widest text-[#19334A]">Your Library</p>
           <div className="flex gap-2 overflow-hidden">
             {[
               { title: "Alice in Wonderland", color: "from-purple-400 to-indigo-500" },
               { title: "Frankenstein", color: "from-slate-500 to-slate-700" },
-              { title: "Your Upload.pdf", color: "from-[#5B8FB9] to-[#2D5A8A]" },
+              { title: "Your Upload.pdf", color: "from-[#FE987A] to-[#F5865F]" },
             ].map((b) => (
               <div key={b.title} className={`flex-shrink-0 w-14 h-20 rounded-lg bg-gradient-to-br ${b.color} flex items-end p-1.5 shadow-md`}>
                 <span className="text-white text-[7px] font-bold leading-tight line-clamp-2">{b.title}</span>
@@ -36,7 +36,7 @@ export default function InteractiveTutorialVideo() {
           </div>
           <div className="flex gap-1 mt-1">
             {["Classics", "Fantasy", "Upload"].map(tag => (
-              <span key={tag} className="text-[8px] font-bold px-1.5 py-0.5 bg-[#5B8FB9]/10 text-[#5B8FB9] rounded border border-[#5B8FB9]/20">{tag}</span>
+              <span key={tag} className="text-[8px] font-bold px-1.5 py-0.5 bg-[#FE987A]/10 text-[#19334A] rounded border border-[#FE987A]/20">{tag}</span>
             ))}
           </div>
         </div>
@@ -56,12 +56,12 @@ export default function InteractiveTutorialVideo() {
             <p className="text-[8px] text-amber-500 mt-0.5">Instantly readable with all tools</p>
           </div>
           <div className="flex items-center gap-1.5 bg-white border border-amber-200 rounded-lg p-1.5">
-            <div className="w-8 h-10 rounded bg-gradient-to-br from-[#5B8FB9] to-[#2D5A8A] flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-10 rounded bg-gradient-to-br from-[#FE987A] to-[#F5865F] flex items-center justify-center flex-shrink-0">
               <span className="text-white text-[7px] font-black">PDF</span>
             </div>
             <div>
               <p className="text-[8px] font-bold text-slate-700">chapter_1.pdf</p>
-              <p className="text-[7px] text-[#5B8FB9]">✓ Ready to read</p>
+              <p className="text-[7px] text-[#19334A]">✓ Ready to read</p>
             </div>
           </div>
         </div>

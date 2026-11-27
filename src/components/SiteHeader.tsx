@@ -53,7 +53,7 @@ export default function SiteHeader({ onOpenTab }: SiteHeaderProps) {
               <button
                 key={tab.id}
                 onClick={() => onOpenTab(tab.id)}
-                className="text-xs font-black uppercase flex items-center gap-1.5 pb-1 border-b-2 transition-colors touch-target border-transparent text-[#444444] hover:text-[#5B8FB9]"
+                className="text-xs font-black uppercase flex items-center gap-1.5 pb-1 border-b-2 transition-colors touch-target border-transparent text-[#444444] hover:text-[#19334A]"
               >
                 <Icon className="w-4 h-4" />
                 <span>{tab.label}</span>
@@ -64,16 +64,16 @@ export default function SiteHeader({ onOpenTab }: SiteHeaderProps) {
 
         {/* Mobile-only profile icon */}
         <button
-          className="flex md:hidden items-center justify-center w-9 h-9 rounded-full bg-[#5B8FB9]/10 border border-[#5B8FB9]/20"
+          className="flex md:hidden items-center justify-center w-9 h-9 rounded-full bg-[#FE987A]/10 border border-[#FE987A]/20"
           onClick={() => onOpenTab("profile")}
           aria-label="Profile"
         >
           {currentUser ? (
-            <span className="text-[10px] font-black text-[#5B8FB9]">
+            <span className="text-[10px] font-black text-[#19334A]">
               {currentUser.email?.substring(0, 2).toUpperCase() || "U"}
             </span>
           ) : (
-            <User className="w-4 h-4 text-[#5B8FB9]" />
+            <User className="w-4 h-4 text-[#FE987A]" />
           )}
         </button>
 
@@ -81,10 +81,10 @@ export default function SiteHeader({ onOpenTab }: SiteHeaderProps) {
           {currentUser ? (
             <button
               onClick={() => onOpenTab("profile")}
-              className="px-3 h-10 rounded-full bg-[#5B8FB9]/10 text-[#3D729E] border border-[#5B8FB9]/20 flex items-center gap-2 hover:bg-[#5B8FB9]/20 transition-all cursor-pointer touch-target"
+              className="px-3 h-10 rounded-full bg-[#FE987A]/10 text-[#19334A] border border-[#FE987A]/20 flex items-center gap-2 hover:bg-[#FE987A]/20 transition-all cursor-pointer touch-target"
               aria-label="View user profile"
             >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#3D729E] to-[#6FA6CD] text-white flex items-center justify-center text-[10px] font-black">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#F5865F] to-[#FFB26A] text-[#19334A] flex items-center justify-center text-[10px] font-black">
                 {currentUser.email ? currentUser.email.substring(0, 2).toUpperCase() : "U"}
               </div>
               <span className="text-xs font-bold truncate max-w-[120px]">{currentUser.email}</span>

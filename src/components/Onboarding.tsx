@@ -90,7 +90,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   return (
-    <div id="onboarding-root" className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between py-12 px-6 transition-all duration-300`}>
+    <div id="onboarding-root" style={{ "--accent-text": isDark ? "#FE987A" : "#19334A" } as React.CSSProperties} className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between py-12 px-6 transition-all duration-300`}>
       <div className="max-w-4xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-start my-auto">
         
         {/* Left Interactive Configuration Screen */}
@@ -105,7 +105,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             {step === 1 && (
               <div className="space-y-4 animate-fadeIn">
                 <h1 className="text-3xl font-extrabold tracking-tight text-[#222222]">
-                  Reading should adapt <span className="text-[#5B8FB9]">to you</span>.
+                  Reading should adapt <span className="text-[color:var(--accent-text)]">to you</span>.
                 </h1>
                 
                 <p className="text-[#444444] text-xs leading-relaxed">
@@ -118,7 +118,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 </div>
 
                 <div className="p-3 bg-[#FFFFFF] rounded-xl border border-[#DCD9D0] text-[11px] text-[#444444] flex items-start gap-2">
-                  <Sparkles className="w-4 h-4 text-[#5B8FB9] flex-shrink-0 mt-0.5" />
+                  <Sparkles className="w-4 h-4 text-[#FE987A] flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="font-bold">Next Setup Steps:</p>
                     <p className="text-[#666666]">We will help customize your favorite fonts, sizing bounds, contrast palettes, and active helpers.</p>
@@ -131,7 +131,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             {step === 2 && (
               <div className="space-y-4 animate-fadeIn">
                 <h2 className="text-xl font-bold text-[#222222] flex items-center gap-2">
-                  <Sliders className="w-5 h-5 text-[#5B8FB9]" /> Select reading typeface
+                  <Sliders className="w-5 h-5 text-[#FE987A]" /> Select reading typeface
                 </h2>
                 <p className="text-xs text-[#666666]">
                   Choose typefaces designed to prevent mirroring, letter swapping, or visual crowding.
@@ -147,9 +147,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     <button
                       key={f.id}
                       onClick={() => setFont(f.id as FontOption)}
-                      className={`text-left p-4 rounded-xl border transition-all hover:border-[#5B8FB9] ${
+                      className={`text-left p-4 rounded-xl border transition-all hover:border-[#FE987A] ${
                         font === f.id
-                          ? "bg-[#5B8FB9]/10 border-[#5B8FB9] ring-2 ring-[#5B8FB9]/30"
+                          ? "bg-[#FE987A]/10 border-[#FE987A] ring-2 ring-[#FE987A]/30"
                           : isDark ? "bg-[#252B38] border-[#3D4558] text-[#F0F2F5]" : "bg-white border-[#DCD9D0]"
                       }`}
                     >
@@ -174,7 +174,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 <div className="p-6 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center gap-4">
                   <div className="flex justify-between w-full text-xs font-bold text-[#666666]">
                     <span>Standard (16px)</span>
-                    <span className="text-[#5B8FB9] text-base">{textSize}px</span>
+                    <span className="text-[color:var(--accent-text)] text-base">{textSize}px</span>
                     <span>Generous (36px)</span>
                   </div>
                   <input
@@ -183,7 +183,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     max="36"
                     value={textSize}
                     onChange={(e) => setTextSize(parseInt(e.target.value))}
-                    className="w-full h-2 bg-[#DCD9D0] rounded-lg appearance-none cursor-pointer accent-[#5B8FB9]"
+                    className="w-full h-2 bg-[#DCD9D0] rounded-lg appearance-none cursor-pointer accent-[#FE987A]"
                   />
                 </div>
               </div>
@@ -200,7 +200,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                 <div className="p-6 bg-gray-50 rounded-xl border border-gray-100 flex flex-col items-center gap-4">
                   <div className="flex justify-between w-full text-xs font-bold text-[#666666]">
                     <span>Compact (1.2)</span>
-                    <span className="text-[#5B8FB9] text-base">{lineSpacing}x</span>
+                    <span className="text-[color:var(--accent-text)] text-base">{lineSpacing}x</span>
                     <span>Relaxed (2.5)</span>
                   </div>
                   <input
@@ -210,7 +210,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     step="0.1"
                     value={lineSpacing}
                     onChange={(e) => setLineSpacing(parseFloat(e.target.value))}
-                    className="w-full h-2 bg-[#DCD9D0] rounded-lg appearance-none cursor-pointer accent-[#5B8FB9]"
+                    className="w-full h-2 bg-[#DCD9D0] rounded-lg appearance-none cursor-pointer accent-[#FE987A]"
                   />
                 </div>
               </div>
@@ -237,7 +237,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                       onClick={() => setTheme(t.id as ThemeOption)}
                       className={`p-3 rounded-xl border transition-all text-left flex items-center gap-2 ${
                         theme === t.id
-                          ? "border-[#5B8FB9] ring-2 ring-[#5B8FB9]/40 bg-gray-50"
+                          ? "border-[#FE987A] ring-2 ring-[#FE987A]/40 bg-gray-50"
                           : "border-[#DCD9D0] bg-white"
                       }`}
                     >
@@ -281,9 +281,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     <button
                       key={sm.id}
                       onClick={() => setSupport(sm.id as SupportMode)}
-                      className={`w-full text-left p-4 rounded-xl border transition-all hover:border-[#5B8FB9] flex items-center justify-between ${
+                      className={`w-full text-left p-4 rounded-xl border transition-all hover:border-[#FE987A] flex items-center justify-between ${
                         support === sm.id
-                          ? "bg-[#5B8FB9]/10 border-[#5B8FB9] ring-1 ring-[#5B8FB9]"
+                          ? "bg-[#FE987A]/10 border-[#FE987A] ring-1 ring-[#FE987A]"
                           : "bg-white border-[#DCD9D0]"
                       }`}
                     >
@@ -292,7 +292,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                         <p className="text-xs text-[#777777] mt-1 pr-4">{sm.desc}</p>
                       </div>
                       {support === sm.id && (
-                        <Check className="w-5 h-5 text-[#5B8FB9] flex-shrink-0" />
+                        <Check className="w-5 h-5 text-[#FE987A] flex-shrink-0" />
                       )}
                     </button>
                   ))}
@@ -303,12 +303,12 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
             {/* Step 7: Finish Page */}
             {step === 7 && (
               <div className="space-y-5 animate-fadeIn">
-                <h2 className="text-2xl font-black text-[#5B8FB9]">Settings Compiled!</h2>
+                <h2 className="text-2xl font-black text-[color:var(--accent-text)]">Settings Compiled!</h2>
                 <p className="text-[#333333] leading-relaxed text-sm">
                   Your reading workspace is fully customized. These layout ratios, fonts, sizes and tone templates will be locked across your device library profiles automatically.
                 </p>
 
-                <div className="p-4 bg-[#EEF5FA] rounded-xl border border-[#D0DFEB] space-y-2 text-xs">
+                <div className="p-4 bg-[#FEEAE3] rounded-xl border border-[#FE987A]/40 space-y-2 text-xs">
                   <p className="font-bold text-[#1B2A4A]">Saved Profile Summary:</p>
                   <div className="grid grid-cols-2 gap-1 text-[#444444]">
                     <div>Font: <span className="font-bold">{font}</span></div>
@@ -324,7 +324,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
                     type="checkbox"
                     checked={reduceMotion}
                     onChange={(e) => setReduceMotion(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300 accent-[#5B8FB9]"
+                    className="w-4 h-4 rounded border-gray-300 accent-[#FE987A]"
                   />
                   <label htmlFor="mot-red">Enable WCAG Reduce Motion mode (fewer fade animations)</label>
                 </div>

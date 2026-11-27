@@ -718,7 +718,7 @@ useEffect(() => {
   };
 
   return (
-    <div id="reader-shell" className={`min-h-screen ${shellBgClass} font-sans flex flex-col relative transition-all duration-300`}>
+    <div id="reader-shell" style={{ "--accent-text": isDark ? "#FE987A" : "#19334A" } as React.CSSProperties} className={`min-h-screen ${shellBgClass} font-sans flex flex-col relative transition-all duration-300`}>
       
       {/* 1. Header with minimalist Incluread Logo style */}
       <header className={`h-16 border-b px-6 flex items-center justify-between backdrop-blur-sm sticky top-0 z-40 ${headerBgClass} transition-all duration-300`}>
@@ -728,7 +728,7 @@ useEffect(() => {
             className={`flex items-center gap-1 text-xs font-black uppercase transition-all border px-3 py-2 rounded-xl touch-target ${buttonClass}`}
             aria-label="Return to library shelf"
           >
-            <ArrowLeft className="w-4 h-4 text-[#5B8FB9]" />
+            <ArrowLeft className="w-4 h-4 text-[#FE987A]" />
             <span>Library Shelf</span>
           </button>
           
@@ -738,7 +738,7 @@ useEffect(() => {
         </div>
 
         <div className="text-center font-bold text-xs truncate max-w-sm">
-          <span className="text-[#666666]">{book.title}</span> &bull; <span className="text-[#5B8FB9]">{activeChapter.title}</span>
+          <span className="text-[#666666]">{book.title}</span> &bull; <span className="text-[color:var(--accent-text)]">{activeChapter.title}</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -746,7 +746,7 @@ useEffect(() => {
           <button
             onClick={() => setShowRuler(!showRuler)}
             className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-colors ${
-              showRuler ? "bg-[#5B8FB9] text-white border-[#5B8FB9]" : "bg-white text-[#666666] border-[#DCD9D0]"
+              showRuler ? "bg-[#FE987A] text-[#19334A] border-[#FE987A]" : "bg-white text-[#666666] border-[#DCD9D0]"
             } hover:bg-gray-50`}
             title="Toggle Reading Ruler Guide"
             aria-label="Toggle Reading Ruler Guide"
@@ -757,7 +757,7 @@ useEffect(() => {
           {/* Summarize chapter trigger */}
           <button
             onClick={handleSummarizeChapter}
-            className="bg-[#5B8FB9]/10 text-[#5B8FB9] border border-[#5B8FB9]/30 hover:bg-[#5B8FB9]/20 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5"
+            className="bg-[#FE987A]/10 text-[color:var(--accent-text)] border border-[#FE987A]/30 hover:bg-[#FE987A]/20 px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5"
             title="AI Memory Summarizer"
           >
             <Sparkles className="w-4 h-4" />
@@ -783,7 +783,7 @@ useEffect(() => {
         >
           {/* Swipe direction hint, shown only while dragging */}
           {Math.abs(swipeOffset) > 20 && (
-            <div className={`fixed top-1/2 ${swipeOffset > 0 ? "left-6" : "right-6"} -translate-y-1/2 z-30 bg-[#5B8FB9] text-white rounded-full p-3 shadow-lg opacity-80 pointer-events-none`}>
+            <div className={`fixed top-1/2 ${swipeOffset > 0 ? "left-6" : "right-6"} -translate-y-1/2 z-30 bg-[#FE987A] text-[#19334A] rounded-full p-3 shadow-lg opacity-80 pointer-events-none`}>
               {swipeOffset > 0 ? <ChevronLeft className="w-6 h-6" /> : <ChevronRight className="w-6 h-6" />}
             </div>
           )}
@@ -860,12 +860,12 @@ useEffect(() => {
                     }}
                     className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold border transition-all ${
                       isActive
-                        ? "bg-[#5B8FB9] text-white border-[#5B8FB9]"
+                        ? "bg-[#FE987A] text-[#19334A] border-[#FE987A]"
                         : isErrored
                         ? "border-rose-300 text-rose-500 hover:border-rose-400"
                         : isLoaded
-                        ? `${buttonClass} hover:border-[#5B8FB9]/50`
-                        : `${buttonClass} opacity-60 hover:opacity-100 hover:border-[#5B8FB9]/50`
+                        ? `${buttonClass} hover:border-[#FE987A]/50`
+                        : `${buttonClass} opacity-60 hover:opacity-100 hover:border-[#FE987A]/50`
                     }`}
                     title={isErrored ? "Couldn't load — tap to retry" : ch.title}
                   >
@@ -887,7 +887,7 @@ useEffect(() => {
               onClick={triggerAddBookmark}
               className={`text-xs border flex items-center gap-1 px-3 py-1.5 rounded-lg font-semibold transition-all ${buttonClass}`}
             >
-              <BookmarkIcon className="w-4 h-4 text-[#5B8FB9]" />
+              <BookmarkIcon className="w-4 h-4 text-[#FE987A]" />
               <span>{bookmarkToast || isCurrentlyBookmarked ? "✓ Saved" : "Bookmark"}</span>
             </button>
           </div>
@@ -938,7 +938,7 @@ useEffect(() => {
             <div className="space-y-8 relative z-20">
               {activeChapterContent.length === 0 && chapterLoadingId === activeChapter.id && (
                 <div className="flex flex-col items-center justify-center py-16 gap-3">
-                  <Loader2 className="w-7 h-7 animate-spin text-[#5B8FB9]" />
+                  <Loader2 className="w-7 h-7 animate-spin text-[#FE987A]" />
                   <p className="text-sm font-bold text-slate-500">Preparing "{activeChapter.title}"…</p>
                 </div>
               )}
@@ -977,7 +977,7 @@ useEffect(() => {
                     }}
                     className={`p-4 rounded-xl transition-all border ${
                       isActiveP
-                        ? "border-[#5B8FB9]/50 bg-[#5B8FB9]/5 ring-1 ring-[#5B8FB9]/10"
+                        ? "border-[#FE987A]/50 bg-[#FE987A]/5 ring-1 ring-[#FE987A]/10"
                         : "border-transparent"
                     } ${pOpacity}`}
                   >
@@ -988,7 +988,7 @@ useEffect(() => {
                           <div className="flex items-center gap-1 bg-white/70 border border-black/5 p-1 rounded-lg">
                             {(["little", "lot", "child"] as const).map((level) => (
                               <button key={level} onClick={(e) => { e.stopPropagation(); setSimplifyLevel(level); }}
-                                className={`text-[9px] font-black px-2 py-1 rounded transition-all uppercase ${simplifyLevel === level ? "bg-[#5B8FB9] text-white" : "text-slate-400 hover:text-[#5B8FB9]"}`}>
+                                className={`text-[9px] font-black px-2 py-1 rounded transition-all uppercase ${simplifyLevel === level ? "bg-[#FE987A] text-[#19334A]" : "text-slate-400 hover:text-[color:var(--accent-text)]"}`}>
                                 {level === "little" ? "Simpler" : level === "lot" ? "Much simpler" : "Child-friendly"}
                               </button>
                             ))}
@@ -996,7 +996,7 @@ useEffect(() => {
                         )}
                         <div className="flex items-center gap-1 bg-white/70 border border-black/5 p-1 rounded-lg">
                           <button onClick={(e) => { e.stopPropagation(); handleSimplifyParagraph(pIndex, paragraphText); }}
-                            className="text-[10px] uppercase font-black tracking-wider text-[#5B8FB9] hover:bg-slate-100 px-2 py-1 rounded"
+                            className="text-[10px] uppercase font-black tracking-wider text-[color:var(--accent-text)] hover:bg-slate-100 px-2 py-1 rounded"
                             disabled={aiSimplifyLoading}>
                             {aiSimplifyLoading ? "Simplifying..." : isSimplifyApplied ? "↩ Original" : "Simplify ✨"}
                           </button>
@@ -1056,7 +1056,7 @@ useEffect(() => {
                 </span>
               </div>
               <div className={`w-full h-2 rounded-full overflow-hidden ${isDark ? "bg-[#2D3139]" : "bg-[#E8E4DC]"}`}>
-                <div className="h-full rounded-full bg-[#5B8FB9] transition-all duration-500"
+                <div className="h-full rounded-full bg-[#FE987A] transition-all duration-500"
                   style={{ width: `${activeChapterContent.length ? Math.round(((activeParagraphIndex + 1) / activeChapterContent.length) * 100) : 0}%` }} />
               </div>
             </div>
@@ -1075,7 +1075,7 @@ useEffect(() => {
           <div className={`border rounded-3xl p-6 shadow-sm ${cardBgClass} transition-all duration-300`}>
             <div className="flex items-center justify-between mb-4">
               <span className={`text-xs uppercase font-extrabold tracking-widest flex items-center gap-1 ${isDark ? 'text-[#BAC1CC]' : 'text-[#777777]'}`}>
-                <Volume2 className="w-4 h-4 text-[#5B8FB9]" /> Narrator Companion
+                <Volume2 className="w-4 h-4 text-[#FE987A]" /> Narrator Companion
               </span>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${isDark ? 'bg-amber-950/40 text-amber-400 border border-amber-900/50' : 'bg-amber-50 text-amber-700'}`}>Active Sync</span>
             </div>
@@ -1118,7 +1118,7 @@ useEffect(() => {
               {/* Dynamic Voice Select */}
               <div className={`mt-3 pt-3 border-t ${isDark ? 'border-[#383A40]' : 'border-[#DCD9D0]/50'}`}>
                 <span className={`text-[9px] font-bold uppercase flex items-center gap-1 mb-1 ${isDark ? 'text-[#A5AAB5]' : 'text-[#888888]'}`}>
-                  <User className="w-3.5 h-3.5 text-[#5B8FB9]" /> Choose Narrator Voice
+                  <User className="w-3.5 h-3.5 text-[#FE987A]" /> Choose Narrator Voice
                 </span>
                 <select
                   value={preferences.narratorVoice || ""}
@@ -1249,14 +1249,14 @@ useEffect(() => {
                 onClick={() => setActiveSideDrawer(activeSideDrawer === "memory" ? "none" : "memory")}
                 className={`w-full p-3 rounded-xl border text-left flex items-center justify-between text-xs font-bold transition-all ${
                   activeSideDrawer === "memory" 
-                    ? "border-[#5B8FB9] bg-[#5B8FB9]/10 text-[#5B8FB9] ring-2 ring-[#5B8FB9]/30" 
+                    ? "border-[#FE987A] bg-[#FE987A]/10 text-[color:var(--accent-text)] ring-2 ring-[#FE987A]/30" 
                     : buttonClass
                 }`}
               >
                 <span className="flex items-center gap-2">
-                  <Smile className="w-4 h-4 text-[#5B8FB9]" /> Memory Support Cards
+                  <Smile className="w-4 h-4 text-[#FE987A]" /> Memory Support Cards
                 </span>
-                <span className={`text-[10px] px-2 py-0.5 rounded font-black ${isDark ? 'bg-indigo-950 text-indigo-300' : 'bg-indigo-50 text-[#5B8FB9]'}`}>
+                <span className={`text-[10px] px-2 py-0.5 rounded font-black ${isDark ? 'bg-indigo-950 text-indigo-300' : 'bg-indigo-50 text-[color:var(--accent-text)]'}`}>
                   {book.characters.length + book.concepts.length} active
                 </span>
               </button>
@@ -1290,9 +1290,9 @@ useEffect(() => {
                   <div className="space-y-3">
                     <p className={`text-[10px] font-black uppercase tracking-widest ${textTertiary}`}>Character Profiles</p>
                     {book.characters.map((char, index) => (
-                      <div key={index} className={`p-3 rounded-xl border text-xs ${isDark ? 'bg-sky-950/20 border-sky-900/50 text-[#BAC1CC]' : 'bg-[#EEF5FA] border-[#D0DFEB] text-[#1B2A4A]'}`}>
+                      <div key={index} className={`p-3 rounded-xl border text-xs ${isDark ? 'bg-sky-950/20 border-sky-900/50 text-[#BAC1CC]' : 'bg-[#FEEAE3] border-[#FE987A]/40 text-[#1B2A4A]'}`}>
                         <p className="font-bold">{char.name}</p>
-                        <p className={`text-[10px] font-semibold mt-0.5 uppercase tracking-wider ${isDark ? 'text-[#5B8FB9]' : 'text-sky-700'}`}>{char.role}</p>
+                        <p className={`text-[10px] font-semibold mt-0.5 uppercase tracking-wider ${isDark ? 'text-[#FE987A]' : 'text-sky-700'}`}>{char.role}</p>
                         <p className={`text-[11px] mt-1.5 ${isDark ? 'text-gray-300' : 'text-[#444444]'}`}><span className="font-bold">Relationships:</span> {char.relationships}</p>
                         <p className={`text-[11px] mt-1 ${isDark ? 'text-gray-300' : 'text-[#444444]'}`}><span className="font-bold">Recent Storyline:</span> {char.events}</p>
                       </div>
@@ -1388,7 +1388,7 @@ useEffect(() => {
                   <div className="text-xs space-y-2.5">
                     <div className="p-2.5 bg-amber-50 rounded-lg border border-amber-200">
                       <p className="font-bold text-amber-950 text-base italic">&#47; {selectedWord} &#47;</p>
-                      <p className="text-[10px] text-[#5B8FB9] tracking-wider font-mono mt-0.5">&ldquo;{wordDetails.pronunciation}&rdquo;</p>
+                      <p className="text-[10px] text-[color:var(--accent-text)] tracking-wider font-mono mt-0.5">&ldquo;{wordDetails.pronunciation}&rdquo;</p>
                     </div>
 
                     <div>
@@ -1429,7 +1429,7 @@ useEffect(() => {
             <button
               onClick={() => setShowToolbarSettings(!showToolbarSettings)}
               className={`p-3 rounded-xl border flex items-center justify-center font-bold text-xs gap-1.5 transition-colors ${
-                showToolbarSettings ? "bg-[#5B8FB9] text-white border-[#5B8FB9]" : buttonClass
+                showToolbarSettings ? "bg-[#FE987A] text-[#19334A] border-[#FE987A]" : buttonClass
               }`}
               title="Scale sizes and fonts"
             >
@@ -1438,11 +1438,11 @@ useEffect(() => {
             </button>
           </div>
 
-          <div className="flex items-center gap-1 bg-[#EEF5FA] p-1 rounded-full border border-[#D0DFEB]">
+          <div className="flex items-center gap-1 bg-[#FEEAE3] p-1 rounded-full border border-[#FE987A]/40">
             <span>&nbsp;</span>
             <div className="text-xs uppercase font-extrabold text-[#1B2A4A] tracking-wider pr-2 flex items-center gap-1">
-              <BookOpen className="w-4 h-4 text-[#5B8FB9]" /> Focus block:&nbsp;
-              <span className="text-[#5B8FB9] font-black">{focusMode}</span>
+              <BookOpen className="w-4 h-4 text-[#FE987A]" /> Focus block:&nbsp;
+              <span className="text-[color:var(--accent-text)] font-black">{focusMode}</span>
             </div>
           </div>
 
@@ -1469,7 +1469,7 @@ useEffect(() => {
                     key={f}
                     onClick={() => onUpdatePreferences({ ...preferences, font: f as any })}
                     className={`p-1.5 border rounded-lg text-xs font-bold text-left truncate transition-all ${
-                      preferences.font === f ? "border-[#5B8FB9] bg-[#5B8FB9]/10 text-[#5B8FB9]" : buttonClass
+                      preferences.font === f ? "border-[#FE987A] bg-[#FE987A]/10 text-[color:var(--accent-text)]" : buttonClass
                     }`}
                   >
                     {f}
@@ -1486,7 +1486,7 @@ useEffect(() => {
                 max="36"
                 value={preferences.textSize}
                 onChange={(e) => onUpdatePreferences({ ...preferences, textSize: parseInt(e.target.value) })}
-                className="w-full mt-2 accent-[#5B8FB9]"
+                className="w-full mt-2 accent-[#FE987A]"
               />
             </div>
 
@@ -1499,7 +1499,7 @@ useEffect(() => {
                 step="0.1"
                 value={preferences.lineSpacing}
                 onChange={(e) => onUpdatePreferences({ ...preferences, lineSpacing: parseFloat(e.target.value) })}
-                className="w-full mt-2 accent-[#5B8FB9]"
+                className="w-full mt-2 accent-[#FE987A]"
               />
             </div>
 
@@ -1511,7 +1511,7 @@ useEffect(() => {
                     key={t}
                     onClick={() => onUpdatePreferences({ ...preferences, theme: t })}
                     className={`w-6 h-6 rounded-full border ${
-                      preferences.theme === t ? "ring-2 ring-[#5B8FB9]" : ""
+                      preferences.theme === t ? "ring-2 ring-[#FE987A]" : ""
                     }`}
                     style={{
                       backgroundColor:
@@ -1558,13 +1558,13 @@ useEffect(() => {
 
             {aiSummaryLoading ? (
               <div className="py-12 flex flex-col items-center justify-center gap-4 text-center">
-                <div className="w-10 h-10 border-4 border-[#E5E1D8] border-t-[#5B8FB9] rounded-full animate-spin" />
+                <div className="w-10 h-10 border-4 border-[#E5E1D8] border-t-[#FE987A] rounded-full animate-spin" />
                 <p className="text-xs text-[#555555] font-semibold">IncluRead is compiling chapter elements, key updates, and character tracking...</p>
               </div>
             ) : aiSummaryOutput ? (
               <div className="space-y-6">
                 <div>
-                  <h4 className="text-xs uppercase font-extrabold text-[#5B8FB9] tracking-widest mb-2 flex items-center gap-1">
+                  <h4 className="text-xs uppercase font-extrabold text-[color:var(--accent-text)] tracking-widest mb-2 flex items-center gap-1">
                     <Smile className="w-4 h-4" /> Key Narrative Concepts
                   </h4>
                   <ul className="list-disc pl-5 text-sm leading-relaxed text-[#333333] space-y-1.5">
@@ -1575,7 +1575,7 @@ useEffect(() => {
                 </div>
 
                 <div>
-                  <h4 className="text-xs uppercase font-extrabold text-[#5B8FB9] tracking-widest mb-2 flex items-center gap-1">
+                  <h4 className="text-xs uppercase font-extrabold text-[color:var(--accent-text)] tracking-widest mb-2 flex items-center gap-1">
                     <FileText className="w-4 h-4" /> Main Storyline Events
                   </h4>
                   <ul className="list-decimal pl-5 text-sm leading-relaxed text-[#444444] space-y-1.5">

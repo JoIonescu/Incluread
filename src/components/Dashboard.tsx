@@ -115,7 +115,7 @@ export default function Dashboard({
         title: file.name.replace(/\.[^/.]+$/, ""),
         author: "Uploaded document",
         description: `Uploaded document: ${file.name}. Read with full Incluread accessibility tools.`,
-        coverColor: "from-[#5B8FB9] to-[#2D5A8A]",
+        coverColor: "from-[#FE987A] to-[#F5865F]",
         coverIcon: "FileText",
         category: "Uploaded",
         difficulty: "Moderate",
@@ -221,7 +221,7 @@ export default function Dashboard({
         const mapped = works.map((work: any, index: number) => {
           const id = `openlib-${work.key.split("/").pop()}`;
           const gradients = [
-            "from-[#5b8fb9] to-[#b3c7d6]",
+            "from-[#FE987A] to-[#b3c7d6]",
             "from-emerald-600 to-teal-950",
             "from-amber-600 to-amber-950",
             "from-pink-500 to-indigo-600",
@@ -326,7 +326,7 @@ export default function Dashboard({
       const mapped = docs.map((doc: any, index: number) => {
         const id = `openlib-${doc.key.split("/").pop()}`;
         const gradients = [
-          "from-[#5B8FB9] to-[#E3EFFD]",
+          "from-[#FE987A] to-[#E3EFFD]",
           "from-emerald-600 to-teal-950",
           "from-amber-600 to-amber-950",
           "from-pink-500 to-indigo-600",
@@ -736,7 +736,7 @@ export default function Dashboard({
   };
 
   return (
-    <div id="dashboard-root" className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between transition-all duration-300 overflow-x-clip`}>
+    <div id="dashboard-root" style={{ "--accent-text": isDark ? "#FE987A" : "#19334A" } as React.CSSProperties} className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between transition-all duration-300 overflow-x-clip`}>
       
       {/* HEADER: Geometric navigation toolbar */}
       <nav className={`h-16 border-b px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 ${headerBgClass} ${borderClass} transition-all duration-300`}>
@@ -762,7 +762,7 @@ export default function Dashboard({
                   setDetailedBookId(null);
                 }}
                 className={`text-xs font-black uppercase flex items-center gap-1.5 pb-1 border-b-2 transition-colors touch-target ${
-                  isActive ? "border-[#5B8FB9] text-[#5B8FB9]" : `border-transparent ${textSecondary} hover:text-[#5B8FB9]`
+                  isActive ? "border-[#FE987A] text-[color:var(--accent-text)]" : `border-transparent ${textSecondary} hover:text-[color:var(--accent-text)]`
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -774,16 +774,16 @@ export default function Dashboard({
 
         {/* Mobile-only profile icon in top nav */}
         <button
-          className="flex md:hidden items-center justify-center w-9 h-9 rounded-full bg-[#5B8FB9]/10 border border-[#5B8FB9]/20"
+          className="flex md:hidden items-center justify-center w-9 h-9 rounded-full bg-[#FE987A]/10 border border-[#FE987A]/20"
           onClick={() => setActiveTab("profile")}
           aria-label="Profile"
         >
           {currentUser ? (
-            <span className="text-[10px] font-black text-[#5B8FB9]">
+            <span className="text-[10px] font-black text-[color:var(--accent-text)]">
               {currentUser.email?.substring(0, 2).toUpperCase() || "U"}
             </span>
           ) : (
-            <User className="w-4 h-4 text-[#5B8FB9]" />
+            <User className="w-4 h-4 text-[#FE987A]" />
           )}
         </button>
 
@@ -792,10 +792,10 @@ export default function Dashboard({
           {currentUser ? (
             <button
               onClick={() => setActiveTab("profile")}
-              className="px-3 h-10 rounded-full bg-[#5B8FB9]/10 text-[#3D729E] border border-[#5B8FB9]/20 flex items-center gap-2 hover:bg-[#5B8FB9]/20 transition-all cursor-pointer touch-target"
+              className="px-3 h-10 rounded-full bg-[#FE987A]/10 text-[color:var(--accent-text)] border border-[#FE987A]/20 flex items-center gap-2 hover:bg-[#FE987A]/20 transition-all cursor-pointer touch-target"
               aria-label="View user profile"
             >
-              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#3D729E] to-[#6FA6CD] text-white flex items-center justify-center text-[10px] font-black">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#F5865F] to-[#FFB26A] text-[#19334A] flex items-center justify-center text-[10px] font-black">
                 {currentUser.email ? currentUser.email.substring(0, 2).toUpperCase() : "U"}
               </div>
               <span className="text-xs font-bold truncate max-w-[120px]">{currentUser.email}</span>
@@ -831,7 +831,7 @@ export default function Dashboard({
                 setDetailedBookId(null);
               }}
               className={`flex flex-col items-center justify-center p-2 rounded-xl text-[10px] font-bold ${
-                isActive ? "text-[#5B8FB9]" : "text-[#666666]"
+                isActive ? "text-[color:var(--accent-text)]" : "text-[#666666]"
               } touch-target`}
             >
               <Icon className="w-5 h-5" />
@@ -886,7 +886,7 @@ export default function Dashboard({
                   {/* Right metadata description */}
                   <div className="md:col-span-8 space-y-6">
                     <div className="space-y-2">
-                      <span className="text-[10px] uppercase font-bold text-[#5B8FB9] tracking-widest bg-[#EEF5FA] px-3 py-1 rounded">
+                      <span className="text-[10px] uppercase font-bold text-[color:var(--accent-text)] tracking-widest bg-[#FEEAE3] px-3 py-1 rounded">
                         {detailBook.category}
                       </span>
                       <h1 className="text-3xl font-extrabold tracking-tight mt-1">{detailBook.title}</h1>
@@ -966,7 +966,7 @@ export default function Dashboard({
                               setBooks(prev => prev.filter(b => b.id !== detailBook.id));
                               handleGenerateAndReadBook({ ...detailBook, chapters: [] });
                             }}
-                            className="w-full text-center text-[11px] font-bold text-slate-400 hover:text-[#5B8FB9] transition-colors py-1"
+                            className="w-full text-center text-[11px] font-bold text-slate-400 hover:text-[color:var(--accent-text)] transition-colors py-1"
                           >
                             Regenerate chapters with AI
                           </button>
@@ -975,7 +975,7 @@ export default function Dashboard({
                     ) : (
                       <button
                         onClick={() => handleGenerateAndReadBook(detailBook)}
-                        className="w-full h-14 bg-gradient-to-r from-emerald-600 to-[#5B8FB9] text-white font-black text-sm uppercase rounded-2xl tracking-widest hover:brightness-105 transition-all flex items-center justify-center gap-2 shadow-lg hover:translate-y-[-1px] cursor-pointer"
+                        className="w-full h-14 bg-gradient-to-r from-emerald-600 to-[#FE987A] text-white font-black text-sm uppercase rounded-2xl tracking-widest hover:brightness-105 transition-all flex items-center justify-center gap-2 shadow-lg hover:translate-y-[-1px] cursor-pointer"
                       >
                         <Sparkles className="w-5 h-5 text-emerald-100" />
                         <span>AI Format & Start Reading</span>
@@ -1028,12 +1028,12 @@ export default function Dashboard({
                           <span className="text-[8px] font-black bg-white/20 px-1.5 py-0.5 rounded w-fit">{book.difficulty}</span>
                         </div>
                       )}
-                      <span className={`absolute top-1.5 left-1.5 text-[8px] font-black px-1.5 py-0.5 rounded ${isGlobal ? 'bg-emerald-600 text-white' : 'bg-[#5B8FB9] text-white'}`}>
+                      <span className={`absolute top-1.5 left-1.5 text-[8px] font-black px-1.5 py-0.5 rounded ${isGlobal ? 'bg-emerald-600 text-white' : 'bg-[#FE987A] text-[#19334A]'}`}>
                         {isGlobal ? "Global" : "Offline"}
                       </span>
                     </div>
                     <div className="mt-2 px-0.5">
-                      <p className="text-xs font-bold text-slate-800 line-clamp-2 leading-tight group-hover:text-[#5B8FB9] transition-colors">{book.title}</p>
+                      <p className="text-xs font-bold text-slate-800 line-clamp-2 leading-tight group-hover:text-[color:var(--accent-text)] transition-colors">{book.title}</p>
                       <p className="text-[10px] text-slate-500 mt-0.5 line-clamp-1">{book.author}</p>
                     </div>
                     <div className="mt-2 flex gap-1">
@@ -1052,8 +1052,8 @@ export default function Dashboard({
                         }}
                         className={`flex-1 py-1.5 rounded-lg text-[10px] font-black transition-all ${
                           isGlobal
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-600 hover:text-white'
-                            : 'bg-[#EEF5FA] text-[#5B8FB9] border border-[#5B8FB9]/30 hover:bg-[#5B8FB9] hover:text-white'
+                            ? 'bg-[#FEEAE3] text-[#636D7E] border border-[#FE987A] hover:bg-[#FE987A] hover:text-[#19334A]'
+                            : 'bg-[#FEEAE3] text-[#636D7E] border border-[#FE987A] hover:bg-[#FE987A] hover:text-[#19334A]'
                         }`}
                       >
                         {isGlobal ? (generatingBookId === book.id ? "..." : "Read") : "Read"}
@@ -1064,8 +1064,8 @@ export default function Dashboard({
                           title={savedBookIds.includes(book.id) ? "Remove from shelf" : "Save to My Shelf"}
                           className={`w-7 py-1.5 rounded-lg text-sm border transition-all ${
                             savedBookIds.includes(book.id)
-                              ? 'bg-amber-400 border-amber-400 text-white'
-                              : 'bg-white border-[#DCD9D0] text-slate-300 hover:border-amber-400 hover:text-amber-400'
+                              ? 'bg-[#FFB26A] border-[#FFB26A] text-white'
+                              : 'bg-white border-[#DCD9D0] text-slate-300 hover:border-[#FFB26A] hover:text-[#FFB26A]'
                           }`}
                         >
                           {savedBookIds.includes(book.id) ? "★" : "☆"}
@@ -1092,14 +1092,14 @@ export default function Dashboard({
                       </div>
                       {bookList.length > 3 && (
                         <div className="flex gap-1">
-                          <button onClick={() => scroll("l")} className="w-7 h-7 rounded-full border border-[#DCD9D0] bg-white flex items-center justify-center hover:bg-[#5B8FB9] hover:text-white hover:border-[#5B8FB9] transition-all text-slate-500 text-sm font-bold shadow-sm">‹</button>
-                          <button onClick={() => scroll("r")} className="w-7 h-7 rounded-full border border-[#DCD9D0] bg-white flex items-center justify-center hover:bg-[#5B8FB9] hover:text-white hover:border-[#5B8FB9] transition-all text-slate-500 text-sm font-bold shadow-sm">›</button>
+                          <button onClick={() => scroll("l")} className="w-7 h-7 rounded-full border border-[#DCD9D0] bg-white flex items-center justify-center hover:bg-[#FE987A] hover:text-[#19334A] hover:border-[#FE987A] transition-all text-slate-500 text-sm font-bold shadow-sm">‹</button>
+                          <button onClick={() => scroll("r")} className="w-7 h-7 rounded-full border border-[#DCD9D0] bg-white flex items-center justify-center hover:bg-[#FE987A] hover:text-[#19334A] hover:border-[#FE987A] transition-all text-slate-500 text-sm font-bold shadow-sm">›</button>
                         </div>
                       )}
                     </div>
                     {loading ? (
                       <div className="flex items-center gap-3 py-4">
-                        <Loader2 className="w-5 h-5 animate-spin text-[#5B8FB9]" />
+                        <Loader2 className="w-5 h-5 animate-spin text-[#FE987A]" />
                         <span className="text-xs text-slate-400">Loading titles...</span>
                       </div>
                     ) : bookList.length === 0 ? (
@@ -1153,7 +1153,7 @@ export default function Dashboard({
                         placeholder="Search millions of books by title, author..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full text-xs pl-9 pr-3 py-2.5 bg-[#FFFFFF]/50 border border-[#DCD9D0] rounded-xl focus:outline-none focus:border-[#5B8FB9]"
+                        className="w-full text-xs pl-9 pr-3 py-2.5 bg-[#FFFFFF]/50 border border-[#DCD9D0] rounded-xl focus:outline-none focus:border-[#FE987A]"
                       />
                     </div>
 
@@ -1218,7 +1218,7 @@ export default function Dashboard({
                         Browse Millions of Books by Subject (Open Library Stream)
                       </h3>
                       {fetchingSubject && (
-                        <span className="flex items-center gap-1.5 text-[10px] uppercase font-black text-[#5B8FB9] animate-pulse">
+                        <span className="flex items-center gap-1.5 text-[10px] uppercase font-black text-[color:var(--accent-text)] animate-pulse">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
                           Indexing...
                         </span>
@@ -1233,8 +1233,8 @@ export default function Dashboard({
                             onClick={() => setSelectedSubject(opt.key)}
                             className={`flex items-center gap-1.5 px-4 py-2 border rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                               isActive
-                                ? "bg-[#5B8FB9] text-white border-[#5B8FB9] shadow-inner font-extrabold translate-y-[0.5px]"
-                                : "bg-white text-slate-700 border-[#DCD9D0] hover:border-[#5B8FB9]"
+                                ? "bg-[#FE987A] text-[#19334A] border-[#FE987A] shadow-inner font-extrabold translate-y-[0.5px]"
+                                : "bg-white text-slate-700 border-[#DCD9D0] hover:border-[#FE987A]"
                             }`}
                           >
                             <span>{opt.emoji}</span>
@@ -1252,7 +1252,7 @@ export default function Dashboard({
                       {activeBook && (
                       <div
                         onClick={() => onSelectBook(activeBook.id)}
-                        className="bg-white border border-[#DCD9D0] rounded-2xl p-6 flex flex-col md:flex-row gap-6 shadow-xs hover:border-[#5B8FB9] cursor-pointer transition-all"
+                        className="bg-white border border-[#DCD9D0] rounded-2xl p-6 flex flex-col md:flex-row gap-6 shadow-xs hover:border-[#FE987A] cursor-pointer transition-all"
                       >
                         {activeBook.coverUrl ? (
                           <img src={activeBook.coverUrl} alt={activeBook.title} className="w-28 h-36 object-cover rounded-xl shadow-md flex-shrink-0 border border-black/10" />
@@ -1263,7 +1263,7 @@ export default function Dashboard({
                         )}
                         <div className="flex-1 flex flex-col justify-between py-1">
                           <div>
-                            <span className="px-2 py-1 bg-[#EEF5FA] text-[#5B8FB9] text-[9px] font-black rounded uppercase">Continue Reading</span>
+                            <span className="px-2 py-1 bg-[#FEEAE3] text-[color:var(--accent-text)] text-[9px] font-black rounded uppercase">Continue Reading</span>
                             <h2 className="text-xl font-bold mt-2 text-[#222222]">{activeBook.title}</h2>
                             <p className="text-[#666666] text-xs leading-relaxed max-w-xl mt-1">
                               Pick up where you left off — chapter {currentPosition.chapterId?.replace("chapter-", "") || "1"}, paragraph {(currentPosition.paragraphIndex || 0) + 1}. Your reading aids and spacing settings are saved.
@@ -1320,7 +1320,7 @@ export default function Dashboard({
                       {/* Open Library: 3 rows — Trending, New Arrivals, Classic picks */}
                       {fetchingSubject ? (
                         <div className="flex items-center gap-3 py-6">
-                          <Loader2 className="w-5 h-5 animate-spin text-[#5B8FB9]" />
+                          <Loader2 className="w-5 h-5 animate-spin text-[#FE987A]" />
                           <span className="text-xs text-slate-400">Loading Open Library titles...</span>
                         </div>
                       ) : filteredSubjectBooks.length > 0 ? (
@@ -1394,7 +1394,7 @@ export default function Dashboard({
                             </h3>
                           </div>
                           {searchingOnline && (
-                            <span className="flex items-center gap-1 text-[10px] uppercase font-black text-[#5B8FB9] animate-pulse">
+                            <span className="flex items-center gap-1 text-[10px] uppercase font-black text-[color:var(--accent-text)] animate-pulse">
                               <Loader2 className="w-3.5 h-3.5 animate-spin" />
                               Searching...
                             </span>
@@ -1409,7 +1409,7 @@ export default function Dashboard({
 
                         {searchingOnline && onlineBooks.length === 0 ? (
                           <div className="text-center py-12 bg-white/50 border border-dashed border-[#DCD9D0] rounded-2xl">
-                            <Loader2 className="w-6 h-6 animate-spin text-[#5B8FB9] mx-auto" />
+                            <Loader2 className="w-6 h-6 animate-spin text-[#FE987A] mx-auto" />
                             <p className="text-xs font-bold text-slate-700 mt-3 uppercase tracking-wider">Connecting to Open Library & Gutenberg database...</p>
                             <p className="text-[10px] text-slate-500 mt-0.5">Searching for covers, authors, metadata, and books matching "{searchQuery}" automatically.</p>
                           </div>
@@ -1443,10 +1443,10 @@ export default function Dashboard({
             {activeTab === "upload" && (
               <div className="space-y-8">
                 {/* Hero */}
-                <div className={`rounded-2xl p-8 border ${isDark ? "bg-[#1B2E4A] border-[#2A5080]" : "bg-[#EEF5FA] border-[#CCDDED]"}`}>
+                <div className={`rounded-2xl p-8 border ${isDark ? "bg-[#1B2E4A] border-[#FE987A]/30" : "bg-[#FEEAE3] border-[#FE987A]/40"}`}>
                   <div className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${isDark ? "bg-[#2A5080]" : "bg-[#5B8FB9]/20"}`}>
-                      <Upload className="w-6 h-6 text-[#5B8FB9]" />
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${isDark ? "bg-[#FE987A]/25" : "bg-[#FE987A]/20"}`}>
+                      <Upload className="w-6 h-6 text-[#FE987A]" />
                     </div>
                     <div>
                       <h2 className={`text-xl font-black mb-1 ${textPrimary}`}>Read Your Own Documents</h2>
@@ -1470,7 +1470,7 @@ export default function Dashboard({
                 {/* Upload area */}
                 <div
                   className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all cursor-pointer ${
-                    isDark ? "border-[#3D4558] hover:border-[#5B8FB9] bg-[#1A1D24]" : "border-[#DCD9D0] hover:border-[#5B8FB9] bg-white"
+                    isDark ? "border-[#3D4558] hover:border-[#FE987A] bg-[#1A1D24]" : "border-[#DCD9D0] hover:border-[#FE987A] bg-white"
                   }`}
                   onClick={() => document.getElementById("doc-upload-input")?.click()}
                   onDragOver={(e) => e.preventDefault()}
@@ -1489,12 +1489,12 @@ export default function Dashboard({
                   />
                   {uploadLoading ? (
                     <div className="flex flex-col items-center gap-3">
-                      <Loader2 className="w-8 h-8 animate-spin text-[#5B8FB9]" />
+                      <Loader2 className="w-8 h-8 animate-spin text-[#FE987A]" />
                       <p className={`text-sm font-bold ${textSecondary}`}>Processing your document...</p>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center gap-3">
-                      <Upload className={`w-10 h-10 ${isDark ? "text-[#5B8FB9]" : "text-[#5B8FB9]/60"}`} />
+                      <Upload className={`w-10 h-10 ${isDark ? "text-[#FE987A]" : "text-[#FE987A]/60"}`} />
                       <p className={`text-sm font-bold ${textPrimary}`}>Drop a file here or click to browse</p>
                       <p className={`text-xs ${textTertiary}`}>PDF, DOCX, or TXT · Max 10MB</p>
                     </div>
@@ -1532,7 +1532,7 @@ export default function Dashboard({
                           <p className={`text-xs font-bold mt-2 line-clamp-2 ${textPrimary}`}>{doc.title}</p>
                           <button
                             onClick={() => onSelectBook(doc.id)}
-                            className="mt-1 w-full py-1.5 rounded-lg text-[10px] font-black bg-[#EEF5FA] text-[#5B8FB9] border border-[#5B8FB9]/30 hover:bg-[#5B8FB9] hover:text-white transition-all"
+                            className="mt-1 w-full py-1.5 rounded-lg text-[10px] font-black bg-[#FEEAE3] text-[#636D7E] border border-[#FE987A] hover:bg-[#FE987A] hover:text-[#19334A] transition-all"
                           >
                             Read
                           </button>
@@ -1560,12 +1560,12 @@ export default function Dashboard({
                 {(!currentUser && !activeBook) ? (
                   <div className="border border-dashed border-[#DCD9D0] rounded-2xl p-10 text-center">
                     <p className="text-slate-400 text-sm mb-2">Sign in to track your reading progress.</p>
-                    <button onClick={() => setActiveTab("library")} className="text-[#5B8FB9] text-xs font-bold underline">Browse the library →</button>
+                    <button onClick={() => setActiveTab("library")} className="text-[color:var(--accent-text)] text-xs font-bold underline">Browse the library →</button>
                   </div>
                 ) : activeBook ? (
                   <div
                     onClick={() => onSelectBook(activeBook.id)}
-                    className="bg-white border-2 border-[#5B8FB9] rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6 hover:shadow-lg cursor-pointer transition-all ring-2 ring-[#5B8FB9]/20"
+                    className="bg-white border-2 border-[#FE987A] rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6 hover:shadow-lg cursor-pointer transition-all ring-2 ring-[#FE987A]/20"
                   >
                     {activeBook.coverUrl ? (
                       <img src={activeBook.coverUrl} alt={activeBook.title} className="w-24 h-32 object-cover rounded-xl shadow-md flex-shrink-0" />
@@ -1575,7 +1575,7 @@ export default function Dashboard({
                       </div>
                     )}
                     <div className="flex-1 text-center md:text-left">
-                      <span className="inline-block px-2 py-0.5 bg-[#EEF5FA] text-[#5B8FB9] text-[9px] font-black rounded uppercase mb-2">Currently Reading</span>
+                      <span className="inline-block px-2 py-0.5 bg-[#FEEAE3] text-[color:var(--accent-text)] text-[9px] font-black rounded uppercase mb-2">Currently Reading</span>
                       <h3 className="text-xl font-black text-[#111111]">{activeBook.title}</h3>
                       <p className="text-sm text-[#666666] mt-0.5">by {activeBook.author}</p>
                       <p className="text-xs text-slate-400 mt-2">
@@ -1593,7 +1593,7 @@ export default function Dashboard({
                 ) : (
                   <div className="border border-dashed border-[#DCD9D0] rounded-2xl p-10 text-center">
                     <p className="text-slate-400 text-sm">You haven't opened a book yet.</p>
-                    <button onClick={() => setActiveTab("library")} className="mt-3 text-[#5B8FB9] text-xs font-bold underline">Browse the library →</button>
+                    <button onClick={() => setActiveTab("library")} className="mt-3 text-[color:var(--accent-text)] text-xs font-bold underline">Browse the library →</button>
                   </div>
                 )}
 
@@ -1617,7 +1617,7 @@ export default function Dashboard({
                                 <span className="text-[10px] font-bold line-clamp-2">{b.title}</span>
                               </div>
                             )}
-                            <p className="text-xs font-bold text-slate-700 mt-1.5 line-clamp-2 group-hover:text-[#5B8FB9] transition-colors">{b.title}</p>
+                            <p className="text-xs font-bold text-slate-700 mt-1.5 line-clamp-2 group-hover:text-[color:var(--accent-text)] transition-colors">{b.title}</p>
                           </div>
                         ))}
                     </div>
@@ -1664,7 +1664,7 @@ export default function Dashboard({
                   <div className="bg-white p-5 rounded-2xl border border-[#DCD9D0] flex flex-col justify-between">
                     <p className="text-[10px] text-[#666666] font-bold uppercase tracking-wider">Active Reading Minutes</p>
                     <div className="flex items-end justify-between mt-2">
-                      <p className="text-3xl font-black text-[#5B8FB9]">{stats.minutesRead} mins</p>
+                      <p className="text-3xl font-black text-[color:var(--accent-text)]">{stats.minutesRead} mins</p>
                     </div>
                   </div>
 
@@ -1736,7 +1736,7 @@ export default function Dashboard({
                   <h4 className="text-xs uppercase font-extrabold text-[#777777] tracking-widest">Calculated Daily Comfort Zone</h4>
                   <div className="w-full bg-[#E5E1D8] h-3 rounded-full overflow-hidden">
                     <div 
-                      className="bg-[#5B8FB9] h-full rounded-full transition-all duration-500" 
+                      className="bg-[#FE987A] h-full rounded-full transition-all duration-500" 
                       style={{ width: `${Math.min(100, (stats.minutesRead / stats.dailyGoalMinutes) * 100)}%` }} 
                     />
                   </div>
@@ -1768,12 +1768,12 @@ export default function Dashboard({
 
                       {currentUser ? (
                         <div className="space-y-4">
-                          <div className="flex items-center gap-3 bg-[#EEF5FA] p-3 rounded-xl border border-[#D0DFEB]">
-                            <div className="w-10 h-10 rounded-full bg-[#5B8FB9] text-white flex items-center justify-center font-black text-sm shrink-0">
+                          <div className="flex items-center gap-3 bg-[#FEEAE3] p-3 rounded-xl border border-[#FE987A]/40">
+                            <div className="w-10 h-10 rounded-full bg-[#FE987A] text-[#19334A] flex items-center justify-center font-black text-sm shrink-0">
                               {currentUser.email ? currentUser.email.substring(0, 2).toUpperCase() : "R"}
                             </div>
                             <div className="overflow-hidden">
-                              <p className="text-[9px] text-[#5B8FB9] font-extrabold uppercase tracking-wider">Logged In</p>
+                              <p className="text-[9px] text-[color:var(--accent-text)] font-extrabold uppercase tracking-wider">Logged In</p>
                               <p className="text-xs font-bold text-[#1B2A4A] truncate">{currentUser.email}</p>
                             </div>
                           </div>
@@ -1797,7 +1797,7 @@ export default function Dashboard({
                               placeholder="you@domain.com"
                               value={authEmail}
                               onChange={(e) => setAuthEmail(e.target.value)}
-                              className="w-full text-xs p-3 bg-[#FFFFFF]/50 border border-[#DCD9D0] rounded-xl focus:outline-none focus:border-[#5B8FB9]"
+                              className="w-full text-xs p-3 bg-[#FFFFFF]/50 border border-[#DCD9D0] rounded-xl focus:outline-none focus:border-[#FE987A]"
                             />
                           </div>
 
@@ -1832,7 +1832,7 @@ export default function Dashboard({
                     {currentUser ? (
                       <>
                         <div className="flex items-center gap-4">
-                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#5B8FB9] to-[#E3EFFD] flex items-center justify-center font-black text-white text-xl">
+                          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FE987A] to-[#E3EFFD] flex items-center justify-center font-black text-white text-xl">
                             {currentUser.email ? currentUser.email.substring(0, 2).toUpperCase() : "R"}
                           </div>
                           <div>
@@ -1889,7 +1889,7 @@ export default function Dashboard({
                     <div className="pt-4 flex flex-col gap-2">
                       <button
                         onClick={onRestartOnboarding}
-                        className="w-full py-3 border-2 border-[#5B8FB9] text-[#5B8FB9] hover:bg-[#5B8FB9] hover:text-white rounded-xl text-xs font-black uppercase tracking-wider transition-colors cursor-pointer"
+                        className="w-full py-3 border-2 border-[#FE987A] text-[color:var(--accent-text)] hover:bg-[#FE987A] hover:text-[#19334A] rounded-xl text-xs font-black uppercase tracking-wider transition-colors cursor-pointer"
                       >
                         Re-run Interactive Onboarding Setup
                       </button>
@@ -1922,7 +1922,7 @@ export default function Dashboard({
                           max="36"
                           value={preferences.textSize}
                           onChange={(e) => onUpdatePreferences({ ...preferences, textSize: parseInt(e.target.value) })}
-                          className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-[#5B8FB9] ${isDark ? 'bg-[#2A2D35]' : 'bg-[#DCD9D0]'}`}
+                          className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-[#FE987A] ${isDark ? 'bg-[#2A2D35]' : 'bg-[#DCD9D0]'}`}
                         />
                       </div>
 
@@ -1935,7 +1935,7 @@ export default function Dashboard({
                           step="0.1"
                           value={preferences.lineSpacing}
                           onChange={(e) => onUpdatePreferences({ ...preferences, lineSpacing: parseFloat(e.target.value) })}
-                          className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-[#5B8FB9] ${isDark ? 'bg-[#2A2D35]' : 'bg-[#DCD9D0]'}`}
+                          className={`w-full h-2 rounded-lg appearance-none cursor-pointer accent-[#FE987A] ${isDark ? 'bg-[#2A2D35]' : 'bg-[#DCD9D0]'}`}
                         />
                       </div>
                     </div>
@@ -1950,7 +1950,7 @@ export default function Dashboard({
                               onClick={() => onUpdatePreferences({ ...preferences, font: f as any })}
                               className={`p-2 border rounded-xl text-xs font-extrabold transition-all truncate text-left select-none cursor-pointer ${
                                 preferences.font === f
-                                  ? "border-[#5B8FB9] bg-[#5B8FB9]/10 text-[#5B8FB9] ring-2 ring-[#5B8FB9]/20"
+                                  ? "border-[#FE987A] bg-[#FE987A]/10 text-[color:var(--accent-text)] ring-2 ring-[#FE987A]/20"
                                   : buttonClass
                               }`}
                             >
@@ -1977,7 +1977,7 @@ export default function Dashboard({
                               }}
                               className={`p-2 border rounded-xl text-xs font-extrabold transition-all flex items-center gap-1.5 cursor-pointer truncate ${
                                 preferences.theme === t.id
-                                  ? "border-[#5B8FB9] bg-[#5B8FB9]/10 text-[#5B8FB9] ring-2 ring-[#5B8FB9]/20"
+                                  ? "border-[#FE987A] bg-[#FE987A]/10 text-[color:var(--accent-text)] ring-2 ring-[#FE987A]/20"
                                   : buttonClass
                               }`}
                             >
@@ -2006,7 +2006,7 @@ export default function Dashboard({
                         type="checkbox"
                         checked={preferences.reduceMotion}
                         onChange={(e) => onUpdatePreferences({ ...preferences, reduceMotion: e.target.checked })}
-                        className="w-5 h-5 rounded border-gray-300 text-[#5B8FB9] focus:ring-[#5B8FB9] accent-[#5B8FB9] cursor-pointer"
+                        className="w-5 h-5 rounded border-gray-300 text-[#FE987A] focus:ring-[#FE987A] accent-[#FE987A] cursor-pointer"
                       />
                     </div>
                   </div>
@@ -2014,7 +2014,7 @@ export default function Dashboard({
                   {/* Accessibility Standards list */}
                   <div className={`p-4 rounded-xl space-y-2 border ${isDark ? 'bg-sky-950/20 border-sky-900/40 text-sky-200' : 'bg-blue-50 border-blue-200 text-[#1B2A4A]'}`}>
                     <p className="text-xs font-bold flex items-center gap-1.5">
-                      <CheckCircle className="w-4 h-4 text-[#5B8FB9]" /> WCAG AA compliance audited:
+                      <CheckCircle className="w-4 h-4 text-[#FE987A]" /> WCAG AA compliance audited:
                     </p>
                     <ul className={`text-[11px] list-disc pl-5 space-y-1 ${isDark ? 'text-sky-200/80' : 'text-[#444444]'}`}>
                       <li>Color contrast values strictly avoid #FFFFFF backgrounds to relieve macular tension.</li>

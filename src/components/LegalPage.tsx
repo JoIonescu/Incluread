@@ -17,7 +17,7 @@ export default function LegalPage({ onBack, onGoToAbout, initialSection = "priva
       {/* Header */}
       <div className="bg-white border-b border-[#DCD9D0] sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-4">
-          <button onClick={onBack} className="flex items-center gap-2 text-xs font-bold text-[#5B8FB9] hover:text-[#3A6F9A] transition-colors">
+          <button onClick={onBack} className="flex items-center gap-2 text-xs font-bold text-[#19334A] hover:underline transition-colors">
             <ArrowLeft className="w-4 h-4" /> Back to Incluread
           </button>
           <div className="flex gap-1 ml-auto">
