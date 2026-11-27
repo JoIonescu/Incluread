@@ -29,8 +29,22 @@
 
 /* Accessibility Focus Indicator */
 *:focus-visible {
-  outline: 3px solid #6366f1 !important;
+  outline: 3px solid var(--focus-ring, #016271) !important;
   outline-offset: 2px !important;
+}
+
+/* Lighter ring on the dark navy banner and footer so it stays visible */
+.bg-\[\#0B1A2D\] :focus-visible {
+  outline-color: #4E929C !important;
+}
+
+/* Dropdown highlight: browsers that honour it use the brand teal with a white label */
+select {
+  accent-color: #016271;
+}
+select option:checked {
+  background-color: #016271;
+  color: #ffffff;
 }
 
 /* Keyboard navigable styles */

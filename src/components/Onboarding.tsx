@@ -90,7 +90,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   return (
-    <div id="onboarding-root" style={{ "--accent-text": isDark ? "#FE987A" : "#19334A" } as React.CSSProperties} className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between py-12 px-6 transition-all duration-300`}>
+    <div id="onboarding-root" style={{ "--accent-text": isDark ? "#FE987A" : "#19334A", "--focus-ring": isDark ? "#4E929C" : "#016271" } as React.CSSProperties} className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between py-12 px-6 transition-all duration-300`}>
       <div className="max-w-4xl mx-auto w-full grid grid-cols-1 md:grid-cols-12 gap-8 items-start my-auto">
         
         {/* Left Interactive Configuration Screen */}

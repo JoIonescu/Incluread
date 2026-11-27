@@ -736,7 +736,7 @@ export default function Dashboard({
   };
 
   return (
-    <div id="dashboard-root" style={{ "--accent-text": isDark ? "#FE987A" : "#19334A" } as React.CSSProperties} className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between transition-all duration-300 overflow-x-clip`}>
+    <div id="dashboard-root" style={{ "--accent-text": isDark ? "#FE987A" : "#19334A", "--focus-ring": isDark ? "#4E929C" : "#016271" } as React.CSSProperties} className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between transition-all duration-300 overflow-x-clip`}>
       
       {/* HEADER: Geometric navigation toolbar */}
       <nav className={`h-16 border-b px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 ${headerBgClass} ${borderClass} transition-all duration-300`}>

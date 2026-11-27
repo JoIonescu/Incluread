@@ -718,7 +718,7 @@ useEffect(() => {
   };
 
   return (
-    <div id="reader-shell" style={{ "--accent-text": isDark ? "#FE987A" : "#19334A" } as React.CSSProperties} className={`min-h-screen ${shellBgClass} font-sans flex flex-col relative transition-all duration-300`}>
+    <div id="reader-shell" style={{ "--accent-text": isDark ? "#FE987A" : "#19334A", "--focus-ring": isDark ? "#4E929C" : "#016271" } as React.CSSProperties} className={`min-h-screen ${shellBgClass} font-sans flex flex-col relative transition-all duration-300`}>
       
       {/* 1. Header with minimalist Incluread Logo style */}
       <header className={`h-16 border-b px-6 flex items-center justify-between backdrop-blur-sm sticky top-0 z-40 ${headerBgClass} transition-all duration-300`}>
