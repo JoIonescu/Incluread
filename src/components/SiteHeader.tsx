@@ -40,7 +40,7 @@ export default function SiteHeader({ onOpenTab }: SiteHeaderProps) {
       <div className="w-full bg-[#0B1A2D] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00A795] animate-pulse flex-shrink-0" />
         Incluread is in beta — we're actively improving. Your feedback shapes what comes next.{" "}
-        <a href="mailto:hello@incluread.click" className="underline text-[#00A795] hover:text-white transition-colors">Share feedback →</a>
+        <a href="mailto:hello@incluread.click" className="underline text-[#FE987A] hover:text-white transition-colors">Share feedback →</a>
       </div>
 
       <nav className="h-16 border-b px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 bg-white/50 border-[#DCD9D0] text-[#111111] font-sans">

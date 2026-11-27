@@ -28,7 +28,7 @@ export default function SiteFooter({ onGoToAbout, onGoToLegal }: SiteFooterProps
         </div>
         <div>
           <p className="text-white font-bold mb-2">Research</p>
-          <p className="opacity-70 leading-relaxed">Built on peer-reviewed dyslexia research. <button onClick={onGoToAbout} className="underline text-[#00A795] hover:text-white">Read our approach →</button></p>
+          <p className="opacity-70 leading-relaxed">Built on peer-reviewed dyslexia research. <button onClick={onGoToAbout} className="underline text-[#FE987A] hover:text-white">Read our approach →</button></p>
         </div>
       </div>
       <div className="border-t border-[#1D3049] px-6 py-4 text-center opacity-50">

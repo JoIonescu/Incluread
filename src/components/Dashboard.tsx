@@ -1028,7 +1028,7 @@ export default function Dashboard({
                           <span className="text-[8px] font-black bg-white/20 px-1.5 py-0.5 rounded w-fit">{book.difficulty}</span>
                         </div>
                       )}
-                      <span className={`absolute top-1.5 left-1.5 text-[8px] font-black px-1.5 py-0.5 rounded ${isGlobal ? 'bg-emerald-600 text-white' : 'bg-[#FE987A] text-[#19334A]'}`}>
+                      <span className={`absolute top-1.5 left-1.5 text-[8px] font-black px-1.5 py-0.5 rounded ${isGlobal ? 'bg-[#FFB26A] text-[#0B1A2D]' : 'bg-[#FE987A] text-[#19334A]'}`}>
                         {isGlobal ? "Global" : "Offline"}
                       </span>
                     </div>
@@ -1052,8 +1052,8 @@ export default function Dashboard({
                         }}
                         className={`flex-1 py-1.5 rounded-lg text-[10px] font-black transition-all ${
                           isGlobal
-                            ? 'bg-[#FEEAE3] text-[#636D7E] border border-[#FE987A] hover:bg-[#FE987A] hover:text-[#19334A]'
-                            : 'bg-[#FEEAE3] text-[#636D7E] border border-[#FE987A] hover:bg-[#FE987A] hover:text-[#19334A]'
+                            ? 'bg-[#4E929C]/20 text-[#636D7E] border border-[#4E929C] hover:bg-[#4E929C]/40'
+                            : 'bg-[#4E929C]/20 text-[#636D7E] border border-[#4E929C] hover:bg-[#4E929C]/40'
                         }`}
                       >
                         {isGlobal ? (generatingBookId === book.id ? "..." : "Read") : "Read"}
@@ -1233,7 +1233,7 @@ export default function Dashboard({
                             onClick={() => setSelectedSubject(opt.key)}
                             className={`flex items-center gap-1.5 px-4 py-2 border rounded-full text-xs font-bold whitespace-nowrap transition-all cursor-pointer ${
                               isActive
-                                ? "bg-[#FE987A] text-[#19334A] border-[#FE987A] shadow-inner font-extrabold translate-y-[0.5px]"
+                                ? "bg-[#016271]/70 text-white border-[#016271]/70 shadow-inner font-extrabold translate-y-[0.5px]"
                                 : "bg-white text-slate-700 border-[#DCD9D0] hover:border-[#FE987A]"
                             }`}
                           >

@@ -478,7 +478,7 @@ export default function App() {
       <div className="w-full bg-[#0B1A2D] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00A795] animate-pulse flex-shrink-0" />
         Incluread is in beta — we're actively improving. Your feedback shapes what comes next.{" "}
-        <a href="mailto:hello@incluread.click" className="underline text-[#00A795] hover:text-white transition-colors">Share feedback →</a>
+        <a href="mailto:hello@incluread.click" className="underline text-[#FE987A] hover:text-white transition-colors">Share feedback →</a>
       </div>
     );
     // Check SAMPLE_BOOKS first, then localStorage cache for Open Library books
@@ -514,7 +514,7 @@ export default function App() {
       <div className="w-full bg-[#0B1A2D] text-center py-2 px-4 text-[11px] font-semibold text-gray-300 flex items-center justify-center gap-2">
         <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#00A795] animate-pulse flex-shrink-0" />
         Incluread is in beta — we're actively improving. Your feedback shapes what comes next.{" "}
-        <a href="mailto:hello@incluread.click" className="underline text-[#00A795] hover:text-white transition-colors">Share feedback →</a>
+        <a href="mailto:hello@incluread.click" className="underline text-[#FE987A] hover:text-white transition-colors">Share feedback →</a>
       </div>
 
       {magicLinkStatus && (
