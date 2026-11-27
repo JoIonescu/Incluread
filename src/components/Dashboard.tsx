@@ -1565,7 +1565,7 @@ export default function Dashboard({
                 ) : activeBook ? (
                   <div
                     onClick={() => onSelectBook(activeBook.id)}
-                    className="bg-white border-2 border-[#FE987A] rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6 hover:shadow-lg cursor-pointer transition-all ring-2 ring-[#FE987A]/20"
+                    className="bg-white border-2 border-[#CBDDF3] rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6 hover:shadow-lg cursor-pointer transition-all ring-2 ring-[#CBDDF3]/40"
                   >
                     {activeBook.coverUrl ? (
                       <img src={activeBook.coverUrl} alt={activeBook.title} className="w-24 h-32 object-cover rounded-xl shadow-md flex-shrink-0" />
