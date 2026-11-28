@@ -43,7 +43,7 @@ export default function SiteHeader({ onOpenTab }: SiteHeaderProps) {
         <a href="mailto:hello@incluread.click" className="underline text-[#FE987A] hover:text-white transition-colors">Share feedback →</a>
       </div>
 
-      <nav className="h-16 border-b px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 bg-white/50 border-[#DCD9D0] text-[#111111] font-sans">
+      <nav className="h-16 border-b px-6 md:px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 bg-white/50 border-[#DCD9D0] text-[#111111] font-sans">
         <NaraLogo showText={true} size="lg" className="hidden md:flex" onClick={() => onOpenTab("library")} /><NaraLogo showText={true} size="sm" className="flex md:hidden" onClick={() => onOpenTab("library")} />
 
         <div className="hidden md:flex gap-8">

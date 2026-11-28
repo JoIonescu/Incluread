@@ -16,7 +16,7 @@ export default function SiteFooter({ onGoToAbout, onGoToLegal, reserveBottomNav 
         reserveBottomNav ? "pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0" : ""
       }`}
     >
-      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-0 px-6 pb-2 pt-10 text-[15px] md:grid-cols-4 md:gap-6 md:py-8 md:text-xs">
+      <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-6 gap-y-0 px-6 pb-2 pt-10 text-[15px] md:grid-cols-4 md:gap-6 md:pb-8 md:pt-14 md:text-xs">
         {/* Brand */}
         <div className="col-span-2 border-b border-[#1D3049] pb-8 md:col-span-1 md:border-0 md:pb-0">
           <img
@@ -25,7 +25,7 @@ export default function SiteFooter({ onGoToAbout, onGoToLegal, reserveBottomNav 
             className="h-auto w-[190px] max-w-full md:w-[180px] md:-translate-x-[1%] md:-translate-y-[22%] lg:h-14 lg:w-auto"
             style={{ opacity: 0.9 }}
           />
-          <p className="mt-4 max-w-[30ch] leading-relaxed md:mt-3 md:max-w-none md:opacity-70">
+          <p className="mt-4 max-w-[30ch] leading-relaxed md:-mt-4 md:max-w-none md:opacity-70">
             Accessible reading for every mind. Built for dyslexia, ADHD, and visual stress.
           </p>
         </div>

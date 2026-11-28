@@ -740,7 +740,7 @@ export default function Dashboard({
     <div id="dashboard-root" style={{ "--accent-text": isDark ? "#FE987A" : "#19334A", "--focus-ring": isDark ? "#4E929C" : "#016271" } as React.CSSProperties} className={`min-h-screen ${pageBgClass} font-sans flex flex-col justify-between transition-all duration-300 overflow-x-clip`}>
       
       {/* HEADER: Geometric navigation toolbar */}
-      <nav className={`h-16 border-b px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 ${headerBgClass} ${borderClass} transition-all duration-300`}>
+      <nav className={`h-16 border-b px-6 md:px-8 flex items-center justify-between backdrop-blur-sm shadow-xs sticky top-0 z-40 ${headerBgClass} ${borderClass} transition-all duration-300`}>
         <NaraLogo showText={true} size="lg" className="hidden md:flex" onClick={goToLibrary} /><NaraLogo showText={true} size="sm" className="flex md:hidden" onClick={goToLibrary} />
         
         {/* Navigation tabs */}
