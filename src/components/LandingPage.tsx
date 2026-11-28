@@ -73,7 +73,7 @@ export default function LandingPage({ onStartReading, onWalkthrough }: LandingPa
       </div>
 
       {/* Artwork: one box so the circles always keep their position relative to the photo */}
-      <div className="relative min-h-[220px] w-full flex-1 lg:pointer-events-none lg:absolute lg:bottom-0 lg:right-0 lg:aspect-[1965/1948] lg:min-h-0 lg:w-[min(50vw,95svh)] lg:flex-none">
+      <div className="relative min-h-[220px] w-full flex-1 lg:pointer-events-none lg:absolute lg:bottom-0 lg:right-[4vw] lg:aspect-[1965/1948] lg:min-h-0 lg:w-[min(50vw,95svh)] lg:flex-none">
         <img
           src="/landing/circles-cluster.webp"
           alt=""
