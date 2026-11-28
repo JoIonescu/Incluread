@@ -8,7 +8,7 @@ interface NaraLogoProps {
 }
 
 export default function NaraLogo({ showText = true, className = "", size = "md", onClick }: NaraLogoProps) {
-  const imgSizes = { sm: "h-7", md: "h-9", lg: "h-14" };
+  const imgSizes = { sm: "h-12", md: "h-9", lg: "h-14" };
 
   const clickable = onClick
     ? {

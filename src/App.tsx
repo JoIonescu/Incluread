@@ -610,7 +610,7 @@ export default function App() {
       />
       {/* Footer */}
       {!selectedBookId && (
-        <SiteFooter onGoToAbout={goToAbout} onGoToLegal={goToLegal} />
+        <SiteFooter onGoToAbout={goToAbout} onGoToLegal={goToLegal} reserveBottomNav />
       )}
     </>
   );
