@@ -40,12 +40,25 @@ export default function App() {
     isSignInWithEmailLink(auth, window.location.href) ? "dashboard" : pageFromPath()
   );
   const [legalSection, setLegalSection] = useState<"privacy" | "terms" | "cookies">("privacy");
+  // Counts in-app page changes so "back" only goes to a page of this site, never to a previous website
+  const inAppNavs = React.useRef(0);
   const go = (page: keyof typeof PATHS) => {
-    if (currentPath() !== PATHS[page]) window.history.pushState({}, "", PATHS[page]);
+    if (currentPath() !== PATHS[page]) {
+      window.history.pushState({}, "", PATHS[page]);
+      inAppNavs.current += 1;
+    }
     window.scrollTo(0, 0);
     setCurrentPage(page);
   };
   const goToAbout = () => go("about");
+  const goBack = () => {
+    if (inAppNavs.current > 0) {
+      inAppNavs.current -= 1;
+      window.history.back(); // the popstate listener below shows the previous page
+    } else {
+      goToDashboard(); // opened /about directly: no previous page, so go to the Library
+    }
+  };
   const goToWalkthrough = () => go("walkthrough");
   const [dashboardTab, setDashboardTab] = useState<DashboardTab>("library");
   const goToDashboard = (tab: DashboardTab = "library") => {
@@ -62,7 +75,10 @@ export default function App() {
 
   // Keep the page in sync with the browser's back/forward buttons
   useEffect(() => {
-    const onPopState = () => setCurrentPage(pageFromPath());
+    const onPopState = () => {
+      window.scrollTo(0, 0);
+      setCurrentPage(pageFromPath());
+    };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
   }, []);
@@ -493,7 +509,7 @@ export default function App() {
   }
 
   if (currentPage === "about") {
-    return <OurApproachPage onOpenTab={goToDashboard} onGoToAbout={goToAbout} onGoToLegal={goToLegal} />;
+    return <OurApproachPage onBack={goBack} onOpenTab={goToDashboard} onGoToAbout={goToAbout} onGoToLegal={goToLegal} />;
   }
 
   if (currentPage === "legal") {

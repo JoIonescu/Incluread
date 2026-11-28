@@ -22,7 +22,7 @@ export default function SiteFooter({ onGoToAbout, onGoToLegal, reserveBottomNav 
           <img
             src="/incluread-logo-white.png"
             alt="Incluread"
-            className="h-auto w-[190px] max-w-full md:w-[180px] lg:h-14 lg:w-auto"
+            className="h-auto w-[190px] max-w-full md:w-[180px] md:-translate-x-[1%] md:-translate-y-[22%] lg:h-14 lg:w-auto"
             style={{ opacity: 0.9 }}
           />
           <p className="mt-4 max-w-[30ch] leading-relaxed md:mt-3 md:max-w-none md:opacity-70">
