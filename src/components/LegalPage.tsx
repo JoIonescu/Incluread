@@ -1,16 +1,19 @@
 import React from "react";
 import { ArrowLeft } from "lucide-react";
 import SiteFooter from "./SiteFooter";
+import MobileTabBar from "./MobileTabBar";
+import type { DashboardTab } from "./SiteHeader";
 
 type LegalSection = "privacy" | "terms" | "cookies";
 
 interface LegalPageProps {
   onBack: () => void;
   onGoToAbout: () => void;
+  onOpenTab: (tab: DashboardTab) => void;
   initialSection?: LegalSection;
 }
 
-export default function LegalPage({ onBack, onGoToAbout, initialSection = "privacy" }: LegalPageProps) {
+export default function LegalPage({ onBack, onGoToAbout, onOpenTab, initialSection = "privacy" }: LegalPageProps) {
   const [activeSection, setActiveSection] = React.useState<LegalSection>(initialSection);
 
   return (
@@ -132,7 +135,8 @@ export default function LegalPage({ onBack, onGoToAbout, initialSection = "priva
         )}
 
       </div>
-      <SiteFooter onGoToAbout={onGoToAbout} onGoToLegal={setActiveSection} />
+      <SiteFooter onGoToAbout={onGoToAbout} onGoToLegal={setActiveSection} reserveBottomNav />
+      <MobileTabBar onSelect={onOpenTab} />
     </div>
   );
 }

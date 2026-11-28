@@ -96,7 +96,6 @@ select option:hover {
 /* Draggable ruler helper */
 .reading-ruler-line {
   pointer-events: none;
-  mix-blend-mode: color-burn;
 }
 
 /* Hide scrollbars for focus modes if needed */

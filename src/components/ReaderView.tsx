@@ -897,10 +897,12 @@ useEffect(() => {
           {/* Draggable Reading Guide Ruler segment when active */}
           {showRuler && (
             <div
-              className="absolute left-0 right-0 h-6 bg-yellow-300/40 border-y-2 border-yellow-400 z-10 flex items-center justify-between px-12 pointer-events-none reading-ruler-line"
+              className={`absolute left-0 right-0 h-6 border-y-2 z-10 flex items-center justify-between px-12 pointer-events-none reading-ruler-line ${
+                isDark ? "bg-[#CBDDF3]/25 border-[#CBDDF3]/60" : "bg-[#CBDDF3] border-[#CBDDF3] mix-blend-multiply"
+              }`}
               style={{ top: `${rulerTop}px` }}
             >
-              <span className="text-[9px] uppercase font-bold text-yellow-950 tracking-wider">Assistive Focus line</span>
+              <span className={`text-[9px] uppercase font-bold tracking-wider ${isDark ? "text-[#CBDDF3]" : "text-[#19334A]"}`}>Assistive Focus line</span>
               <div className="flex gap-2 pointer-events-auto">
                 <button
                   type="button"

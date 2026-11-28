@@ -52,8 +52,11 @@ export default function App() {
     setDashboardTab(tab);
     go("dashboard");
   };
+  const [legalReturn, setLegalReturn] = useState<"dashboard" | "about">("dashboard");
   const goToLegal = (section: "privacy" | "terms" | "cookies") => {
+    if (currentPage === "dashboard" || currentPage === "about") setLegalReturn(currentPage);
     setLegalSection(section);
+    window.scrollTo(0, 0);
     setCurrentPage("legal");
   };
 
@@ -494,7 +497,7 @@ export default function App() {
   }
 
   if (currentPage === "legal") {
-    return <LegalPage onBack={() => goToDashboard()} onGoToAbout={goToAbout} initialSection={legalSection} />;
+    return <LegalPage onBack={() => (legalReturn === "about" ? goToAbout() : goToDashboard())} onGoToAbout={goToAbout} onOpenTab={goToDashboard} initialSection={legalSection} />;
   }
 
   // Render Loader screen until localStorage finishes mounting

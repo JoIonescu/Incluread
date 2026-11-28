@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import NaraLogo from "./NaraLogo";
+import MobileTabBar from "./MobileTabBar";
 import { Book, UserPreferences, Bookmark, ReadingPosition, ReadingStats } from "../types";
 import { SAMPLE_BOOKS, DIFFICULTY_SPECS } from "../data/books";
 import { auth } from "../lib/firebase";
@@ -812,34 +813,14 @@ export default function Dashboard({
         </div>
       </nav>
 
-      {/* MOBILE LOWER NAVIGATION BAR (High-contrast 44px tap targets for mobile) */}
-      <div className="md:hidden bg-white border-t border-[#DCD9D0] px-4 py-2 fixed bottom-0 left-0 right-0 z-40 flex justify-around">
-        {[
-          { id: "library", label: "Library", icon: Compass },
-          { id: "upload", label: "Documents", icon: Upload },
-          { id: "resume", label: "Resume", icon: BookOpen },
-          { id: "stats", label: "Stats", icon: Activity },
-          { id: "profile", label: "Profile", icon: User },
-        ].map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id as any);
-                setDetailedBookId(null);
-              }}
-              className={`flex flex-col items-center justify-center p-2 rounded-xl text-[10px] font-bold ${
-                isActive ? "text-[color:var(--accent-text)]" : "text-[#666666]"
-              } touch-target`}
-            >
-              <Icon className="w-5 h-5" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      {/* MOBILE LOWER NAVIGATION BAR */}
+      <MobileTabBar
+        activeTab={activeTab}
+        onSelect={(tab) => {
+          setActiveTab(tab);
+          setDetailedBookId(null);
+        }}
+      />
 
       {/* MAIN CONTAINER CONTENT */}
       <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full mb-16 md:mb-0">

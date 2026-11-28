@@ -5,6 +5,7 @@ import "./our-approach.css";
 import approachHtml from "./our-approach.html?raw";
 import SiteHeader, { DashboardTab } from "./SiteHeader";
 import SiteFooter from "./SiteFooter";
+import MobileTabBar from "./MobileTabBar";
 
 interface OurApproachPageProps {
   onOpenTab: (tab: DashboardTab) => void;
@@ -26,7 +27,8 @@ export default function OurApproachPage({ onOpenTab, onGoToAbout, onGoToLegal }:
     <>
       <SiteHeader onOpenTab={onOpenTab} />
       <div className="about-approach" dangerouslySetInnerHTML={{ __html: approachHtml }} />
-      <SiteFooter onGoToAbout={onGoToAbout} onGoToLegal={onGoToLegal} />
+      <SiteFooter onGoToAbout={onGoToAbout} onGoToLegal={onGoToLegal} reserveBottomNav />
+      <MobileTabBar onSelect={onOpenTab} />
     </>
   );
 }
